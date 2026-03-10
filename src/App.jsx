@@ -3,7 +3,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell,
   PieChart, Pie
 } from 'recharts';
-import { Upload, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, Activity, Layers, RefreshCw, Clock, Trash2, Plus, Database, X, Key, Info, HelpCircle } from 'lucide-react';
+import { Upload, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, Activity, Layers, RefreshCw, Clock, Trash2, Edit2, Plus, Database, X, Key, Info, HelpCircle } from 'lucide-react';
 
 // 股票資料對應表 (當 API 抓不到名稱或價格時的備援)
 const STOCK_MAPPING = {
@@ -199,6 +199,7 @@ export default function App() {
 
   const [showManager, setShowManager] = useState(false);
   const [showCsvHelp, setShowCsvHelp] = useState(false);
+  const [editingIndex, setEditingIndex] = useState(null);
   const [newRec, setNewRec] = useState({ date: '', type: '買入', code: '', market: '陸股', qty: '', amount: '', pnl: '' });
 
   useEffect(() => {
@@ -414,7 +415,19 @@ export default function App() {
       '總金額': newRec.amount,
       '損益': newRec.pnl || ''
     };
-    const newData = [...rawData, row];
+    
+    let newData;
+    if (editingIndex !== null) {
+      // 編輯模式
+      newData = [...rawData];
+      newData[editingIndex] = row;
+      setEditingIndex(null);
+      showToast('交易紀錄已更新！');
+    } else {
+      // 新增模式
+      newData = [...rawData, row];
+    }
+    
     setRawData(newData);
     asyncStorage.set('tr_dashboard_data', JSON.stringify(newData));
     setNewRec({ ...newRec, date: '', code: '', qty: '', amount: '', pnl: '' });
@@ -425,6 +438,35 @@ export default function App() {
     setRawData(newData);
     asyncStorage.set('tr_dashboard_data', JSON.stringify(newData));
     if (newData.length === 0) setIsDemo(true);
+    if (editingIndex === idx) {
+      setEditingIndex(null);
+      setNewRec({ ...newRec, date: '', code: '', qty: '', amount: '', pnl: '' });
+    }
+  };
+
+  const handleEditRecord = (idx) => {
+    const row = rawData[idx];
+    
+    // 如果日期格式是 D/M/YYYY，轉換為 YYYY-MM-DD 以便 <input type="date"> 顯示
+    let dateVal = row['日期'];
+    const d = new Date(dateVal);
+    if (!isNaN(d.getTime())) {
+       dateVal = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    setNewRec({
+      date: dateVal,
+      type: row['類型'],
+      code: row['代號'],
+      market: row['市場'] || guessMarket(row['代號']),
+      qty: row['數量'],
+      amount: row['總金額'],
+      pnl: row['損益'] || ''
+    });
+    setEditingIndex(idx);
+    
+    // 平滑滾動到最上方表單
+    document.querySelector('.bg-slate-50.border-slate-200.p-4')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleClearData = () => {
@@ -860,13 +902,26 @@ export default function App() {
                     <label className="block text-xs font-semibold text-slate-500 mb-1">損益 (賣出填,原幣)</label>
                     <input type="number" placeholder="選填" value={newRec.pnl} onChange={e => setNewRec({...newRec, pnl: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
                   </div>
-                  <button 
-                    onClick={handleAddRecord}
-                    disabled={!newRec.date || !newRec.code || !newRec.qty || !newRec.amount}
-                    className="flex items-center justify-center bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed h-[38px] w-[80px]"
-                  >
-                    加入
-                  </button>
+                  <div className="flex gap-2">
+                    {editingIndex !== null && (
+                      <button 
+                        onClick={() => {
+                          setEditingIndex(null);
+                          setNewRec({ ...newRec, date: '', code: '', qty: '', amount: '', pnl: '' });
+                        }}
+                        className="flex items-center justify-center bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors h-[38px] w-[80px]"
+                      >
+                        取消
+                      </button>
+                    )}
+                    <button 
+                      onClick={handleAddRecord}
+                      disabled={!newRec.date || !newRec.code || !newRec.qty || !newRec.amount}
+                      className="flex items-center justify-center bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed h-[38px] min-w-[80px]"
+                    >
+                      {editingIndex !== null ? '儲存變更' : '加入'}
+                    </button>
+                  </div>
                 </div>
             </div>
 
@@ -914,13 +969,22 @@ export default function App() {
                           <td className="px-4 py-2 text-right font-medium">{row['總金額']}</td>
                           <td className="px-4 py-2 text-right text-slate-500">{row['損益'] || '-'}</td>
                           <td className="px-4 py-2 text-center">
-                            <button 
-                              onClick={() => handleDeleteRecord(row.originalIndex)}
-                              className="text-slate-400 hover:text-rose-500 transition-colors p-1"
-                              title="刪除"
-                            >
-                              <Trash2 size={16} />
-                            </button>
+                            <div className="flex items-center justify-center gap-2">
+                              <button 
+                                onClick={() => handleEditRecord(row.originalIndex)}
+                                className="text-slate-400 hover:text-blue-500 transition-colors p-1"
+                                title="編輯"
+                              >
+                                <Edit2 size={16} />
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteRecord(row.originalIndex)}
+                                className="text-slate-400 hover:text-rose-500 transition-colors p-1"
+                                title="刪除"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       )
