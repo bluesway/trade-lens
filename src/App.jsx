@@ -155,14 +155,18 @@ const parseCSV = (text) => {
 // 根據市場自動補齊後綴
 const formatSymbol = (code, market) => {
   code = code.trim().toUpperCase();
-  if (code.includes('.')) return code; // 已經有後綴就不處理
+  if (code.includes('.')) return code; // 已經有後綴 (代號.市場) 就不處理
+  
+  // 老闆指令：如果代號是 6 位數且 6 或 0 開頭，就當作陸股
+  if (code.length === 6 && (code.startsWith('6') || code.startsWith('0'))) {
+    return code.startsWith('6') ? `${code}.SS` : `${code}.SZ`;
+  }
   
   switch(market) {
-    case '陸股': return code.startsWith('6') ? `${code}.SS` : `${code}.SZ`;
     case '港股': return `${code}.HK`;
     case '台股': return `${code}.TW`;
-    case '日股': return `${code}.T`; // 東京證交所
-    case '美股': return code; // 美股通常沒有後綴
+    case '日股': return `${code}.T`;
+    case '美股': return code; 
     default: return code;
   }
 };
@@ -689,14 +693,15 @@ export default function App() {
                   <ul className="list-disc pl-5 space-y-1 text-xs font-mono bg-slate-50 p-2 rounded">
                     <li>日期 <span className="text-slate-400">(如: 2025/01/01)</span></li>
                     <li>類型 <span className="text-slate-400">(買入/賣出)</span></li>
-                    <li>代號 <span className="text-slate-400">(如: AAPL, 2330)</span></li>
-                    <li className="text-blue-600 font-bold">市場 <span className="text-slate-400">(陸股/港股/台股/日股/美股)</span></li>
+                    <li>代號 <span className="text-slate-400">(如: 2330.TW, AAPL)</span></li>
+                    <li>市場 <span className="text-slate-400">(選填, 供手動新增參考)</span></li>
                     <li>數量</li>
                     <li>單價 <span className="text-slate-400">(原幣別)</span></li>
                     <li>總金額 <span className="text-slate-400">(原幣別)</span></li>
                     <li>損益 <span className="text-slate-400">(賣出必填, 原幣別)</span></li>
                   </ul>
-                  <p className="mt-2 text-xs text-rose-500 font-medium">* 註：新增了「市場」欄位以支援全球報價與匯率轉換。</p>
+                  <p className="mt-2 text-xs text-blue-600 font-medium">* 註 1：代號若為 6 位數且以 6 或 0 開頭，系統會自動判定為陸股 (.SS / .SZ)。</p>
+                  <p className="text-xs text-blue-600 font-medium">* 註 2：其餘市場請直接在代號後加上後綴 (如: .TW, .HK)。</p>
                 </div>
               )}
             </div>
@@ -883,7 +888,7 @@ export default function App() {
                             </span>
                           </td>
                           <td className="px-4 py-2">
-                            <div className="font-bold text-slate-800">{row['代號']}</div>
+                            <div className="font-bold text-slate-800">{symbol}</div>
                             <div className="text-xs text-slate-500 mt-0.5">{resolvedName}</div>
                           </td>
                           <td className="px-4 py-2 text-center">
@@ -1082,7 +1087,7 @@ export default function App() {
                   return (
                     <tr key={stock.symbol} className="hover:bg-slate-50 transition-colors">
                       <td className="px-6 py-4">
-                        <div className="font-bold text-slate-800">{stock.rawCode}</div>
+                        <div className="font-bold text-slate-800">{stock.symbol}</div>
                         <div className="text-xs text-slate-500 mt-0.5">{stock.name}</div>
                       </td>
                       <td className="px-6 py-4 text-center">
