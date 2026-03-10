@@ -679,6 +679,19 @@ export default function App() {
             </button>
             
             <div className="relative">
+              <input 
+                type="file" 
+                accept=".csv" 
+                onChange={handleFileUpload} 
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+              <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap">
+                <Upload size={18} />
+                匯入 CSV
+              </button>
+            </div>
+
+            <div className="relative">
               <button 
                 onClick={() => setShowCsvHelp(!showCsvHelp)}
                 className="flex items-center justify-center w-10 h-[44px] bg-white border border-slate-200 text-slate-400 hover:text-blue-600 hover:border-blue-300 rounded-lg transition-colors"
@@ -704,19 +717,6 @@ export default function App() {
                   <p className="text-xs text-blue-600 font-medium">* 註 2：其餘市場請直接在代號後加上後綴 (如: .TW, .HK)。</p>
                 </div>
               )}
-            </div>
-
-            <div className="relative">
-              <input 
-                type="file" 
-                accept=".csv" 
-                onChange={handleFileUpload} 
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
-              <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap">
-                <Upload size={18} />
-                匯入 CSV
-              </button>
             </div>
           </div>
         </div>
