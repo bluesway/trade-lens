@@ -282,7 +282,7 @@ export default function App() {
             const rawCode = item.symbol.replace('.SS', '').replace('.SZ', '');
             newData[rawCode] = {
               price: item.regularMarketPrice,
-              name: item.shortName || item.longName || STOCK_MAPPING[rawCode]?.name,
+              name: item.longName || item.shortName || STOCK_MAPPING[rawCode]?.name,
               timestamp: now
             };
             fetchedCount++;
