@@ -217,9 +217,9 @@ export default function App() {
   };
 
   // 儲存 API Key
-  const handleSaveApiKey = (newKey) => {
-    setApiKey(newKey);
-    asyncStorage.set('yfapi_net_key', newKey);
+  const handleSaveApiKey = () => {
+    asyncStorage.set('yfapi_net_key', apiKey);
+    showToast('API 金鑰已更新並儲存！');
   };
 
   // 手動觸發取得即時股價 (使用 yfapi.net)
@@ -628,13 +628,19 @@ export default function App() {
                   type="password" 
                   placeholder="請貼上您的 x-api-key (例如: A2sD8...)" 
                   value={apiKey} 
-                  onChange={e => handleSaveApiKey(e.target.value)} 
+                  onChange={e => setApiKey(e.target.value)} 
                   className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" 
                 />
-                <p className="text-xs text-blue-600/80 flex items-center">
-                  *安全儲存於本機 IndexedDB，輸入後即可解鎖「更新股價」功能，支援 A 股與全球報價。
-                </p>
+                <button
+                  onClick={handleSaveApiKey}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm whitespace-nowrap"
+                >
+                  儲存 / 更新金鑰
+                </button>
               </div>
+              <p className="text-xs text-blue-600/80 flex items-center mt-2">
+                *安全儲存於本機 IndexedDB，輸入後即可解鎖「更新股價」功能，支援 A 股與全球報價。
+              </p>
             </div>
 
             {/* 新增紀錄表單 */}
