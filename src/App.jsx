@@ -223,7 +223,7 @@ export default function App() {
   };
 
   // 手動觸發取得即時股價 (使用 yfapi.net)
-  const fetchLivePrices = async () => {
+  const fetchLivePrices = async (isForce = false) => {
     if (!apiKey) {
       setShowManager(true);
       showToast('請先於管理面板輸入 yfapi.net 金鑰才能更新股價');
@@ -241,6 +241,7 @@ export default function App() {
       
       // 過濾出超過 24 小時未更新或沒有資料的股票代號
       const codesToFetch = uniqueCodes.filter(code => {
+        if (isForce) return true;
         const cached = liveData[code];
         if (!cached) return true;
         if (now - cached.timestamp > ONE_DAY) return true;
@@ -562,13 +563,26 @@ export default function App() {
               <span className="hidden md:inline">管理紀錄</span>
             </button>
             <button 
-              onClick={fetchLivePrices}
+              onClick={() => fetchLivePrices(false)}
               disabled={isLoadingPrices || rawData.length === 0}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 ${apiKey ? 'bg-slate-100 hover:bg-slate-200 text-slate-700' : 'bg-rose-50 text-rose-600 hover:bg-rose-100'}`}
-              title={apiKey ? "手吐更新即時股價" : "請先設定 API Key"}
+              title={apiKey ? "手動更新即時股價 (使用快取)" : "請先設定 API Key"}
             >
               <RefreshCw size={18} className={isLoadingPrices ? "animate-spin" : ""} />
               <span className="hidden md:inline">{apiKey ? '更新股價' : '需設定金鑰'}</span>
+            </button>
+            <button 
+              onClick={() => {
+                if (window.confirm('確定要強制刷新嗎？這將會忽略 24 小時快取並實際消耗 API 額度。')) {
+                  fetchLivePrices(true);
+                }
+              }}
+              disabled={isLoadingPrices || rawData.length === 0}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 ${apiKey ? 'bg-amber-100 hover:bg-amber-200 text-amber-700' : 'bg-rose-50 text-rose-600 hover:bg-rose-100'}`}
+              title={apiKey ? "強制更新並消耗額度" : "請先設定 API Key"}
+            >
+              <Activity size={18} className={isLoadingPrices ? "animate-pulse" : ""} />
+              <span className="hidden md:inline">強制刷新</span>
             </button>
             <div className="relative">
               <input 
