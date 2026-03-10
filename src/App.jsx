@@ -877,8 +877,7 @@ export default function App() {
                   <tr>
                     <th className="px-4 py-3 font-semibold">日期</th>
                     <th className="px-4 py-3 font-semibold">類型</th>
-                    <th className="px-4 py-3 font-semibold">代號 / 股名</th>
-                    <th className="px-4 py-3 font-semibold text-center">市場</th>
+                    <th className="px-4 py-3 font-semibold">代號 / 股名 (市場)</th>
                     <th className="px-4 py-3 font-semibold text-right">數量</th>
                     <th className="px-4 py-3 font-semibold text-right">單價(原幣)</th>
                     <th className="px-4 py-3 font-semibold text-right">總金額(原幣)</th>
@@ -904,11 +903,11 @@ export default function App() {
                             </span>
                           </td>
                           <td className="px-4 py-2">
-                            <div className="font-bold text-slate-800">{symbol}</div>
+                            <div className="font-bold text-slate-800 flex items-center gap-2">
+                              {symbol}
+                              <span className="text-[10px] font-medium bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">{market}</span>
+                            </div>
                             <div className="text-xs text-slate-500 mt-0.5">{resolvedName}</div>
-                          </td>
-                          <td className="px-4 py-2 text-center">
-                              <span className="text-xs bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded">{market}</span>
                           </td>
                           <td className="px-4 py-2 text-right">{row['數量']}</td>
                           <td className="px-4 py-2 text-right text-slate-500">{row['單價']}</td>
@@ -1085,8 +1084,7 @@ export default function App() {
             <table className="w-full text-left text-sm whitespace-nowrap">
               <thead className="bg-slate-50 text-slate-600">
                 <tr>
-                  <th className="px-6 py-4 font-semibold">代號 / 股名</th>
-                  <th className="px-6 py-4 font-semibold text-center">市場(幣別)</th>
+                  <th className="px-6 py-4 font-semibold">代號 / 股名 (市場·幣別)</th>
                   <th className="px-6 py-4 font-semibold text-right">當前持股數</th>
                   <th className="px-6 py-4 font-semibold text-right">目前股價</th>
                   <th className="px-6 py-4 font-semibold text-right">市值(原幣)</th>
@@ -1103,14 +1101,13 @@ export default function App() {
                   return (
                     <tr key={stock.symbol} className="hover:bg-slate-50 transition-colors">
                       <td className="px-6 py-4">
-                        <div className="font-bold text-slate-800">{stock.symbol}</div>
-                        <div className="text-xs text-slate-500 mt-0.5">{stock.name}</div>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <div className="inline-flex flex-col items-center">
-                           <span className="text-xs font-medium text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded">{stock.market}</span>
-                           <span className="text-[10px] text-slate-400 mt-1">{stock.currency}</span>
+                        <div className="font-bold text-slate-800 flex items-center gap-2">
+                          {stock.symbol}
+                          <span className="text-[10px] font-medium bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
+                            {stock.market} &middot; {stock.currency}
+                          </span>
                         </div>
+                        <div className="text-xs text-slate-500 mt-0.5">{stock.name}</div>
                       </td>
                       <td className="px-6 py-4 text-right font-medium">{stock.holdingQty.toLocaleString()}</td>
                       <td className="px-6 py-4 text-right text-slate-600">
