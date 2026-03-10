@@ -262,7 +262,7 @@ export default function App() {
         const chunk = codesToFetch.slice(i, i + chunkSize);
         const symbols = chunk.map(code => code.startsWith('6') ? `${code}.SS` : `${code}.SZ`).join(',');
         
-        const res = await fetch(`https://yfapi.net/v6/finance/quote?region=US&lang=zh&symbols=${symbols}`, {
+        const res = await fetch(`https://yfapi.net/v6/finance/quote?region=HK&lang=zh&symbols=${symbols}`, {
           headers: {
             'x-api-key': apiKey,
             'accept': 'application/json'
