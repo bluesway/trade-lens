@@ -261,10 +261,15 @@ export default function App() {
   const handleSaveBaseCurrency = (currency) => {
     setBaseCurrency(currency);
     asyncStorage.set('tr_base_currency', currency);
-    showToast(`基礎計價幣別已更改為 ${currency}`);
+    showToast(`基礎計價幣別已更改為 ${currency}，正在更新匯率...`);
+    // 傳入 true 強制刷新，或透過 fetchLivePrices 內的邏輯抓取缺失的匯率
+    // 這裡我們稍微延遲一下，確保 state 有更新的機會，或者直接呼叫 fetchLivePrices
+    setTimeout(() => {
+        fetchLivePrices(false, currency); 
+    }, 100);
   };
 
-  const fetchLivePrices = async (isForce = false) => {
+  const fetchLivePrices = async (isForce = false, targetBaseCurrency = baseCurrency) => {
     if (!apiKey) {
       setShowManager(true);
       showToast('請先於管理面板輸入 yfapi.net 金鑰才能更新股價');
@@ -294,12 +299,12 @@ export default function App() {
         return false;
       });
 
-      // 檢查匯率是否需要更新 (需要轉換成 baseCurrency)
+      // 檢查匯率是否需要更新 (需要轉換成 targetBaseCurrency)
       const currenciesToFetch = new Set();
       uniqueSymbols.forEach(symbol => {
           const cached = liveData[symbol];
-          if(cached && cached.currency && cached.currency !== baseCurrency) {
-             const rateKey = `${cached.currency}${baseCurrency}=X`;
+          if(cached && cached.currency && cached.currency !== targetBaseCurrency) {
+             const rateKey = `${cached.currency}${targetBaseCurrency}=X`;
              const cachedRate = exchangeRates[rateKey];
              if(isForce || !cachedRate || (now - cachedRate.timestamp > ONE_DAY)) {
                  currenciesToFetch.add(rateKey);
@@ -309,7 +314,7 @@ export default function App() {
       // 加上目前這批新抓的股票可能的匯率 (保守起見常抓的先加)
       if(codesToFetch.length > 0) {
           ['USD', 'HKD', 'CNY', 'JPY'].forEach(c => {
-             if(c !== baseCurrency) currenciesToFetch.add(`${c}${baseCurrency}=X`);
+             if(c !== targetBaseCurrency) currenciesToFetch.add(`${c}${targetBaseCurrency}=X`);
           });
       }
 
@@ -348,8 +353,8 @@ export default function App() {
             fetchedCount++;
             
             // 順便把需要的匯率加進去
-            if(item.currency && item.currency !== baseCurrency) {
-                 currenciesToFetch.add(`${item.currency}${baseCurrency}=X`);
+            if(item.currency && item.currency !== targetBaseCurrency) {
+                 currenciesToFetch.add(`${item.currency}${targetBaseCurrency}=X`);
             }
           });
         }
