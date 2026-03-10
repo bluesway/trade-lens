@@ -1150,8 +1150,7 @@ export default function App() {
                 <tr>
                   <th className="px-6 py-4 font-semibold">代號 / 股名 (市場·幣別)</th>
                   <th className="px-6 py-4 font-semibold text-right">當前持股數</th>
-                  <th className="px-6 py-4 font-semibold text-right">目前股價</th>
-                  <th className="px-6 py-4 font-semibold text-right">市值(原幣)</th>
+                  <th className="px-6 py-4 font-semibold text-right">目前股價 / 市值(原幣)</th>
                   <th className="px-6 py-4 font-semibold text-right">未實現損益(原幣)</th>
                   <th className="px-6 py-4 font-semibold text-right">實際已實現(原幣)</th>
                   <th className="px-6 py-4 font-semibold text-right border-l border-slate-200">若今天才賣(原幣)</th>
@@ -1174,11 +1173,13 @@ export default function App() {
                         <div className="text-xs text-slate-500 mt-0.5">{stock.name}</div>
                       </td>
                       <td className="px-6 py-4 text-right font-medium">{stock.holdingQty.toLocaleString()}</td>
-                      <td className="px-6 py-4 text-right text-slate-600">
-                        {stock.currentPrice > 0 ? `${sym}${stock.currentPrice.toFixed(2)}` : '-'}
-                      </td>
-                      <td className="px-6 py-4 text-right font-medium text-slate-800">
-                        {stock.currentValueOriginal > 0 ? formatOriginalCurrency(stock.currentValueOriginal, sym) : '-'}
+                      <td className="px-6 py-4 text-right">
+                        <div className="font-medium text-slate-800">
+                          {stock.currentValueOriginal > 0 ? formatOriginalCurrency(stock.currentValueOriginal, sym) : '-'}
+                        </div>
+                        <div className="text-xs text-slate-400 mt-1">
+                          {stock.currentPrice > 0 ? `@ ${sym}${stock.currentPrice.toFixed(2)}` : '-'}
+                        </div>
                       </td>
                       <td className="px-6 py-4 text-right">
                         {stock.holdingQty > 0 ? (
