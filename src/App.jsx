@@ -614,7 +614,7 @@ export default function App() {
                   yfapi.net API 金鑰設定
                 </label>
                 <a 
-                  href="https://yfapi.net/" 
+                  href="https://financeapi.net/dashboard" 
                   target="_blank" 
                   rel="noreferrer" 
                   className="text-xs font-semibold flex items-center gap-1 bg-white border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors px-2.5 py-1 rounded-md"
