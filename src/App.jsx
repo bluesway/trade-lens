@@ -152,6 +152,19 @@ const parseCSV = (text) => {
   return result;
 };
 
+// 自動推測市場 (給舊版 CSV 或是缺少市場欄位的資料使用)
+const guessMarket = (code) => {
+  if (!code) return '未知';
+  const c = code.trim().toUpperCase();
+  if (c.length === 6 && (c.startsWith('6') || c.startsWith('0'))) return '陸股';
+  if (c.includes('.TW')) return '台股';
+  if (c.includes('.HK')) return '港股';
+  if (c.includes('.T')) return '日股';
+  if (c.includes('.') && (c.includes('.SS') || c.includes('.SZ'))) return '陸股';
+  if (/^[A-Z]+$/.test(c)) return '美股'; // 純英文預設猜美股
+  return '未知';
+};
+
 // 根據市場自動補齊後綴
 const formatSymbol = (code, market) => {
   code = code.trim().toUpperCase();
@@ -257,7 +270,8 @@ export default function App() {
 
     const uniqueSymbols = Array.from(new Set(rawData.map(row => {
       const code = String(row['代號'] || '').trim();
-      const market = row['市場'] || '未知';
+      let market = row['市場'] || '未知';
+      if (market === '未知' || !market) market = guessMarket(code);
       return formatSymbol(code, market);
     }).filter(c => c && c !== '000000' && c !== '未知')));
     
@@ -440,6 +454,7 @@ export default function App() {
       if (!rawCode || !type) return;
       
       let market = row['市場'] || '未知';
+      if (market === '未知' || !market) market = guessMarket(rawCode);
       let symbol = formatSymbol(rawCode, market);
       
       let qty = parseFloat(row['數量']) || 0;
@@ -876,7 +891,8 @@ export default function App() {
                     .map((row, originalIndex) => ({ ...row, originalIndex }))
                     .sort((a, b) => new Date(b['日期'] || 0) - new Date(a['日期'] || 0))
                     .map((row) => {
-                      const market = row['市場'] || '未知';
+                      let market = row['市場'] || '未知';
+                      if (market === '未知' || !market) market = guessMarket(row['代號']);
                       const symbol = formatSymbol(row['代號'], market);
                       const resolvedName = liveData[symbol]?.name || STOCK_MAPPING[symbol]?.name || '未知';
                       return (
