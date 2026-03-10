@@ -1010,7 +1010,7 @@ export default function App() {
                   })}
                   {rawData.length === 0 && (
                     <tr>
-                      <td colSpan="9" className="px-4 py-8 text-center text-slate-400">目前沒有任何紀錄</td>
+                      <td colSpan="8" className="px-4 py-8 text-center text-slate-400">目前沒有任何紀錄</td>
                     </tr>
                   )}
                 </tbody>
@@ -1158,12 +1158,15 @@ export default function App() {
 
         {/* Data Table */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-          <div className="p-6 border-b border-slate-100">
+          <div className="p-4 md:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-              各股歷史交易記錄 <span className="text-xs font-normal text-slate-400 bg-slate-100 px-2 py-1 rounded ml-2">點擊列可查看買賣明細，金額皆顯示為該市場原幣別</span>
+              各股歷史交易記錄
             </h3>
+            <span className="text-xs font-normal text-slate-500 bg-slate-100 px-2 py-1 rounded w-fit">點擊列可查看買賣明細，金額皆為該市場原幣別</span>
           </div>
-          <div className="overflow-x-auto">
+          
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-sm whitespace-nowrap">
               <thead className="bg-slate-50 text-slate-600">
                 <tr>
@@ -1193,97 +1196,201 @@ export default function App() {
                           {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                         </td>
                         <td className="px-6 py-4">
-                        <div className="font-bold text-slate-800 flex items-center gap-2">
-                          {stock.symbol}
-                          <span className="text-[10px] font-medium bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
-                            {stock.market} &middot; {stock.currency}
-                          </span>
-                        </div>
-                        <div className="text-xs text-slate-500 mt-0.5">{stock.name}</div>
-                      </td>
-                      <td className="px-6 py-4 text-right font-medium">{stock.holdingQty.toLocaleString()}</td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="font-medium text-slate-800">
-                          {stock.currentValueOriginal > 0 ? formatOriginalCurrency(stock.currentValueOriginal, sym) : '-'}
-                        </div>
-                        <div className="text-xs text-slate-400 mt-1">
-                          {stock.currentPrice > 0 ? `@ ${sym}${stock.currentPrice.toFixed(2)}` : '-'}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        {stock.holdingQty > 0 ? (
-                          <div className={`flex flex-col items-end ${stock.unrealizedPnlOriginal > 0 ? 'text-blue-600' : stock.unrealizedPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500'}`}>
-                            <span className="font-bold">{stock.unrealizedPnlOriginal > 0 ? '+' : ''}{formatOriginalCurrency(stock.unrealizedPnlOriginal, sym)}</span>
-                            <span className="text-xs bg-slate-100 px-1.5 py-0.5 rounded mt-1">{formatPercent(stock.unrealizedPnlPercent)}</span>
+                          <div className="font-bold text-slate-800 flex items-center gap-2">
+                            {stock.symbol}
+                            <span className="text-[10px] font-medium bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
+                              {stock.market} &middot; {stock.currency}
+                            </span>
                           </div>
-                        ) : '-'}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        {(stock.realizedPnlOriginal !== 0 || stock.tradeCount > 0) ? (
-                          <div className={`flex flex-col items-end ${stock.realizedPnlOriginal > 0 ? 'text-emerald-600' : stock.realizedPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500'}`}>
-                            <span className="font-bold">{stock.realizedPnlOriginal > 0 ? '+' : ''}{stock.realizedPnlOriginal !== 0 ? formatOriginalCurrency(stock.realizedPnlOriginal, sym) : '-'}</span>
-                            {stock.realizedPnlPercent !== 0 && (
-                              <span className="text-xs bg-slate-100 px-1.5 py-0.5 rounded mt-1">{formatPercent(stock.realizedPnlPercent)}</span>
-                            )}
+                          <div className="text-xs text-slate-500 mt-0.5">{stock.name}</div>
+                        </td>
+                        <td className="px-6 py-4 text-right font-medium">{stock.holdingQty.toLocaleString()}</td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="font-medium text-slate-800">
+                            {stock.currentValueOriginal > 0 ? formatOriginalCurrency(stock.currentValueOriginal, sym) : '-'}
                           </div>
-                        ) : '-'}
-                      </td>
-                      <td className="px-6 py-4 text-right border-l border-slate-200">
-                        {hasSold ? (
-                          <div className={`flex flex-col items-end ${stock.ifSoldTodayPnlOriginal > 0 ? 'text-emerald-600' : stock.ifSoldTodayPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500'}`}>
-                            <span className="font-bold opacity-75">{stock.ifSoldTodayPnlOriginal > 0 ? '+' : ''}{formatOriginalCurrency(stock.ifSoldTodayPnlOriginal, sym)}</span>
-                            <div className="mt-1 flex items-center gap-1">
-                              {percentDiff > 7 ? (
-                                <span className="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-medium whitespace-nowrap">成功避險 (+{percentDiff.toFixed(2)}%)</span>
-                              ) : percentDiff < -7 ? (
-                                <span className="text-[10px] bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded font-medium whitespace-nowrap">少賺賣飛 ({percentDiff.toFixed(2)}%)</span>
-                              ) : null}
+                          <div className="text-xs text-slate-400 mt-1">
+                            {stock.currentPrice > 0 ? `@ ${sym}${stock.currentPrice.toFixed(2)}` : '-'}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          {stock.holdingQty > 0 ? (
+                            <div className={`flex flex-col items-end ${stock.unrealizedPnlOriginal > 0 ? 'text-blue-600' : stock.unrealizedPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500'}`}>
+                              <span className="font-bold">{stock.unrealizedPnlOriginal > 0 ? '+' : ''}{formatOriginalCurrency(stock.unrealizedPnlOriginal, sym)}</span>
+                              <span className="text-xs bg-slate-100 px-1.5 py-0.5 rounded mt-1">{formatPercent(stock.unrealizedPnlPercent)}</span>
                             </div>
-                          </div>
-                        ) : '-'}
-                      </td>
-                                          </tr>
-                                          {isExpanded && (
-                                            <tr className="bg-slate-50/50">
-                                              <td colSpan="8" className="px-6 py-4 p-0 border-b border-slate-200">
-                                                <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm m-2">
-                                                  <table className="w-full text-xs text-left">
-                                                    <thead className="bg-slate-100 text-slate-600">
-                                                      <tr>
-                                                        <th className="px-4 py-2 font-semibold">日期</th>
-                                                        <th className="px-4 py-2 font-semibold">類型</th>
-                                                        <th className="px-4 py-2 font-semibold text-right">數量</th>
-                                                        <th className="px-4 py-2 font-semibold text-right">單價</th>
-                                                        <th className="px-4 py-2 font-semibold text-right">總金額</th>
-                                                        <th className="px-4 py-2 font-semibold text-right">損益</th>
-                                                      </tr>
-                                                    </thead>
-                                                    <tbody className="divide-y divide-slate-100">
-                                                      {stock.history.map((hRow, idx) => (
-                                                        <tr key={idx} className="hover:bg-slate-50">
-                                                          <td className="px-4 py-2 text-slate-600">{formatDate(hRow['日期'])}</td>
-                                                          <td className="px-4 py-2">
-                                                            <span className={`px-1.5 py-0.5 rounded font-medium ${hRow['類型'] === '買入' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>
-                                                              {hRow['類型']}
-                                                            </span>
-                                                          </td>
-                                                          <td className="px-4 py-2 text-right">{hRow['數量']}</td>
-                                                          <td className="px-4 py-2 text-right">{hRow['單價']}</td>
-                                                          <td className="px-4 py-2 text-right font-medium">{hRow['總金額']}</td>
-                                                          <td className="px-4 py-2 text-right text-slate-500">{hRow['損益'] || '-'}</td>
-                                                        </tr>
-                                                      ))}
-                                                    </tbody>
-                                                  </table>
-                                                </div>
-                                              </td>
-                                            </tr>
-                                          )}
-                                        </React.Fragment>
-                                      )
-                                    })}
-                                  </tbody>            </table>
+                          ) : '-'}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          {(stock.realizedPnlOriginal !== 0 || stock.tradeCount > 0) ? (
+                            <div className={`flex flex-col items-end ${stock.realizedPnlOriginal > 0 ? 'text-emerald-600' : stock.realizedPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500'}`}>
+                              <span className="font-bold">{stock.realizedPnlOriginal > 0 ? '+' : ''}{stock.realizedPnlOriginal !== 0 ? formatOriginalCurrency(stock.realizedPnlOriginal, sym) : '-'}</span>
+                              {stock.realizedPnlPercent !== 0 && (
+                                <span className="text-xs bg-slate-100 px-1.5 py-0.5 rounded mt-1">{formatPercent(stock.realizedPnlPercent)}</span>
+                              )}
+                            </div>
+                          ) : '-'}
+                        </td>
+                        <td className="px-6 py-4 text-right border-l border-slate-200">
+                          {hasSold ? (
+                            <div className={`flex flex-col items-end ${stock.ifSoldTodayPnlOriginal > 0 ? 'text-emerald-600' : stock.ifSoldTodayPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500'}`}>
+                              <span className="font-bold opacity-75">{stock.ifSoldTodayPnlOriginal > 0 ? '+' : ''}{formatOriginalCurrency(stock.ifSoldTodayPnlOriginal, sym)}</span>
+                              <div className="mt-1 flex items-center gap-1">
+                                {percentDiff > 7 ? (
+                                  <span className="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-medium whitespace-nowrap">成功避險 (+{percentDiff.toFixed(2)}%)</span>
+                                ) : percentDiff < -7 ? (
+                                  <span className="text-[10px] bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded font-medium whitespace-nowrap">少賺賣飛 ({percentDiff.toFixed(2)}%)</span>
+                                ) : null}
+                              </div>
+                            </div>
+                          ) : '-'}
+                        </td>
+                      </tr>
+                      {isExpanded && (
+                        <tr className="bg-slate-50/50">
+                          <td colSpan="8" className="px-6 py-4 p-0 border-b border-slate-200">
+                            <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm m-2">
+                              <table className="w-full text-xs text-left">
+                                <thead className="bg-slate-100 text-slate-600">
+                                  <tr>
+                                    <th className="px-4 py-2 font-semibold">日期</th>
+                                    <th className="px-4 py-2 font-semibold">類型</th>
+                                    <th className="px-4 py-2 font-semibold text-right">數量</th>
+                                    <th className="px-4 py-2 font-semibold text-right">單價</th>
+                                    <th className="px-4 py-2 font-semibold text-right">總金額</th>
+                                    <th className="px-4 py-2 font-semibold text-right">損益</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100">
+                                  {stock.history.map((hRow, idx) => (
+                                    <tr key={idx} className="hover:bg-slate-50">
+                                      <td className="px-4 py-2 text-slate-600">{formatDate(hRow['日期'])}</td>
+                                      <td className="px-4 py-2">
+                                        <span className={`px-1.5 py-0.5 rounded font-medium ${hRow['類型'] === '買入' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>
+                                          {hRow['類型']}
+                                        </span>
+                                      </td>
+                                      <td className="px-4 py-2 text-right">{hRow['數量']}</td>
+                                      <td className="px-4 py-2 text-right">{hRow['單價']}</td>
+                                      <td className="px-4 py-2 text-right font-medium">{hRow['總金額']}</td>
+                                      <td className="px-4 py-2 text-right text-slate-500">{hRow['損益'] || '-'}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  )
+                })}
+              </tbody>
+            </table>
           </div>
+
+          {/* Mobile Card View for Main Data */}
+          <div className="md:hidden flex flex-col bg-slate-50 p-3 gap-3">
+             {displayData.map((stock) => {
+                const percentDiff = stock.realizedPnlPercent - stock.ifSoldTodayPnlPercent;
+                const hasSold = stock.totalSoldQty > 0;
+                const sym = stock.currencySymbol;
+                const isExpanded = expandedStock === stock.symbol;
+
+                return (
+                  <div key={stock.symbol} className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    <div 
+                      className="p-4 flex flex-col gap-3 cursor-pointer hover:bg-slate-50 transition-colors"
+                      onClick={() => setExpandedStock(isExpanded ? null : stock.symbol)}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="font-bold text-slate-800 text-lg flex items-center gap-2">
+                            {stock.symbol}
+                            <span className="text-[10px] font-medium bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
+                              {stock.market} &middot; {stock.currency}
+                            </span>
+                          </div>
+                          <div className="text-xs text-slate-500 mt-1">{stock.name}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold text-slate-800 text-lg">
+                            {stock.currentValueOriginal > 0 ? formatOriginalCurrency(stock.currentValueOriginal, sym) : '-'}
+                          </div>
+                          <div className="text-xs text-slate-400 mt-0.5">
+                            {stock.currentPrice > 0 ? `@ ${sym}${stock.currentPrice.toFixed(2)}` : '-'}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-3 gap-2 text-sm pt-3 border-t border-slate-50">
+                        <div className="flex flex-col">
+                          <span className="text-[10px] text-slate-400 uppercase tracking-wider">持股數</span>
+                          <span className="font-medium text-slate-700 mt-0.5">{stock.holdingQty.toLocaleString()}</span>
+                        </div>
+                        <div className="flex flex-col items-end">
+                          <span className="text-[10px] text-slate-400 uppercase tracking-wider">未實現損益</span>
+                          {stock.holdingQty > 0 ? (
+                            <div className={`flex flex-col items-end mt-0.5 ${stock.unrealizedPnlOriginal > 0 ? 'text-blue-600' : stock.unrealizedPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500'}`}>
+                              <span className="font-bold text-xs">{stock.unrealizedPnlOriginal > 0 ? '+' : ''}{formatOriginalCurrency(stock.unrealizedPnlOriginal, sym)}</span>
+                              <span className="text-[10px] leading-none mt-1">{formatPercent(stock.unrealizedPnlPercent)}</span>
+                            </div>
+                          ) : <span className="mt-0.5 text-slate-400">-</span>}
+                        </div>
+                        <div className="flex flex-col items-end">
+                          <span className="text-[10px] text-slate-400 uppercase tracking-wider">已實現損益</span>
+                          {(stock.realizedPnlOriginal !== 0 || stock.tradeCount > 0) ? (
+                            <div className={`flex flex-col items-end mt-0.5 ${stock.realizedPnlOriginal > 0 ? 'text-emerald-600' : stock.realizedPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500'}`}>
+                              <span className="font-bold text-xs">{stock.realizedPnlOriginal > 0 ? '+' : ''}{stock.realizedPnlOriginal !== 0 ? formatOriginalCurrency(stock.realizedPnlOriginal, sym) : '-'}</span>
+                              {stock.realizedPnlPercent !== 0 && (
+                                <span className="text-[10px] leading-none mt-1">{formatPercent(stock.realizedPnlPercent)}</span>
+                              )}
+                            </div>
+                          ) : <span className="mt-0.5 text-slate-400">-</span>}
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-center mt-1 text-slate-300">
+                        {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                      </div>
+                    </div>
+                    
+                    {/* Expanded History for Mobile */}
+                    {isExpanded && (
+                      <div className="bg-slate-50/80 border-t border-slate-100 p-3">
+                         <div className="text-[10px] font-bold text-slate-500 mb-2 uppercase tracking-wider">交易明細</div>
+                         <div className="flex flex-col gap-2">
+                           {stock.history.map((hRow, idx) => (
+                             <div key={idx} className="bg-white p-2.5 rounded-lg border border-slate-200 text-xs flex justify-between items-center shadow-sm">
+                               <div className="flex flex-col gap-1">
+                                 <div className="flex items-center gap-2">
+                                    <span className={`px-1.5 py-0.5 text-[10px] rounded font-medium ${hRow['類型'] === '買入' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>
+                                      {hRow['類型']}
+                                    </span>
+                                    <span className="text-slate-500">{formatDate(hRow['日期'])}</span>
+                                 </div>
+                                 <div className="text-slate-600">
+                                   <span className="font-medium">{hRow['數量']}</span> 股 @ <span>{hRow['單價']}</span>
+                                 </div>
+                               </div>
+                               <div className="flex flex-col items-end gap-1">
+                                 <span className="font-bold text-slate-700">{hRow['總金額']}</span>
+                                 {hRow['類型'] === '賣出' && hRow['損益'] && (
+                                   <span className={`font-medium ${parseFloat(hRow['損益']) > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                                      {parseFloat(hRow['損益']) > 0 ? '+' : ''}{hRow['損益']}
+                                   </span>
+                                 )}
+                               </div>
+                             </div>
+                           ))}
+                         </div>
+                      </div>
+                    )}
+                  </div>
+                );
+             })}
+          </div>
+
         </div>
 
       </div>
