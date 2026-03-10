@@ -3,7 +3,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell,
   PieChart, Pie
 } from 'recharts';
-import { Upload, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, Activity, Layers, RefreshCw, Clock, Trash2, Edit2, Plus, Database, X, Key, Info, HelpCircle } from 'lucide-react';
+import { Upload, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, Activity, Layers, RefreshCw, Clock, Trash2, Edit2, Plus, Database, X, Key, Info, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
 // 股票資料對應表 (當 API 抓不到名稱或價格時的備援)
 const STOCK_MAPPING = {
@@ -199,6 +199,8 @@ export default function App() {
 
   const [showManager, setShowManager] = useState(false);
   const [showCsvHelp, setShowCsvHelp] = useState(false);
+  const [hideZeroHolding, setHideZeroHolding] = useState(false);
+  const [expandedStock, setExpandedStock] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null);
   const [newRec, setNewRec] = useState({ date: '', type: '買入', code: '', market: '陸股', qty: '', amount: '', pnl: '' });
 
@@ -518,11 +520,13 @@ export default function App() {
           totalCost: 0, 
           totalSellRevenue: 0, 
           totalSoldQty: 0, 
-          tradeCount: 0
+          tradeCount: 0,
+          history: []
         };
       }
 
       agg[symbol].tradeCount += 1;
+      agg[symbol].history.push(row);
       
       if (type === '買入') {
         agg[symbol].holdingQty += qty;
@@ -601,6 +605,13 @@ export default function App() {
     const pnlData = processedData.filter(d => d.realizedPnlBase !== 0);
     return { holdingData, pnlData };
   }, [processedData]);
+
+  const displayData = useMemo(() => {
+    if (hideZeroHolding) {
+      return processedData.filter(stock => stock.holdingQty > 0);
+    }
+    return processedData;
+  }, [processedData, hideZeroHolding]);
 
   const summary = useMemo(() => {
     return processedData.reduce((acc, curr) => ({
@@ -856,6 +867,14 @@ export default function App() {
                     * 所有的外幣資產都會透過即時匯率轉換成此幣別，以便在上方總計看板中進行加總計算。
                   </p>
                 </div>
+            </div>
+
+            <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl mb-6 flex items-center justify-between">
+              <span className="text-sm font-bold text-slate-800">隱藏目前無持股的交易紀錄</span>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" className="sr-only peer" checked={hideZeroHolding} onChange={() => setHideZeroHolding(!hideZeroHolding)} />
+                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
             </div>
 
             {/* 新增紀錄表單 */}
@@ -1141,13 +1160,14 @@ export default function App() {
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
           <div className="p-6 border-b border-slate-100">
             <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-              各股詳細數據表 <span className="text-xs font-normal text-slate-400 bg-slate-100 px-2 py-1 rounded ml-2">金額皆顯示為該市場原幣別</span>
+              各股歷史交易記錄 <span className="text-xs font-normal text-slate-400 bg-slate-100 px-2 py-1 rounded ml-2">點擊列可查看買賣明細，金額皆顯示為該市場原幣別</span>
             </h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm whitespace-nowrap">
               <thead className="bg-slate-50 text-slate-600">
                 <tr>
+                  <th className="w-10"></th>
                   <th className="px-6 py-4 font-semibold">代號 / 股名 (市場·幣別)</th>
                   <th className="px-6 py-4 font-semibold text-right">當前持股數</th>
                   <th className="px-6 py-4 font-semibold text-right">目前股價 / 市值(原幣)</th>
@@ -1157,13 +1177,22 @@ export default function App() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {processedData.map((stock) => {
+                {displayData.map((stock) => {
                   const percentDiff = stock.realizedPnlPercent - stock.ifSoldTodayPnlPercent;
                   const hasSold = stock.totalSoldQty > 0;
                   const sym = stock.currencySymbol;
+                  const isExpanded = expandedStock === stock.symbol;
+                  
                   return (
-                    <tr key={stock.symbol} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-6 py-4">
+                    <React.Fragment key={stock.symbol}>
+                      <tr 
+                        className={`hover:bg-slate-50 transition-colors cursor-pointer ${isExpanded ? 'bg-slate-50' : ''}`}
+                        onClick={() => setExpandedStock(isExpanded ? null : stock.symbol)}
+                      >
+                        <td className="pl-4 text-slate-400">
+                          {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                        </td>
+                        <td className="px-6 py-4">
                         <div className="font-bold text-slate-800 flex items-center gap-2">
                           {stock.symbol}
                           <span className="text-[10px] font-medium bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
@@ -1213,11 +1242,47 @@ export default function App() {
                           </div>
                         ) : '-'}
                       </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+                                          </tr>
+                                          {isExpanded && (
+                                            <tr className="bg-slate-50/50">
+                                              <td colSpan="8" className="px-6 py-4 p-0 border-b border-slate-200">
+                                                <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm m-2">
+                                                  <table className="w-full text-xs text-left">
+                                                    <thead className="bg-slate-100 text-slate-600">
+                                                      <tr>
+                                                        <th className="px-4 py-2 font-semibold">日期</th>
+                                                        <th className="px-4 py-2 font-semibold">類型</th>
+                                                        <th className="px-4 py-2 font-semibold text-right">數量</th>
+                                                        <th className="px-4 py-2 font-semibold text-right">單價</th>
+                                                        <th className="px-4 py-2 font-semibold text-right">總金額</th>
+                                                        <th className="px-4 py-2 font-semibold text-right">損益</th>
+                                                      </tr>
+                                                    </thead>
+                                                    <tbody className="divide-y divide-slate-100">
+                                                      {stock.history.map((hRow, idx) => (
+                                                        <tr key={idx} className="hover:bg-slate-50">
+                                                          <td className="px-4 py-2 text-slate-600">{formatDate(hRow['日期'])}</td>
+                                                          <td className="px-4 py-2">
+                                                            <span className={`px-1.5 py-0.5 rounded font-medium ${hRow['類型'] === '買入' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>
+                                                              {hRow['類型']}
+                                                            </span>
+                                                          </td>
+                                                          <td className="px-4 py-2 text-right">{hRow['數量']}</td>
+                                                          <td className="px-4 py-2 text-right">{hRow['單價']}</td>
+                                                          <td className="px-4 py-2 text-right font-medium">{hRow['總金額']}</td>
+                                                          <td className="px-4 py-2 text-right text-slate-500">{hRow['損益'] || '-'}</td>
+                                                        </tr>
+                                                      ))}
+                                                    </tbody>
+                                                  </table>
+                                                </div>
+                                              </td>
+                                            </tr>
+                                          )}
+                                        </React.Fragment>
+                                      )
+                                    })}
+                                  </tbody>            </table>
           </div>
         </div>
 
