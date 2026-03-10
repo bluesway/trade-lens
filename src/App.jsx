@@ -327,7 +327,7 @@ export default function App() {
         const chunk = codesToFetch.slice(i, i + 10);
         const symbolsStr = chunk.join(',');
         
-        const res = await fetch(`https://yfapi.net/v6/finance/quote?region=US&lang=zh&symbols=${symbolsStr}`, {
+        const res = await fetch(`https://yfapi.net/v6/finance/quote?region=HK&lang=zh&symbols=${symbolsStr}`, {
           headers: { 'x-api-key': apiKey, 'accept': 'application/json' }
         });
 
@@ -358,7 +358,7 @@ export default function App() {
       for (let i = 0; i < rateSymbols.length; i += 10) {
           const chunk = rateSymbols.slice(i, i + 10);
           const symbolsStr = chunk.join(',');
-          const res = await fetch(`https://yfapi.net/v6/finance/quote?region=US&lang=en&symbols=${symbolsStr}`, {
+          const res = await fetch(`https://yfapi.net/v6/finance/quote?region=HK&lang=en&symbols=${symbolsStr}`, {
               headers: { 'x-api-key': apiKey, 'accept': 'application/json' }
           });
           if(res.ok) {
