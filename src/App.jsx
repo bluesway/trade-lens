@@ -1,58 +1,60 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { 
+import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell,
   PieChart, Pie
 } from 'recharts';
-import { Upload, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, Activity, Layers, RefreshCw, Clock, Trash2, Plus, Database, X, Key, Info } from 'lucide-react';
+import { Upload, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, Activity, Layers, RefreshCw, Clock, Trash2, Plus, Database, X, Key, Info, HelpCircle } from 'lucide-react';
 
 // 股票資料對應表 (當 API 抓不到名稱或價格時的備援)
 const STOCK_MAPPING = {
-  "002245": { name: "江蘇蔚藍鋰芯集團股份有限公司", price: 17.83 },
-  "603186": { name: "華正新材", price: 70.80 },
-  "002230": { name: "科大訊飛", price: 53.70 },
-  "002074": { name: "國軒高科", price: 38.06 },
-  "000962": { name: "東方鉭業", price: 55.63 },
-  "000090": { name: "天健集團", price: 3.92 },
-  "000166": { name: "申萬宏源", price: 4.88 },
-  "000630": { name: "銅陵有色", price: 7.32 },
-  "000670": { name: "盈方微電子", price: 8.22 },
-  "000725": { name: "京東方", price: 4.35 },
-  "000816": { name: "智慧農業", price: 3.77 },
-  "000878": { name: "雲南銅業", price: 23.36 },
-  "002251": { name: "步步高", price: 4.61 },
-  "002456": { name: "歐菲光集團", price: 9.59 },
-  "002475": { name: "立訊精密", price: 49.39 },
-  "002594": { name: "比亞迪", price: 96.60 },
-  "600006": { name: "東風汽車股份有限公司", price: 6.88 },
-  "600028": { name: "中國石化", price: 6.56 },
-  "600198": { name: "大唐電信", price: 9.23 },
-  "600221": { name: "海南航空", price: 1.55 },
-  "600301": { name: "廣西華錫有色金屬股份有限公司", price: 64.20 },
-  "600808": { name: "馬鞍山鋼鐵股份", price: 4.22 },
-  "601988": { name: "中國銀行", price: 5.33 }
+  "002245.SZ": { name: "江蘇蔚藍鋰芯", price: 17.83 },
+  "603186.SS": { name: "華正新材", price: 70.80 },
+  "002230.SZ": { name: "科大訊飛", price: 53.70 },
+  "002074.SZ": { name: "國軒高科", price: 38.06 },
+  "000962.SZ": { name: "東方鉭業", price: 55.63 },
+  "000090.SZ": { name: "天健集團", price: 3.92 },
+  "000166.SZ": { name: "申萬宏源", price: 4.88 },
+  "000630.SZ": { name: "銅陵有色", price: 7.32 },
+  "000670.SZ": { name: "盈方微電子", price: 8.22 },
+  "000725.SZ": { name: "京東方", price: 4.35 },
+  "000816.SZ": { name: "智慧農業", price: 3.77 },
+  "000878.SZ": { name: "雲南銅業", price: 23.36 },
+  "002251.SZ": { name: "步步高", price: 4.61 },
+  "002456.SZ": { name: "歐菲光集團", price: 9.59 },
+  "002475.SZ": { name: "立訊精密", price: 49.39 },
+  "002594.SZ": { name: "比亞迪", price: 96.60 },
+  "600006.SS": { name: "東風汽車", price: 6.88 },
+  "600028.SS": { name: "中國石化", price: 6.56 },
+  "600198.SS": { name: "大唐電信", price: 9.23 },
+  "600221.SS": { name: "海南航空", price: 1.55 },
+  "600301.SS": { name: "廣西華錫", price: 64.20 },
+  "600808.SS": { name: "馬鞍山鋼鐵", price: 4.22 },
+  "601988.SS": { name: "中國銀行", price: 5.33 },
+  "AAPL": { name: "Apple Inc.", price: 180.00 },
+  "2330.TW": { name: "台積電", price: 800.00 },
+  "0700.HK": { name: "騰訊控股", price: 300.00 }
 };
 
 // 圓餅圖顏色集
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8B5CF6', '#EC4899', '#14B8A6', '#F59E0B'];
 
 // 預設示範資料
-const DEFAULT_CSV = `日期,類型,代號,數量,單價,總金額,損益,獲利率/虧損率,投資天數
-5/28/2025,賣出,002594,100,$362.89,"$36,289.00","+8,596.00",31.04%,124
-1/24/2025,買入,002594,100,$276.93,"$27,693.00",,,
-6/25/2025,買入,002245,1500,$12.41,"$18,615.00",,,
-12/5/2024,買入,002074,700,$22.49,"$15,743.00",,,
-1/24/2025,賣出,002074,700,$20.95,"$14,665.70","-1,077.30",6.84%,50
-10/31/2025,買入,603186,200,$48.24,"$9,648.00",,,
-3/10/2026,賣出,600301,100,$63.50,"$6,350.00","+1,310.00",25.99%,29
-10/11/2024,賣出,600028,100,$6.89,$689.00,+251.00,57.31%,641
-10/11/2024,賣出,600028,100,$6.89,$689.00,+13.00,1.92%,2257
-8/7/2018,買入,600028,100,$6.76,$676.00,,,
-8/7/2018,賣出,600028,100,$6.74,$674.00,-28,3.99%,75
-6/8/2015,賣出,600808,100,$6.70,$670.00,+39.00,3.09%,4
-6/8/2015,賣出,600808,100,$6.70,$670.00,+34.00,5.35%,7
-6/8/2015,賣出,600221,100,$6.38,$638.00,+10.00,0.8%,42`;
+const DEFAULT_CSV = `日期,類型,代號,市場,數量,單價,總金額,損益,獲利率/虧損率,投資天數
+5/28/2025,賣出,002594,陸股,100,362.89,36289.00,+8596.00,31.04%,124
+1/24/2025,買入,002594,陸股,100,276.93,27693.00,,
+10/31/2025,買入,603186,陸股,200,48.24,9648.00,,
+12/1/2025,買入,AAPL,美股,10,180.00,1800.00,,
+12/2/2025,買入,2330,台股,1000,800.00,800000.00,,
+12/3/2025,買入,0700,港股,100,300.00,30000.00,`;
 
-// --- IndexedDB 非同步封裝引擎 ---
+const CURRENCY_SYMBOLS = {
+  USD: '$',
+  TWD: 'NT$',
+  HKD: 'HK$',
+  CNY: '¥',
+  JPY: '¥'
+};
+
 const DB_NAME = 'TrDashboardDB';
 const STORE_NAME = 'store';
 const DB_VERSION = 1;
@@ -111,7 +113,6 @@ const asyncStorage = {
   }
 };
 
-// 解析 CSV 函數
 const parseCSV = (text) => {
   const lines = text.split('\n');
   let headerIdx = lines.findIndex(l => l.includes('代號') && l.includes('類型'));
@@ -151,31 +152,52 @@ const parseCSV = (text) => {
   return result;
 };
 
+// 根據市場自動補齊後綴
+const formatSymbol = (code, market) => {
+  code = code.trim().toUpperCase();
+  if (code.includes('.')) return code; // 已經有後綴就不處理
+  
+  switch(market) {
+    case '陸股': return code.startsWith('6') ? `${code}.SS` : `${code}.SZ`;
+    case '港股': return `${code}.HK`;
+    case '台股': return `${code}.TW`;
+    case '日股': return `${code}.T`; // 東京證交所
+    case '美股': return code; // 美股通常沒有後綴
+    default: return code;
+  }
+};
+
 export default function App() {
-  // 狀態宣告 (初始皆為空，等待 IndexedDB 載入)
   const [isAppLoaded, setIsAppLoaded] = useState(false);
   const [rawData, setRawData] = useState([]);
   const [isDemo, setIsDemo] = useState(true);
   const [liveData, setLiveData] = useState({});
+  const [exchangeRates, setExchangeRates] = useState({});
   const [apiKey, setApiKey] = useState('');
+  const [baseCurrency, setBaseCurrency] = useState('TWD');
   
   const [isLoadingPrices, setIsLoadingPrices] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(null);
   const [toastMsg, setToastMsg] = useState('');
 
-  // 管理介面狀態
   const [showManager, setShowManager] = useState(false);
-  const [newRec, setNewRec] = useState({ date: '', type: '買入', code: '', qty: '', amount: '', pnl: '' });
+  const [showCsvHelp, setShowCsvHelp] = useState(false);
+  const [newRec, setNewRec] = useState({ date: '', type: '買入', code: '', market: '陸股', qty: '', amount: '', pnl: '' });
 
-  // 初始載入：從 IndexedDB 讀取資料
   useEffect(() => {
     const loadInitialData = async () => {
       try {
         const savedKey = await asyncStorage.get('yfapi_net_key');
         if (savedKey) setApiKey(savedKey);
 
+        const savedCurrency = await asyncStorage.get('tr_base_currency');
+        if (savedCurrency) setBaseCurrency(savedCurrency);
+
         const savedCache = await asyncStorage.get('tr_dashboard_cache');
         if (savedCache) setLiveData(JSON.parse(savedCache));
+        
+        const savedRates = await asyncStorage.get('tr_exchange_rates');
+        if (savedRates) setExchangeRates(JSON.parse(savedRates));
 
         const savedData = await asyncStorage.get('tr_dashboard_data');
         if (savedData) {
@@ -199,30 +221,29 @@ export default function App() {
     loadInitialData();
   }, []);
 
-  // 顯示訊息通知
   const showToast = (msg) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(''), 6000);
   };
 
-  // 日期格式化函數
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return dateStr;
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    return `${yyyy}/${mm}/${dd}`;
+    return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
   };
 
-  // 儲存 API Key
   const handleSaveApiKey = () => {
     asyncStorage.set('yfapi_net_key', apiKey);
     showToast('API 金鑰已更新並儲存！');
   };
 
-  // 手動觸發取得即時股價 (使用 yfapi.net)
+  const handleSaveBaseCurrency = (currency) => {
+    setBaseCurrency(currency);
+    asyncStorage.set('tr_base_currency', currency);
+    showToast(`基礎計價幣別已更改為 ${currency}`);
+  };
+
   const fetchLivePrices = async (isForce = false) => {
     if (!apiKey) {
       setShowManager(true);
@@ -230,8 +251,13 @@ export default function App() {
       return;
     }
 
-    const uniqueCodes = Array.from(new Set(rawData.map(row => String(row['代號'] || '').trim()).filter(c => c && c !== '000000')));
-    if (uniqueCodes.length === 0) return;
+    const uniqueSymbols = Array.from(new Set(rawData.map(row => {
+      const code = String(row['代號'] || '').trim();
+      const market = row['市場'] || '未知';
+      return formatSymbol(code, market);
+    }).filter(c => c && c !== '000000' && c !== '未知')));
+    
+    if (uniqueSymbols.length === 0) return;
 
     setIsLoadingPrices(true);
     
@@ -239,68 +265,104 @@ export default function App() {
       const now = Date.now();
       const ONE_DAY = 24 * 60 * 60 * 1000;
       
-      // 過濾出超過 24 小時未更新或沒有資料的股票代號
-      const codesToFetch = uniqueCodes.filter(code => {
+      const codesToFetch = uniqueSymbols.filter(symbol => {
         if (isForce) return true;
-        const cached = liveData[code];
+        const cached = liveData[symbol];
         if (!cached) return true;
         if (now - cached.timestamp > ONE_DAY) return true;
         return false;
       });
 
-      if (codesToFetch.length === 0) {
+      // 檢查匯率是否需要更新 (需要轉換成 baseCurrency)
+      const currenciesToFetch = new Set();
+      uniqueSymbols.forEach(symbol => {
+          const cached = liveData[symbol];
+          if(cached && cached.currency && cached.currency !== baseCurrency) {
+             const rateKey = `${cached.currency}${baseCurrency}=X`;
+             const cachedRate = exchangeRates[rateKey];
+             if(isForce || !cachedRate || (now - cachedRate.timestamp > ONE_DAY)) {
+                 currenciesToFetch.add(rateKey);
+             }
+          }
+      });
+      // 加上目前這批新抓的股票可能的匯率 (保守起見常抓的先加)
+      if(codesToFetch.length > 0) {
+          ['USD', 'HKD', 'CNY', 'JPY'].forEach(c => {
+             if(c !== baseCurrency) currenciesToFetch.add(`${c}${baseCurrency}=X`);
+          });
+      }
+
+
+      if (codesToFetch.length === 0 && currenciesToFetch.size === 0) {
         setLastUpdate(new Date());
         setIsLoadingPrices(false);
-        showToast('所有股價均在 24 小時內更新過，自動使用本機快取以節省額度！');
+        showToast('所有股價與匯率均在 24 小時內更新過，自動使用本機快取以節省額度！');
         return;
       }
 
       const newData = { ...liveData };
-      const chunkSize = 10; // 分批請求
+      const newRates = { ...exchangeRates };
       let fetchedCount = 0;
 
-      for (let i = 0; i < codesToFetch.length; i += chunkSize) {
-        const chunk = codesToFetch.slice(i, i + chunkSize);
-        const symbols = chunk.map(code => code.startsWith('6') ? `${code}.SS` : `${code}.SZ`).join(',');
+      // 1. 抓股價
+      for (let i = 0; i < codesToFetch.length; i += 10) {
+        const chunk = codesToFetch.slice(i, i + 10);
+        const symbolsStr = chunk.join(',');
         
-        const res = await fetch(`https://yfapi.net/v6/finance/quote?region=HK&lang=zh&symbols=${symbols}`, {
-          headers: {
-            'x-api-key': apiKey,
-            'accept': 'application/json'
-          }
+        const res = await fetch(`https://yfapi.net/v6/finance/quote?region=US&lang=zh&symbols=${symbolsStr}`, {
+          headers: { 'x-api-key': apiKey, 'accept': 'application/json' }
         });
 
-        if (!res.ok) {
-          if (res.status === 429) throw new Error('API 額度已耗盡或請求過於頻繁 (429)');
-          if (res.status === 403) throw new Error('API Key 無效或驗證失敗 (403)');
-          throw new Error(`伺服器錯誤: ${res.status}`);
-        }
+        if (!res.ok) throw new Error(res.status === 429 ? 'API 額度已耗盡 (429)' : res.status === 403 ? 'API Key 無效 (403)' : `伺服器錯誤: ${res.status}`);
 
         const json = await res.json();
         if (json?.quoteResponse?.result) {
           json.quoteResponse.result.forEach(item => {
-            const rawCode = item.symbol.replace('.SS', '').replace('.SZ', '');
-            newData[rawCode] = {
+            newData[item.symbol] = {
               price: item.regularMarketPrice,
-              name: item.longName || item.shortName || STOCK_MAPPING[rawCode]?.name,
+              name: item.longName || item.shortName || STOCK_MAPPING[item.symbol]?.name,
+              currency: item.currency || 'USD',
               timestamp: now
             };
             fetchedCount++;
+            
+            // 順便把需要的匯率加進去
+            if(item.currency && item.currency !== baseCurrency) {
+                 currenciesToFetch.add(`${item.currency}${baseCurrency}=X`);
+            }
           });
         }
-        
-        if (i + chunkSize < codesToFetch.length) {
-          await new Promise(r => setTimeout(r, 1000));
-        }
+        if (i + 10 < codesToFetch.length) await new Promise(r => setTimeout(r, 1000));
+      }
+      
+      // 2. 抓匯率
+      const rateSymbols = Array.from(currenciesToFetch);
+      for (let i = 0; i < rateSymbols.length; i += 10) {
+          const chunk = rateSymbols.slice(i, i + 10);
+          const symbolsStr = chunk.join(',');
+          const res = await fetch(`https://yfapi.net/v6/finance/quote?region=US&lang=en&symbols=${symbolsStr}`, {
+              headers: { 'x-api-key': apiKey, 'accept': 'application/json' }
+          });
+          if(res.ok) {
+              const json = await res.json();
+              if (json?.quoteResponse?.result) {
+                  json.quoteResponse.result.forEach(item => {
+                      newRates[item.symbol] = { rate: item.regularMarketPrice, timestamp: now };
+                  });
+              }
+          }
+          if (i + 10 < rateSymbols.length) await new Promise(r => setTimeout(r, 1000));
       }
 
       setLiveData(newData);
+      setExchangeRates(newRates);
       asyncStorage.set('tr_dashboard_cache', JSON.stringify(newData));
+      asyncStorage.set('tr_exchange_rates', JSON.stringify(newRates));
       setLastUpdate(new Date());
-      showToast(`成功更新 ${fetchedCount} 檔股票資訊！其餘使用有效快取。`);
+      showToast(`成功更新 ${fetchedCount} 檔股票與匯率資訊！`);
 
     } catch (error) {
-      showToast(`抓取股價失敗: ${error.message}`);
+      showToast(`抓取失敗: ${error.message}`);
     } finally {
       setIsLoadingPrices(false);
     }
@@ -316,27 +378,28 @@ export default function App() {
         setRawData(parsedData);
         setIsDemo(false);
         asyncStorage.set('tr_dashboard_data', JSON.stringify(parsedData));
+        setShowCsvHelp(false);
       };
       reader.readAsText(file);
     }
   };
 
-  // 管理交易紀錄功能
   const handleAddRecord = () => {
     if (!newRec.code || !newRec.qty || !newRec.amount || !newRec.date) return; 
     const row = {
       '日期': newRec.date,
       '類型': newRec.type,
       '代號': newRec.code.trim(),
+      '市場': newRec.market,
       '數量': newRec.qty,
-      '單價': (parseFloat(newRec.amount) / parseFloat(newRec.qty)).toFixed(2),
+      '單價': (parseFloat(newRec.amount) / parseFloat(newRec.qty)).toFixed(4),
       '總金額': newRec.amount,
       '損益': newRec.pnl || ''
     };
     const newData = [...rawData, row];
     setRawData(newData);
     asyncStorage.set('tr_dashboard_data', JSON.stringify(newData));
-    setNewRec({ date: '', type: '買入', code: '', qty: '', amount: '', pnl: '' });
+    setNewRec({ ...newRec, date: '', code: '', qty: '', amount: '', pnl: '' });
   };
 
   const handleDeleteRecord = (idx) => {
@@ -352,6 +415,13 @@ export default function App() {
     setIsDemo(true);
     setShowManager(false);
   };
+  
+  // 取得匯率輔助函數
+  const getExchangeRate = (fromCurrency, toCurrency) => {
+      if (fromCurrency === toCurrency) return 1;
+      const rateKey = `${fromCurrency}${toCurrency}=X`;
+      return exchangeRates[rateKey]?.rate || 1; // 找不到預設為 1 (可能會有誤差，但避免報錯)
+  };
 
   // 處理與聚合資料
   const processedData = useMemo(() => {
@@ -361,23 +431,27 @@ export default function App() {
     const sortedData = [...rawData].sort((a, b) => new Date(a['日期'] || 0) - new Date(b['日期'] || 0));
 
     sortedData.forEach(row => {
-      if (!row['代號'] || !row['類型']) return;
-      
-      let code = String(row['代號']).trim();
+      let rawCode = String(row['代號'] || '').trim();
       let type = row['類型'];
-      let qty = parseFloat(row['數量']) || 0;
+      if (!rawCode || !type) return;
       
+      let market = row['市場'] || '未知';
+      let symbol = formatSymbol(rawCode, market);
+      
+      let qty = parseFloat(row['數量']) || 0;
       let amountStr = row['總金額'] || "0";
       let amount = parseFloat(amountStr.replace(/[^0-9.-]+/g, "")) || 0;
-
       let pnlStr = row['損益'] || "0";
       let pnl = parseFloat(pnlStr.replace(/[^0-9.-]+/g, "")) || 0;
 
-      if (!agg[code]) {
-        agg[code] = {
-          code,
-          name: STOCK_MAPPING[code]?.name || `未知代號 (${code})`,
-          currentPrice: STOCK_MAPPING[code]?.price || 0,
+      if (!agg[symbol]) {
+        agg[symbol] = {
+          symbol,
+          rawCode,
+          market,
+          name: STOCK_MAPPING[symbol]?.name || `未知代號 (${symbol})`,
+          currentPrice: STOCK_MAPPING[symbol]?.price || 0,
+          currency: 'CNY', // 預設，稍後會被 API 覆蓋
           holdingQty: 0,
           realizedPnl: 0,
           totalCost: 0, 
@@ -387,72 +461,93 @@ export default function App() {
         };
       }
 
-      agg[code].tradeCount += 1;
+      agg[symbol].tradeCount += 1;
       
       if (type === '買入') {
-        agg[code].holdingQty += qty;
-        agg[code].totalCost += amount;
+        agg[symbol].holdingQty += qty;
+        agg[symbol].totalCost += amount; // 這是原幣別成本
       } else if (type === '賣出') {
-        agg[code].realizedPnl += pnl;
-        agg[code].totalSellRevenue += amount;
-        agg[code].totalSoldQty += qty;
+        agg[symbol].realizedPnl += pnl; // 原幣別損益
+        agg[symbol].totalSellRevenue += amount;
+        agg[symbol].totalSoldQty += qty;
 
-        if (agg[code].holdingQty > 0) {
-          let avgCost = agg[code].totalCost / agg[code].holdingQty;
-          agg[code].totalCost -= avgCost * qty;
+        if (agg[symbol].holdingQty > 0) {
+          let avgCost = agg[symbol].totalCost / agg[symbol].holdingQty;
+          agg[symbol].totalCost -= avgCost * qty;
         }
-        agg[code].holdingQty -= qty;
+        agg[symbol].holdingQty -= qty;
 
-        if (agg[code].holdingQty <= 0.01) {
-          agg[code].holdingQty = 0;
-          agg[code].totalCost = 0;
+        if (agg[symbol].holdingQty <= 0.01) {
+          agg[symbol].holdingQty = 0;
+          agg[symbol].totalCost = 0;
         }
       }
     });
 
     return Object.values(agg).map(stock => {
-      const apiData = liveData[stock.code];
+      const apiData = liveData[stock.symbol];
       const currentPrice = apiData?.price || stock.currentPrice; 
       const currentName = apiData?.name || stock.name;
-      const currentValue = stock.holdingQty * currentPrice;
-      
-      const unrealizedPnl = currentValue > 0 ? currentValue - stock.totalCost : 0;
-      const unrealizedPnlPercent = stock.totalCost > 0 ? (unrealizedPnl / stock.totalCost) * 100 : 0;
+      const currency = apiData?.currency || (stock.market === '美股' ? 'USD' : stock.market === '台股' ? 'TWD' : stock.market === '港股' ? 'HKD' : stock.market === '日股' ? 'JPY' : 'CNY');
+      const rate = getExchangeRate(currency, baseCurrency);
 
-      const realizedCost = stock.totalSellRevenue - stock.realizedPnl;
-      const realizedPnlPercent = realizedCost > 0 ? (stock.realizedPnl / realizedCost) * 100 : 0;
+      // 原幣別計算
+      const currentValueOriginal = stock.holdingQty * currentPrice;
+      const unrealizedPnlOriginal = currentValueOriginal > 0 ? currentValueOriginal - stock.totalCost : 0;
+      const unrealizedPnlPercent = stock.totalCost > 0 ? (unrealizedPnlOriginal / stock.totalCost) * 100 : 0;
+      const realizedCostOriginal = stock.totalSellRevenue - stock.realizedPnl;
+      const realizedPnlPercent = realizedCostOriginal > 0 ? (stock.realizedPnl / realizedCostOriginal) * 100 : 0;
+      const ifSoldTodayPnlOriginal = (stock.totalSoldQty * currentPrice) - realizedCostOriginal;
+      const ifSoldTodayPnlPercent = realizedCostOriginal > 0 ? (ifSoldTodayPnlOriginal / realizedCostOriginal) * 100 : 0;
 
-      const ifSoldTodayPnl = (stock.totalSoldQty * currentPrice) - realizedCost;
-      const ifSoldTodayPnlPercent = realizedCost > 0 ? (ifSoldTodayPnl / realizedCost) * 100 : 0;
+      // 轉換成 Base Currency (用於總計)
+      const currentValueBase = currentValueOriginal * rate;
+      const totalCostBase = stock.totalCost * rate;
+      const unrealizedPnlBase = unrealizedPnlOriginal * rate;
+      const realizedPnlBase = stock.realizedPnl * rate;
+      const realizedCostBase = realizedCostOriginal * rate;
+      const ifSoldTodayPnlBase = ifSoldTodayPnlOriginal * rate;
 
       return {
         ...stock,
         name: currentName,
         currentPrice,
-        currentValue,
-        unrealizedPnl,
+        currency,
+        currencySymbol: CURRENCY_SYMBOLS[currency] || currency,
+        exchangeRate: rate,
+        // 原幣別欄位 (UI 顯示用)
+        currentValueOriginal,
+        unrealizedPnlOriginal,
         unrealizedPnlPercent,
-        realizedCost,
+        realizedPnlOriginal: stock.realizedPnl,
+        realizedCostOriginal,
         realizedPnlPercent,
-        ifSoldTodayPnl,
-        ifSoldTodayPnlPercent
+        ifSoldTodayPnlOriginal,
+        ifSoldTodayPnlPercent,
+        // 基準幣別欄位 (加總計算用)
+        currentValueBase,
+        totalCostBase,
+        unrealizedPnlBase,
+        realizedPnlBase,
+        realizedCostBase,
+        ifSoldTodayPnlBase
       };
-    }).sort((a, b) => b.realizedPnl - a.realizedPnl);
-  }, [rawData, liveData, isAppLoaded]);
+    }).sort((a, b) => b.realizedPnlBase - a.realizedPnlBase);
+  }, [rawData, liveData, exchangeRates, baseCurrency, isAppLoaded]);
 
   const chartData = useMemo(() => {
-    const holdingData = processedData.filter(d => d.currentValue > 0).sort((a, b) => b.currentValue - a.currentValue);
-    const pnlData = processedData.filter(d => d.realizedPnl !== 0);
+    const holdingData = processedData.filter(d => d.currentValueBase > 0).sort((a, b) => b.currentValueBase - a.currentValueBase);
+    const pnlData = processedData.filter(d => d.realizedPnlBase !== 0);
     return { holdingData, pnlData };
   }, [processedData]);
 
   const summary = useMemo(() => {
     return processedData.reduce((acc, curr) => ({
-      totalRealizedPnl: acc.totalRealizedPnl + curr.realizedPnl,
-      totalRealizedCost: acc.totalRealizedCost + curr.realizedCost,
-      totalUnrealizedPnl: acc.totalUnrealizedPnl + curr.unrealizedPnl,
-      totalHoldingCost: acc.totalHoldingCost + curr.totalCost,
-      totalValue: acc.totalValue + curr.currentValue
+      totalRealizedPnl: acc.totalRealizedPnl + curr.realizedPnlBase,
+      totalRealizedCost: acc.totalRealizedCost + curr.realizedCostBase,
+      totalUnrealizedPnl: acc.totalUnrealizedPnl + curr.unrealizedPnlBase,
+      totalHoldingCost: acc.totalHoldingCost + curr.totalCostBase,
+      totalValue: acc.totalValue + curr.currentValueBase
     }), { 
       totalRealizedPnl: 0, totalRealizedCost: 0, 
       totalUnrealizedPnl: 0, totalHoldingCost: 0, 
@@ -465,7 +560,8 @@ export default function App() {
   const overallUnrealizedPercent = summary.totalHoldingCost > 0 
     ? (summary.totalUnrealizedPnl / summary.totalHoldingCost) * 100 : 0;
 
-  const formatCurrency = (val) => `¥ ${val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const formatBaseCurrency = (val) => `${CURRENCY_SYMBOLS[baseCurrency] || baseCurrency} ${val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const formatOriginalCurrency = (val, sym) => `${sym}${val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   const formatPercent = (val) => `${val > 0 ? '+' : ''}${val.toFixed(2)}%`;
 
   const CustomTooltip = ({ active, payload, label }) => {
@@ -476,7 +572,7 @@ export default function App() {
           {payload.map((entry, idx) => (
             <p key={idx} className="text-sm flex justify-between gap-4 font-medium" style={{ color: entry.color || entry.fill }}>
               <span>{entry.name}:</span>
-              <span>{formatCurrency(entry.value)}</span>
+              <span>{formatBaseCurrency(entry.value)}</span>
             </p>
           ))}
         </div>
@@ -485,23 +581,20 @@ export default function App() {
     return null;
   };
 
-  // 客製化長條圖圖說 (Legend)
   const renderCustomLegend = (props) => {
     const { payload } = props;
     return (
       <ul className="flex justify-center gap-6 pt-4">
         {payload.map((entry, index) => {
-          const isIfSold = entry.dataKey === 'ifSoldTodayPnl';
+          const isIfSold = entry.dataKey === 'ifSoldTodayPnlBase';
           return (
             <li key={`item-${index}`} className="flex items-center gap-2 text-sm text-slate-600 font-medium">
               {isIfSold ? (
-                // 半透明 + 虛線邊框方塊
                 <div className="w-4 h-4 rounded-[2px] border-2 border-dashed border-slate-400 bg-slate-200/50"></div>
               ) : (
-                // 不透明實心方塊
                 <div className="w-4 h-4 rounded-[2px] bg-slate-500"></div>
               )}
-              <span>{entry.value}</span>
+              <span>{entry.value} (換算後)</span>
             </li>
           );
         })}
@@ -509,7 +602,6 @@ export default function App() {
     );
   };
 
-  // 畫面載入中狀態
   if (!isAppLoaded) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -523,8 +615,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-800 relative">
-      
-      {/* 吐司通知 */}
       {toastMsg && (
         <div className="fixed bottom-6 right-6 bg-slate-800 text-white px-5 py-3 rounded-xl shadow-2xl z-50 animate-fade-in-up flex items-center gap-3">
           <Activity size={18} className="text-blue-400" />
@@ -533,13 +623,12 @@ export default function App() {
       )}
 
       <div className="max-w-7xl mx-auto space-y-6"> 
-        
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
               <Activity className="text-blue-600" />
-              交易組合視覺化儀表板
+              全球交易組合視覺化儀表板
             </h1>
             <div className="flex flex-col gap-2 md:flex-row md:items-center mt-2">
               <p className="text-sm text-slate-500">
@@ -548,7 +637,7 @@ export default function App() {
               {lastUpdate && (
                 <span className="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded-md flex items-center gap-1 w-fit">
                   <Clock size={12} />
-                  快取更新時間: {lastUpdate.toLocaleTimeString()}
+                  快取: {lastUpdate.toLocaleTimeString()}
                 </span>
               )}
             </div>
@@ -560,7 +649,7 @@ export default function App() {
               className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors shadow-sm ${showManager ? 'bg-slate-800 text-white' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'}`}
             >
               <Database size={18} />
-              <span className="hidden md:inline">管理紀錄</span>
+              <span className="hidden md:inline">設定與紀錄</span>
             </button>
             <button 
               onClick={() => fetchLivePrices(false)}
@@ -584,6 +673,34 @@ export default function App() {
               <Activity size={18} className={isLoadingPrices ? "animate-pulse" : ""} />
               <span className="hidden md:inline">強制刷新</span>
             </button>
+            
+            <div className="relative">
+              <button 
+                onClick={() => setShowCsvHelp(!showCsvHelp)}
+                className="flex items-center justify-center w-10 h-[44px] bg-white border border-slate-200 text-slate-400 hover:text-blue-600 hover:border-blue-300 rounded-lg transition-colors"
+                title="CSV 格式說明"
+              >
+                <HelpCircle size={20} />
+              </button>
+              {showCsvHelp && (
+                <div className="absolute right-0 top-14 w-80 bg-white border border-slate-200 p-4 rounded-xl shadow-xl z-50 text-sm text-slate-600">
+                  <h4 className="font-bold text-slate-800 mb-2 border-b pb-1">CSV 欄位格式說明</h4>
+                  <p className="mb-2 text-xs">請確保您的 CSV 包含以下標題列 (順序不拘)：</p>
+                  <ul className="list-disc pl-5 space-y-1 text-xs font-mono bg-slate-50 p-2 rounded">
+                    <li>日期 <span className="text-slate-400">(如: 2025/01/01)</span></li>
+                    <li>類型 <span className="text-slate-400">(買入/賣出)</span></li>
+                    <li>代號 <span className="text-slate-400">(如: AAPL, 2330)</span></li>
+                    <li className="text-blue-600 font-bold">市場 <span className="text-slate-400">(陸股/港股/台股/日股/美股)</span></li>
+                    <li>數量</li>
+                    <li>單價 <span className="text-slate-400">(原幣別)</span></li>
+                    <li>總金額 <span className="text-slate-400">(原幣別)</span></li>
+                    <li>損益 <span className="text-slate-400">(賣出必填, 原幣別)</span></li>
+                  </ul>
+                  <p className="mt-2 text-xs text-rose-500 font-medium">* 註：新增了「市場」欄位以支援全球報價與匯率轉換。</p>
+                </div>
+              )}
+            </div>
+
             <div className="relative">
               <input 
                 type="file" 
@@ -593,7 +710,7 @@ export default function App() {
               />
               <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap">
                 <Upload size={18} />
-                上傳交易記錄 .csv 檔案
+                匯入 CSV
               </button>
             </div>
           </div>
@@ -620,80 +737,117 @@ export default function App() {
               </div>
             </div>
 
-            {/* API Key 設定區塊 */}
-            <div className="bg-blue-50/50 border border-blue-100 p-5 rounded-xl mb-6">
-              <div className="flex justify-between items-start mb-3">
-                <label className="flex items-center gap-2 text-sm font-bold text-blue-900">
-                  <Key size={16} />
-                  yfapi.net API 金鑰設定
-                </label>
-                <a 
-                  href="https://financeapi.net/dashboard" 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  className="text-xs font-semibold flex items-center gap-1 bg-white border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors px-2.5 py-1 rounded-md"
-                >
-                  <Info size={14} />
-                  沒有金鑰？點此前往免費註冊取得
-                </a>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <input 
-                  type="password" 
-                  placeholder="請貼上您的 x-api-key (例如: A2sD8...)" 
-                  value={apiKey} 
-                  onChange={e => setApiKey(e.target.value)} 
-                  className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" 
-                />
-                <button
-                  onClick={handleSaveApiKey}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm whitespace-nowrap"
-                >
-                  儲存 / 更新金鑰
-                </button>
-              </div>
-              <p className="text-xs text-blue-600/80 flex items-center mt-2">
-                *安全儲存於本機 IndexedDB，輸入後即可解鎖「更新股價」功能，支援 A 股與全球報價。
-              </p>
+            {/* Global Settings */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="bg-blue-50/50 border border-blue-100 p-5 rounded-xl">
+                  <div className="flex justify-between items-start mb-3">
+                    <label className="flex items-center gap-2 text-sm font-bold text-blue-900">
+                      <Key size={16} />
+                      yfapi.net API 金鑰設定
+                    </label>
+                    <a 
+                      href="https://financeapi.net/dashboard" 
+                      target="_blank" 
+                      rel="noreferrer" 
+                      className="text-xs font-semibold flex items-center gap-1 bg-white border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors px-2.5 py-1 rounded-md"
+                    >
+                      <Info size={14} />
+                      免費註冊取得
+                    </a>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <input 
+                      type="password" 
+                      placeholder="請貼上您的 x-api-key (例如: A2sD8...)" 
+                      value={apiKey} 
+                      onChange={e => setApiKey(e.target.value)} 
+                      className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" 
+                    />
+                    <button
+                      onClick={handleSaveApiKey}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm whitespace-nowrap"
+                    >
+                      儲存金鑰
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 border border-slate-200 p-5 rounded-xl">
+                  <label className="flex items-center gap-2 text-sm font-bold text-slate-800 mb-3">
+                    <DollarSign size={16} />
+                    總計面板基礎幣別 (Base Currency)
+                  </label>
+                  <div className="flex gap-3">
+                    <select 
+                      value={baseCurrency} 
+                      onChange={e => handleSaveBaseCurrency(e.target.value)}
+                      className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                    >
+                      <option value="TWD">新台幣 (TWD)</option>
+                      <option value="CNY">人民幣 (CNY)</option>
+                      <option value="HKD">港幣 (HKD)</option>
+                      <option value="USD">美金 (USD)</option>
+                      <option value="JPY">日圓 (JPY)</option>
+                    </select>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-2">
+                    * 所有的外幣資產都會透過即時匯率轉換成此幣別，以便在上方總計看板中進行加總計算。
+                  </p>
+                </div>
             </div>
 
             {/* 新增紀錄表單 */}
-            <div className="bg-slate-50 p-4 rounded-xl mb-6 flex flex-wrap gap-4 items-end">
-              <div className="flex-1 min-w-[120px]">
-                <label className="block text-xs font-semibold text-slate-500 mb-1">日期</label>
-                <input type="date" value={newRec.date} onChange={e => setNewRec({...newRec, date: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
-              </div>
-              <div className="w-[100px]">
-                <label className="block text-xs font-semibold text-slate-500 mb-1">類型</label>
-                <select value={newRec.type} onChange={e => setNewRec({...newRec, type: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white">
-                  <option>買入</option>
-                  <option>賣出</option>
-                </select>
-              </div>
-              <div className="flex-1 min-w-[100px]">
-                <label className="block text-xs font-semibold text-slate-500 mb-1">代號</label>
-                <input type="text" placeholder="如: 2594" value={newRec.code} onChange={e => setNewRec({...newRec, code: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
-              </div>
-              <div className="flex-1 min-w-[100px]">
-                <label className="block text-xs font-semibold text-slate-500 mb-1">數量</label>
-                <input type="number" placeholder="股數" value={newRec.qty} onChange={e => setNewRec({...newRec, qty: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
-              </div>
-              <div className="flex-1 min-w-[120px]">
-                <label className="block text-xs font-semibold text-slate-500 mb-1">總金額</label>
-                <input type="number" placeholder="¥" value={newRec.amount} onChange={e => setNewRec({...newRec, amount: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
-              </div>
-              <div className="flex-1 min-w-[120px]">
-                <label className="block text-xs font-semibold text-slate-500 mb-1">損益 (賣出用)</label>
-                <input type="number" placeholder="¥ (選填)" value={newRec.pnl} onChange={e => setNewRec({...newRec, pnl: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
-              </div>
-              <button 
-                onClick={handleAddRecord}
-                disabled={!newRec.date || !newRec.code || !newRec.qty || !newRec.amount}
-                className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed h-[38px]"
-              >
-                <Plus size={16} />
-                新增
-              </button>
+            <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl mb-6">
+                <h4 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2 border-b border-slate-200 pb-2">
+                  <Plus size={16} /> 手動新增單筆紀錄
+                </h4>
+                <div className="flex flex-wrap gap-4 items-end">
+                  <div className="w-[130px]">
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">日期</label>
+                    <input type="date" value={newRec.date} onChange={e => setNewRec({...newRec, date: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
+                  </div>
+                  <div className="w-[80px]">
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">類型</label>
+                    <select value={newRec.type} onChange={e => setNewRec({...newRec, type: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white">
+                      <option>買入</option>
+                      <option>賣出</option>
+                    </select>
+                  </div>
+                  <div className="w-[100px]">
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">市場</label>
+                    <select value={newRec.market} onChange={e => setNewRec({...newRec, market: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white font-medium text-blue-700">
+                      <option>陸股</option>
+                      <option>港股</option>
+                      <option>台股</option>
+                      <option>日股</option>
+                      <option>美股</option>
+                      <option>其他</option>
+                    </select>
+                  </div>
+                  <div className="flex-1 min-w-[100px]">
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">代號</label>
+                    <input type="text" placeholder="如: AAPL" value={newRec.code} onChange={e => setNewRec({...newRec, code: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
+                  </div>
+                  <div className="flex-1 min-w-[100px]">
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">數量</label>
+                    <input type="number" placeholder="股數" value={newRec.qty} onChange={e => setNewRec({...newRec, qty: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
+                  </div>
+                  <div className="flex-1 min-w-[120px]">
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">總金額 (原幣)</label>
+                    <input type="number" placeholder="依該市場幣別" value={newRec.amount} onChange={e => setNewRec({...newRec, amount: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
+                  </div>
+                  <div className="flex-1 min-w-[120px]">
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">損益 (賣出填,原幣)</label>
+                    <input type="number" placeholder="選填" value={newRec.pnl} onChange={e => setNewRec({...newRec, pnl: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
+                  </div>
+                  <button 
+                    onClick={handleAddRecord}
+                    disabled={!newRec.date || !newRec.code || !newRec.qty || !newRec.amount}
+                    className="flex items-center justify-center bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed h-[38px] w-[80px]"
+                  >
+                    加入
+                  </button>
+                </div>
             </div>
 
             {/* 現有紀錄列表 */}
@@ -704,10 +858,11 @@ export default function App() {
                     <th className="px-4 py-3 font-semibold">日期</th>
                     <th className="px-4 py-3 font-semibold">類型</th>
                     <th className="px-4 py-3 font-semibold">代號 / 股名</th>
+                    <th className="px-4 py-3 font-semibold text-center">市場</th>
                     <th className="px-4 py-3 font-semibold text-right">數量</th>
-                    <th className="px-4 py-3 font-semibold text-right">單價</th>
-                    <th className="px-4 py-3 font-semibold text-right">總金額</th>
-                    <th className="px-4 py-3 font-semibold text-right">損益</th>
+                    <th className="px-4 py-3 font-semibold text-right">單價(原幣)</th>
+                    <th className="px-4 py-3 font-semibold text-right">總金額(原幣)</th>
+                    <th className="px-4 py-3 font-semibold text-right">損益(原幣)</th>
                     <th className="px-4 py-3 font-semibold text-center w-16">操作</th>
                   </tr>
                 </thead>
@@ -716,7 +871,9 @@ export default function App() {
                     .map((row, originalIndex) => ({ ...row, originalIndex }))
                     .sort((a, b) => new Date(b['日期'] || 0) - new Date(a['日期'] || 0))
                     .map((row) => {
-                      const resolvedName = liveData[row['代號']]?.name || STOCK_MAPPING[row['代號']]?.name || '未知';
+                      const market = row['市場'] || '未知';
+                      const symbol = formatSymbol(row['代號'], market);
+                      const resolvedName = liveData[symbol]?.name || STOCK_MAPPING[symbol]?.name || '未知';
                       return (
                         <tr key={row.originalIndex} className="hover:bg-slate-50 transition-colors">
                           <td className="px-4 py-2 text-slate-600">{formatDate(row['日期'])}</td>
@@ -728,6 +885,9 @@ export default function App() {
                           <td className="px-4 py-2">
                             <div className="font-bold text-slate-800">{row['代號']}</div>
                             <div className="text-xs text-slate-500 mt-0.5">{resolvedName}</div>
+                          </td>
+                          <td className="px-4 py-2 text-center">
+                              <span className="text-xs bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded">{market}</span>
                           </td>
                           <td className="px-4 py-2 text-right">{row['數量']}</td>
                           <td className="px-4 py-2 text-right text-slate-500">{row['單價']}</td>
@@ -747,7 +907,7 @@ export default function App() {
                   })}
                   {rawData.length === 0 && (
                     <tr>
-                      <td colSpan="8" className="px-4 py-8 text-center text-slate-400">目前沒有任何紀錄</td>
+                      <td colSpan="9" className="px-4 py-8 text-center text-slate-400">目前沒有任何紀錄</td>
                     </tr>
                   )}
                 </tbody>
@@ -756,19 +916,20 @@ export default function App() {
           </div>
         )}
 
-        {/* Top KPI Cards */}
+        {/* Top KPI Cards (顯示 Base Currency) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center gap-2">
-            <div className="flex items-center gap-3">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center gap-2 relative overflow-hidden">
+            <div className="absolute -right-4 -top-4 text-slate-50 opacity-50"><TrendingUp size={100} /></div>
+            <div className="flex items-center gap-3 relative z-10">
               <div className={`p-3 rounded-full ${summary.totalRealizedPnl >= 0 ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
                 {summary.totalRealizedPnl >= 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
               </div>
-              <p className="text-sm font-medium text-slate-500">總已實現損益</p>
+              <p className="text-sm font-medium text-slate-500">總已實現損益 (換算)</p>
             </div>
-            <div className="flex items-baseline gap-2 mt-2">
+            <div className="flex items-baseline gap-2 mt-2 relative z-10">
               <h3 className={`text-2xl font-bold ${summary.totalRealizedPnl >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                {summary.totalRealizedPnl > 0 ? '+' : ''}{formatCurrency(summary.totalRealizedPnl)}
+                {summary.totalRealizedPnl > 0 ? '+' : ''}{formatBaseCurrency(summary.totalRealizedPnl)}
               </h3>
               <span className={`text-sm font-semibold px-2 py-0.5 rounded-md ${summary.totalRealizedPnl >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
                 {formatPercent(overallRealizedPercent)}
@@ -776,16 +937,17 @@ export default function App() {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center gap-2">
-            <div className="flex items-center gap-3">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center gap-2 relative overflow-hidden">
+            <div className="absolute -right-4 -top-4 text-slate-50 opacity-50"><Activity size={100} /></div>
+            <div className="flex items-center gap-3 relative z-10">
               <div className={`p-3 rounded-full ${summary.totalUnrealizedPnl >= 0 ? 'bg-blue-100 text-blue-600' : 'bg-rose-100 text-rose-600'}`}>
                 {summary.totalUnrealizedPnl >= 0 ? <Activity size={20} /> : <TrendingDown size={20} />}
               </div>
-              <p className="text-sm font-medium text-slate-500">總未實現損益</p>
+              <p className="text-sm font-medium text-slate-500">總未實現損益 (換算)</p>
             </div>
-            <div className="flex items-baseline gap-2 mt-2">
+            <div className="flex items-baseline gap-2 mt-2 relative z-10">
               <h3 className={`text-2xl font-bold ${summary.totalUnrealizedPnl >= 0 ? 'text-blue-600' : 'text-rose-600'}`}>
-                {summary.totalUnrealizedPnl > 0 ? '+' : ''}{formatCurrency(summary.totalUnrealizedPnl)}
+                {summary.totalUnrealizedPnl > 0 ? '+' : ''}{formatBaseCurrency(summary.totalUnrealizedPnl)}
               </h3>
               <span className={`text-sm font-semibold px-2 py-0.5 rounded-md ${summary.totalUnrealizedPnl >= 0 ? 'bg-blue-50 text-blue-600' : 'bg-rose-50 text-rose-600'}`}>
                 {formatPercent(overallUnrealizedPercent)}
@@ -798,10 +960,10 @@ export default function App() {
               <div className="p-3 rounded-full bg-slate-100 text-slate-600">
                 <DollarSign size={20} />
               </div>
-              <p className="text-sm font-medium text-slate-500">目前持股總價值</p>
+              <p className="text-sm font-medium text-slate-500">目前持股總市值 (換算)</p>
             </div>
             <h3 className="text-2xl font-bold text-slate-800 mt-2">
-              {formatCurrency(summary.totalValue)}
+              {formatBaseCurrency(summary.totalValue)}
             </h3>
           </div>
 
@@ -822,9 +984,12 @@ export default function App() {
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
-          {/* Bar Chart: PnL */}
+          {/* Bar Chart: PnL (Base Currency) */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-            <h3 className="text-lg font-bold text-slate-800 mb-6">各股已實現損益</h3>
+            <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center justify-between">
+              各股已實現損益
+              <span className="text-xs font-normal text-slate-400 bg-slate-100 px-2 py-1 rounded">統一換算為 {baseCurrency} 繪製</span>
+            </h3>
             <div className="h-80">
               {chartData.pnlData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
@@ -832,28 +997,17 @@ export default function App() {
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
                     <XAxis xAxisId={0} dataKey="name" tick={{fontSize: 12}} tickFormatter={(val) => val.length > 4 ? val.substring(0,4)+'..' : val} />
                     <XAxis xAxisId={1} dataKey="name" hide />
-                    <YAxis tickFormatter={(val) => `¥${val}`} tick={{fontSize: 12}} />
+                    <YAxis tickFormatter={(val) => `${val>1000? (val/1000).toFixed(0)+'k' : val}`} tick={{fontSize: 12}} />
                     <Tooltip content={<CustomTooltip />} cursor={{fill: '#f1f5f9'}} />
-                    
-                    {/* 自訂圖說 (Legend) */}
                     <Legend content={renderCustomLegend} verticalAlign="top" wrapperStyle={{ paddingBottom: '20px' }} />
-                    
-                    {/* 半透明背景：假設今天才賣的損益 */}
-                    <Bar xAxisId={1} dataKey="ifSoldTodayPnl" name="若今天才賣" radius={[4, 4, 0, 0]}>
+                    <Bar xAxisId={1} dataKey="ifSoldTodayPnlBase" name="若今天才賣" radius={[4, 4, 0, 0]}>
                       {chartData.pnlData.map((entry, index) => (
-                        <Cell key={`cell-if-${index}`} 
-                              fill={entry.ifSoldTodayPnl >= 0 ? '#10B981' : '#EF4444'} 
-                              fillOpacity={0.25} 
-                              stroke={entry.ifSoldTodayPnl >= 0 ? '#10B981' : '#EF4444'} 
-                              strokeDasharray="4 4"
-                              strokeWidth={1.5} />
+                        <Cell key={`cell-if-${index}`} fill={entry.ifSoldTodayPnlBase >= 0 ? '#10B981' : '#EF4444'} fillOpacity={0.25} stroke={entry.ifSoldTodayPnlBase >= 0 ? '#10B981' : '#EF4444'} strokeDasharray="4 4" strokeWidth={1.5} />
                       ))}
                     </Bar>
-
-                    {/* 實心前景：實際已實現損益 */}
-                    <Bar xAxisId={0} dataKey="realizedPnl" name="實際已實現" radius={[4, 4, 0, 0]}>
+                    <Bar xAxisId={0} dataKey="realizedPnlBase" name="實際已實現" radius={[4, 4, 0, 0]}>
                       {chartData.pnlData.map((entry, index) => (
-                        <Cell key={`cell-actual-${index}`} fill={entry.realizedPnl >= 0 ? '#10B981' : '#EF4444'} />
+                        <Cell key={`cell-actual-${index}`} fill={entry.realizedPnlBase >= 0 ? '#10B981' : '#EF4444'} />
                       ))}
                     </Bar>
                   </BarChart>
@@ -864,9 +1018,12 @@ export default function App() {
             </div>
           </div>
 
-          {/* Pie Chart: Holdings */}
+          {/* Pie Chart: Holdings (Base Currency) */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-            <h3 className="text-lg font-bold text-slate-800 mb-6">目前持股價值分佈</h3>
+            <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center justify-between">
+              目前持股價值分佈
+              <span className="text-xs font-normal text-slate-400 bg-slate-100 px-2 py-1 rounded">統一換算為 {baseCurrency} 繪製</span>
+            </h3>
             <div className="h-80">
               {chartData.holdingData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
@@ -878,7 +1035,7 @@ export default function App() {
                       innerRadius={60}
                       outerRadius={100}
                       paddingAngle={5}
-                      dataKey="currentValue"
+                      dataKey="currentValueBase"
                       nameKey="name"
                       label={({name, percent}) => `${name.substring(0,4)} ${(percent * 100).toFixed(0)}%`}
                     >
@@ -899,60 +1056,70 @@ export default function App() {
         {/* Data Table */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
           <div className="p-6 border-b border-slate-100">
-            <h3 className="text-lg font-bold text-slate-800">各股詳細數據表</h3>
+            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+              各股詳細數據表 <span className="text-xs font-normal text-slate-400 bg-slate-100 px-2 py-1 rounded ml-2">金額皆顯示為該市場原幣別</span>
+            </h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm whitespace-nowrap">
               <thead className="bg-slate-50 text-slate-600">
                 <tr>
                   <th className="px-6 py-4 font-semibold">代號 / 股名</th>
+                  <th className="px-6 py-4 font-semibold text-center">市場(幣別)</th>
                   <th className="px-6 py-4 font-semibold text-right">當前持股數</th>
                   <th className="px-6 py-4 font-semibold text-right">目前股價</th>
-                  <th className="px-6 py-4 font-semibold text-right">目前價值</th>
-                  <th className="px-6 py-4 font-semibold text-right">未實現損益</th>
-                  <th className="px-6 py-4 font-semibold text-right">實際已實現</th>
-                  <th className="px-6 py-4 font-semibold text-right border-l border-slate-200">若今天才賣</th>
+                  <th className="px-6 py-4 font-semibold text-right">市值(原幣)</th>
+                  <th className="px-6 py-4 font-semibold text-right">未實現損益(原幣)</th>
+                  <th className="px-6 py-4 font-semibold text-right">實際已實現(原幣)</th>
+                  <th className="px-6 py-4 font-semibold text-right border-l border-slate-200">若今天才賣(原幣)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {processedData.map((stock) => {
                   const percentDiff = stock.realizedPnlPercent - stock.ifSoldTodayPnlPercent;
                   const hasSold = stock.totalSoldQty > 0;
+                  const sym = stock.currencySymbol;
                   return (
-                    <tr key={stock.code} className="hover:bg-slate-50 transition-colors">
+                    <tr key={stock.symbol} className="hover:bg-slate-50 transition-colors">
                       <td className="px-6 py-4">
-                        <div className="font-bold text-slate-800">{stock.code}</div>
+                        <div className="font-bold text-slate-800">{stock.rawCode}</div>
                         <div className="text-xs text-slate-500 mt-0.5">{stock.name}</div>
                       </td>
-                      <td className="px-6 py-4 text-right">{stock.holdingQty.toLocaleString()}</td>
-                      <td className="px-6 py-4 text-right">
-                        {stock.currentPrice > 0 ? `¥${stock.currentPrice.toFixed(2)}` : '-'}
+                      <td className="px-6 py-4 text-center">
+                        <div className="inline-flex flex-col items-center">
+                           <span className="text-xs font-medium text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded">{stock.market}</span>
+                           <span className="text-[10px] text-slate-400 mt-1">{stock.currency}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-right font-medium">{stock.holdingQty.toLocaleString()}</td>
+                      <td className="px-6 py-4 text-right text-slate-600">
+                        {stock.currentPrice > 0 ? `${sym}${stock.currentPrice.toFixed(2)}` : '-'}
                       </td>
                       <td className="px-6 py-4 text-right font-medium text-slate-800">
-                        {stock.currentValue > 0 ? formatCurrency(stock.currentValue) : '-'}
+                        {stock.currentValueOriginal > 0 ? formatOriginalCurrency(stock.currentValueOriginal, sym) : '-'}
                       </td>
                       <td className="px-6 py-4 text-right">
                         {stock.holdingQty > 0 ? (
-                          <div className={`flex flex-col items-end ${stock.unrealizedPnl > 0 ? 'text-blue-600' : stock.unrealizedPnl < 0 ? 'text-rose-600' : 'text-slate-500'}`}>
-                            <span className="font-bold">{stock.unrealizedPnl > 0 ? '+' : ''}{formatCurrency(stock.unrealizedPnl)}</span>
+                          <div className={`flex flex-col items-end ${stock.unrealizedPnlOriginal > 0 ? 'text-blue-600' : stock.unrealizedPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500'}`}>
+                            <span className="font-bold">{stock.unrealizedPnlOriginal > 0 ? '+' : ''}{formatOriginalCurrency(stock.unrealizedPnlOriginal, sym)}</span>
                             <span className="text-xs bg-slate-100 px-1.5 py-0.5 rounded mt-1">{formatPercent(stock.unrealizedPnlPercent)}</span>
                           </div>
                         ) : '-'}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        {(stock.realizedPnl !== 0 || stock.tradeCount > 0) ? (
-                          <div className={`flex flex-col items-end ${stock.realizedPnl > 0 ? 'text-emerald-600' : stock.realizedPnl < 0 ? 'text-rose-600' : 'text-slate-500'}`}>
-                            <span className="font-bold">{stock.realizedPnl > 0 ? '+' : ''}{stock.realizedPnl !== 0 ? formatCurrency(stock.realizedPnl) : '-'}</span>
+                        {(stock.realizedPnlOriginal !== 0 || stock.tradeCount > 0) ? (
+                          <div className={`flex flex-col items-end ${stock.realizedPnlOriginal > 0 ? 'text-emerald-600' : stock.realizedPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500'}`}>
+                            <span className="font-bold">{stock.realizedPnlOriginal > 0 ? '+' : ''}{stock.realizedPnlOriginal !== 0 ? formatOriginalCurrency(stock.realizedPnlOriginal, sym) : '-'}</span>
                             {stock.realizedPnlPercent !== 0 && (
                               <span className="text-xs bg-slate-100 px-1.5 py-0.5 rounded mt-1">{formatPercent(stock.realizedPnlPercent)}</span>
                             )}
                           </div>
-                        ) : '-'} 
+                        ) : '-'}
                       </td>
                       <td className="px-6 py-4 text-right border-l border-slate-200">
                         {hasSold ? (
-                          <div className={`flex flex-col items-end ${stock.ifSoldTodayPnl > 0 ? 'text-emerald-600' : stock.ifSoldTodayPnl < 0 ? 'text-rose-600' : 'text-slate-500'}`}>
-                            <span className="font-bold opacity-75">{stock.ifSoldTodayPnl > 0 ? '+' : ''}{formatCurrency(stock.ifSoldTodayPnl)}</span>
+                          <div className={`flex flex-col items-end ${stock.ifSoldTodayPnlOriginal > 0 ? 'text-emerald-600' : stock.ifSoldTodayPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500'}`}>
+                            <span className="font-bold opacity-75">{stock.ifSoldTodayPnlOriginal > 0 ? '+' : ''}{formatOriginalCurrency(stock.ifSoldTodayPnlOriginal, sym)}</span>
                             <div className="mt-1 flex items-center gap-1">
                               {percentDiff > 7 ? (
                                 <span className="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-medium whitespace-nowrap">成功避險 (+{percentDiff.toFixed(2)}%)</span>
@@ -961,7 +1128,7 @@ export default function App() {
                               ) : null}
                             </div>
                           </div>
-                        ) : '-'} 
+                        ) : '-'}
                       </td>
                     </tr>
                   )
