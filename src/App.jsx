@@ -1025,7 +1025,7 @@ export default function App() {
               </div>
               <button 
                 onClick={handleExportCSV}
-                className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:bg-slate-900/50 text-slate-700 px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap"
+                className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-300 px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap"
               >
                 <Download size={18} />
                 匯出 CSV
@@ -1118,7 +1118,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="bg-slate-50 dark:bg-slate-950 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 p-5 rounded-xl">
+                <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-xl">
                   <label className="flex items-center gap-2 text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">
                     <DollarSign size={16} />
                     總計面板基礎幣別 (Base Currency)
@@ -1142,7 +1142,7 @@ export default function App() {
                 </div>
             </div>
 
-            <div className="bg-slate-50 dark:bg-slate-950 dark:bg-slate-900/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-4 rounded-xl mb-6 flex items-center justify-between">
+            <div className="bg-slate-50 dark:bg-slate-800 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-4 rounded-xl mb-6 flex items-center justify-between">
               <span className="text-sm font-bold text-slate-800 dark:text-slate-200">隱藏目前無持股的交易紀錄</span>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" className="sr-only peer" checked={hideZeroHolding} onChange={() => setHideZeroHolding(!hideZeroHolding)} />
@@ -1151,7 +1151,7 @@ export default function App() {
             </div>
 
             {/* 新增紀錄表單 */}
-            <div className="bg-slate-50 dark:bg-slate-950 dark:bg-slate-900/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-4 rounded-xl mb-6">
+            <div className="bg-slate-50 dark:bg-slate-800 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-4 rounded-xl mb-6">
                 <h4 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700 pb-2">
                   <Plus size={16} /> 手動新增單筆紀錄
                 </h4>
@@ -1467,9 +1467,9 @@ export default function App() {
           </div>
           
           {/* Desktop Table View */}
-          <div className="hidden md:block overflow-x-auto overflow-y-visible">
+          <div className="hidden md:block overflow-auto max-h-[calc(100vh-100px)] custom-scrollbar">
             <table className="w-full text-left text-sm whitespace-nowrap">
-              <thead className="bg-slate-50 dark:bg-slate-950 dark:bg-slate-900/50 text-slate-600 dark:text-slate-400 sticky top-0 z-10 shadow-sm">
+              <thead className="bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 sticky top-0 z-30 shadow-sm">
                 <tr>
                   <th className="w-10"></th>
                   <th className="px-6 py-4 font-semibold cursor-pointer hover:bg-slate-200 transition-colors" onClick={() => requestSort('代號')}>
@@ -1596,7 +1596,7 @@ export default function App() {
                         </td>
                       </tr>
                       {isExpanded && (
-                        <tr className="bg-slate-50 dark:bg-slate-950 dark:bg-slate-900/50/50">
+                        <tr className="bg-slate-50 dark:bg-slate-800/50">
                           <td colSpan="8" className="px-6 py-4 p-0 border-b border-slate-200 dark:border-slate-700">
                             <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden shadow-sm m-2">
                               <table className="w-full text-xs text-left">
@@ -1706,7 +1706,7 @@ export default function App() {
                     
                     {/* Expanded History for Mobile */}
                     {isExpanded && (
-                      <div className="bg-slate-50 dark:bg-slate-950 dark:bg-slate-900/50/80 border-t border-slate-100 dark:border-slate-800 p-3">
+                      <div className="bg-slate-50 dark:bg-slate-800/80 border-t border-slate-100 dark:border-slate-800 p-3">
                          <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">交易明細</div>
                          <div className="flex flex-col gap-2">
                            {stock.history.map((hRow, idx) => (
