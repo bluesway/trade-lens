@@ -3,7 +3,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell,
   PieChart, Pie
 } from 'recharts';
-import { Upload, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, Activity, Layers, RefreshCw, Clock, Trash2, Edit2, Plus, Database, X, Key, Info, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { Upload, Download, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, Activity, Layers, RefreshCw, Clock, Trash2, Edit2, Plus, Database, X, Key, Info, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
 // 股票資料對應表 (當 API 抓不到名稱或價格時的備援)
 const STOCK_MAPPING = {
@@ -410,6 +410,39 @@ export default function App() {
     }
   };
 
+  const handleExportCSV = () => {
+    if (rawData.length === 0) {
+      showToast('目前沒有資料可匯出！');
+      return;
+    }
+
+    const headers = ['日期', '類型', '代號', '市場', '數量', '單價', '總金額', '損益'];
+    const csvContent = [
+      headers.join(','),
+      ...rawData.map(row => 
+        headers.map(header => {
+          let val = row[header] || '';
+          // 如果包含逗號，需要用雙引號包起來
+          if (String(val).includes(',')) {
+            val = `"${val}"`;
+          }
+          return val;
+        }).join(',')
+      )
+    ].join('\n');
+
+    // 加上 BOM 讓 Excel 識別為 UTF-8
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `trade_records_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleAddRecord = () => {
     if (!newRec.code || !newRec.qty || !newRec.amount || !newRec.date) return; 
     const row = {
@@ -751,16 +784,25 @@ export default function App() {
               <span className="hidden md:inline">強制刷新</span>
             </button>
             
-            <div className="relative">
-              <input 
-                type="file" 
-                accept=".csv" 
-                onChange={handleFileUpload} 
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
-              <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap">
-                <Upload size={18} />
-                匯入 CSV
+            <div className="relative flex items-center gap-2">
+              <div className="relative group">
+                <input 
+                  type="file" 
+                  accept=".csv" 
+                  onChange={handleFileUpload} 
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                />
+                <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap relative">
+                  <Upload size={18} />
+                  匯入 CSV
+                </button>
+              </div>
+              <button 
+                onClick={handleExportCSV}
+                className="flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap"
+              >
+                <Download size={18} />
+                匯出 CSV
               </button>
             </div>
 
