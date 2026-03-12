@@ -1107,7 +1107,7 @@ export default function App() {
                       placeholder="請貼上您的 x-api-key (例如: A2sD8...)" 
                       value={apiKey} 
                       onChange={e => setApiKey(e.target.value)} 
-                      className="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" 
+                      className="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-mono bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" 
                     />
                     <button
                       onClick={handleSaveApiKey}
@@ -1158,18 +1158,18 @@ export default function App() {
                 <div className="flex flex-wrap gap-4 items-end">
                   <div className="w-[130px]">
                     <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">日期</label>
-                    <input type="date" value={newRec.date} onChange={e => setNewRec({...newRec, date: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm" />
+                    <input type="date" value={newRec.date} onChange={e => setNewRec({...newRec, date: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                   </div>
                   <div className="w-[80px]">
                     <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">類型</label>
-                    <select value={newRec.type} onChange={e => setNewRec({...newRec, type: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 dark:text-slate-200">
+                    <select value={newRec.type} onChange={e => setNewRec({...newRec, type: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">
                       <option>買入</option>
                       <option>賣出</option>
                     </select>
                   </div>
                   <div className="w-[100px]">
                     <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">市場</label>
-                    <select value={newRec.market} onChange={e => setNewRec({...newRec, market: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 dark:text-slate-200 font-medium text-blue-700">
+                    <select value={newRec.market} onChange={e => setNewRec({...newRec, market: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium text-blue-700">
                       <option>陸股</option>
                       <option>港股</option>
                       <option>台股</option>
@@ -1180,19 +1180,19 @@ export default function App() {
                   </div>
                   <div className="flex-1 min-w-[100px]">
                     <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">代號</label>
-                    <input type="text" placeholder="如: AAPL" value={newRec.code} onChange={e => setNewRec({...newRec, code: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm" />
+                    <input type="text" placeholder="如: AAPL" value={newRec.code} onChange={e => setNewRec({...newRec, code: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                   </div>
                   <div className="flex-1 min-w-[100px]">
                     <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">數量</label>
-                    <input type="number" placeholder="股數" value={newRec.qty} onChange={e => setNewRec({...newRec, qty: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm" />
+                    <input type="number" placeholder="股數" value={newRec.qty} onChange={e => setNewRec({...newRec, qty: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                   </div>
                   <div className="flex-1 min-w-[120px]">
                     <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">總金額 (原幣)</label>
-                    <input type="number" placeholder="依該市場幣別" value={newRec.amount} onChange={e => setNewRec({...newRec, amount: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm" />
+                    <input type="number" placeholder="依該市場幣別" value={newRec.amount} onChange={e => setNewRec({...newRec, amount: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                   </div>
                   <div className="flex-1 min-w-[120px]">
                     <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">損益 (賣出填,原幣)</label>
-                    <input type="number" placeholder="選填" value={newRec.pnl} onChange={e => setNewRec({...newRec, pnl: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm" />
+                    <input type="number" placeholder="選填" value={newRec.pnl} onChange={e => setNewRec({...newRec, pnl: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                   </div>
                   <div className="flex gap-2">
                     {editingIndex !== null && (
@@ -1514,7 +1514,7 @@ export default function App() {
                                   type="text" 
                                   value={tempStockEdit.name} 
                                   onChange={e=>setTempStockEdit({...tempStockEdit, name: e.target.value})} 
-                                  className="px-2 py-1 border rounded text-xs w-28" 
+                                  className="px-2 py-1 border border-slate-300 dark:border-slate-600 rounded text-xs w-28 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500" 
                                   placeholder="手動股名"
                                 />
                                 <div className="flex gap-1">
@@ -1554,7 +1554,7 @@ export default function App() {
                                 type="number" 
                                 value={tempStockEdit.price} 
                                 onChange={e=>setTempStockEdit({...tempStockEdit, price: e.target.value})} 
-                                className="px-1 border rounded w-20 text-right text-xs" 
+                                className="px-1 py-1 border border-slate-300 dark:border-slate-600 rounded w-20 text-right text-xs bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500" 
                                 placeholder="現價"
                               />
                             ) : (
