@@ -1305,14 +1305,24 @@ export default function App() {
           {/* Desktop Table View */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-sm whitespace-nowrap">
-              <thead className="bg-slate-50 text-slate-600">
+              <thead className="bg-slate-50 text-slate-600 sticky top-0 z-10 shadow-sm">
                 <tr>
                   <th className="w-10"></th>
-                  <th className="px-6 py-4 font-semibold">代號 / 股名 (市場·幣別)</th>
-                  <th className="px-6 py-4 font-semibold text-right">當前持股數</th>
-                  <th className="px-6 py-4 font-semibold text-right">目前股價 / 市值(原幣)</th>
-                  <th className="px-6 py-4 font-semibold text-right">未實現損益(原幣)</th>
-                  <th className="px-6 py-4 font-semibold text-right">實際已實現(原幣)</th>
+                  <th className="px-6 py-4 font-semibold cursor-pointer hover:bg-slate-200 transition-colors" onClick={() => requestSort('代號')}>
+                    <div className="flex items-center gap-1">代號 / 股名 (市場·幣別) {historySortConfig?.key === '代號' ? (historySortConfig.direction === 'asc' ? <ArrowUp size={14}/> : <ArrowDown size={14}/>) : <ArrowUpDown size={14} className="opacity-50"/>}</div>
+                  </th>
+                  <th className="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-slate-200 transition-colors" onClick={() => requestSort('持股數')}>
+                    <div className="flex items-center justify-end gap-1">當前持股數 {historySortConfig?.key === '持股數' ? (historySortConfig.direction === 'asc' ? <ArrowUp size={14}/> : <ArrowDown size={14}/>) : <ArrowUpDown size={14} className="opacity-50"/>}</div>
+                  </th>
+                  <th className="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-slate-200 transition-colors" onClick={() => requestSort('市值')}>
+                    <div className="flex items-center justify-end gap-1">目前股價 / 市值(原幣) {historySortConfig?.key === '市值' ? (historySortConfig.direction === 'asc' ? <ArrowUp size={14}/> : <ArrowDown size={14}/>) : <ArrowUpDown size={14} className="opacity-50"/>}</div>
+                  </th>
+                  <th className="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-slate-200 transition-colors" onClick={() => requestSort('未實現')}>
+                    <div className="flex items-center justify-end gap-1">未實現損益(原幣) {historySortConfig?.key === '未實現' ? (historySortConfig.direction === 'asc' ? <ArrowUp size={14}/> : <ArrowDown size={14}/>) : <ArrowUpDown size={14} className="opacity-50"/>}</div>
+                  </th>
+                  <th className="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-slate-200 transition-colors" onClick={() => requestSort('已實現')}>
+                    <div className="flex items-center justify-end gap-1">實際已實現(原幣) {historySortConfig?.key === '已實現' ? (historySortConfig.direction === 'asc' ? <ArrowUp size={14}/> : <ArrowDown size={14}/>) : <ArrowUpDown size={14} className="opacity-50"/>}</div>
+                  </th>
                   <th className="px-6 py-4 font-semibold text-right border-l border-slate-200">若今天才賣(原幣)</th>
                 </tr>
               </thead>
