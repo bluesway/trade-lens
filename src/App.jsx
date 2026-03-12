@@ -685,7 +685,7 @@ export default function App() {
     setEditingIndex(idx);
     
     // 平滑滾動到最上方表單
-    document.querySelector('.bg-slate-50.border-slate-200.p-4')?.scrollIntoView({ behavior: 'smooth' });
+    document.querySelector('.bg-slate-50 dark:bg-slate-900/50.border-slate-200 dark:border-slate-700.p-4')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleClearData = () => {
@@ -896,8 +896,8 @@ export default function App() {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 border border-slate-200 shadow-lg rounded-lg z-50">
-          <p className="font-bold text-slate-800 mb-2 border-b pb-1">{label}</p>
+        <div className="bg-white dark:bg-slate-900 p-3 border border-slate-200 dark:border-slate-700 shadow-lg rounded-lg z-50">
+          <p className="font-bold text-slate-800 dark:text-slate-200 mb-2 border-b pb-1">{label}</p>
           {payload.map((entry, idx) => (
             <p key={idx} className="text-sm flex justify-between gap-4 font-medium" style={{ color: entry.color || entry.fill }}>
               <span>{entry.name}:</span>
@@ -917,11 +917,11 @@ export default function App() {
         {payload.map((entry, index) => {
           const isIfSold = entry.dataKey === 'ifSoldTodayPnlBase';
           return (
-            <li key={`item-${index}`} className="flex items-center gap-2 text-sm text-slate-600 font-medium">
+            <li key={`item-${index}`} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 font-medium">
               {isIfSold ? (
                 <div className="w-4 h-4 rounded-[2px] border-2 border-dashed border-slate-400 bg-slate-200/50"></div>
               ) : (
-                <div className="w-4 h-4 rounded-[2px] bg-slate-500"></div>
+                <div className="w-4 h-4 rounded-[2px] bg-slate-50 dark:bg-slate-900/500"></div>
               )}
               <span>{entry.value} (換算後)</span>
             </li>
@@ -933,8 +933,8 @@ export default function App() {
 
   if (!isAppLoaded) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-slate-500">
+      <div className="min-h-screen transition-colors duration-300 bg-slate-50 dark:bg-slate-900/50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3 text-slate-500 dark:text-slate-400">
           <RefreshCw size={24} className="animate-spin text-blue-500" />
           <p className="font-medium">載入本機 IndexedDB 資料中...</p>
         </div>
@@ -943,7 +943,7 @@ export default function App() {
   }
 
   return (
-        <div className={`min-h-screen ${darkMode ? 'dark bg-slate-950 text-slate-200' : 'bg-slate-50 text-slate-800'} transition-colors duration-300 p-4 md:p-8 font-sans`}>
+        <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'dark bg-slate-950 text-slate-200' : 'bg-slate-50 dark:bg-slate-900/50 text-slate-800 dark:text-slate-200'} transition-colors duration-300 p-4 md:p-8 font-sans`}>
           {toastMsg && (
             <div className="fixed bottom-6 right-6 bg-slate-800 dark:bg-blue-600 text-white px-5 py-3 rounded-xl shadow-2xl z-50 animate-fade-in-up border border-white/10 flex items-center gap-2">
               <ShieldCheck size={18} /> {toastMsg}
@@ -955,16 +955,16 @@ export default function App() {
             {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
               <div>
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white dark:text-white flex items-center gap-2">
                   <Activity className="text-blue-600" />
                   全球交易組合視覺化儀表板
                 </h1>
                 <div className="flex flex-col gap-2 md:flex-row md:items-center mt-2">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-400">
                     {isDemo ? "目前顯示為部分預設範例資料。請上傳完整 CSV 以查看全貌。" : `已成功載入並分析 ${rawData.length} 筆交易紀錄`}
                   </p>
                   {lastUpdate && (
-                    <span className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-1 rounded-md flex items-center gap-1 w-fit">
+                    <span className="text-xs bg-slate-100 dark:bg-slate-800 dark:bg-slate-800 text-slate-500 dark:text-slate-400 dark:text-slate-400 px-2 py-1 rounded-md flex items-center gap-1 w-fit">
                       <Clock size={12} />
                       快取: {lastUpdate.toLocaleTimeString()}
                     </span>
@@ -975,14 +975,14 @@ export default function App() {
               <div className="flex flex-wrap items-center gap-3">
                 <button
                   onClick={toggleDarkMode}
-                  className="p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm"
+                  className="p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:bg-slate-900/50 dark:hover:bg-slate-700 transition-colors shadow-sm"
                   title={darkMode ? "切換至淺色模式" : "切換至深色模式"}
                 >
                   {darkMode ? <Sun size={18} /> : <Moon size={18} />}
                 </button>
                 <button 
                   onClick={() => setShowManager(!showManager)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors shadow-sm ${showManager ? 'bg-slate-800 text-white' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors shadow-sm ${showManager ? 'bg-slate-800 text-white' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:bg-slate-900/50 dark:hover:bg-slate-700'}`}
                 >
                   <Database size={18} />
                   <span className="hidden md:inline">設定與紀錄</span>
@@ -990,7 +990,7 @@ export default function App() {
             <button 
               onClick={() => fetchLivePrices(false)}
               disabled={isLoadingPrices || rawData.length === 0}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 ${apiKey ? 'bg-slate-100 hover:bg-slate-200 text-slate-700' : 'bg-rose-50 text-rose-600 hover:bg-rose-100'}`}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 ${apiKey ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700' : 'bg-rose-50 text-rose-600 hover:bg-rose-100'}`}
               title={apiKey ? "手動更新即時股價 (使用快取)" : "請先設定 API Key"}
             >
               <RefreshCw size={18} className={isLoadingPrices ? "animate-spin" : ""} />
@@ -1025,7 +1025,7 @@ export default function App() {
               </div>
               <button 
                 onClick={handleExportCSV}
-                className="flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap"
+                className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:bg-slate-900/50 text-slate-700 px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap"
               >
                 <Download size={18} />
                 匯出 CSV
@@ -1035,16 +1035,16 @@ export default function App() {
             <div className="relative">
               <button 
                 onClick={() => setShowCsvHelp(!showCsvHelp)}
-                className="flex items-center justify-center w-10 h-[44px] bg-white border border-slate-200 text-slate-400 hover:text-blue-600 hover:border-blue-300 rounded-lg transition-colors"
+                className="flex items-center justify-center w-10 h-[44px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-blue-600 hover:border-blue-300 rounded-lg transition-colors"
                 title="CSV 格式說明"
               >
                 <HelpCircle size={20} />
               </button>
               {showCsvHelp && (
-                <div className="absolute right-0 top-14 w-80 bg-white border border-slate-200 p-4 rounded-xl shadow-xl z-50 text-sm text-slate-600">
-                  <h4 className="font-bold text-slate-800 mb-2 border-b pb-1">CSV 欄位格式說明</h4>
+                <div className="absolute right-0 top-14 w-80 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-xl shadow-xl z-50 text-sm text-slate-600 dark:text-slate-400">
+                  <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2 border-b pb-1">CSV 欄位格式說明</h4>
                   <p className="mb-2 text-xs">請確保您的 CSV 包含以下標題列 (順序不拘)：</p>
-                  <ul className="list-disc pl-5 space-y-1 text-xs font-mono bg-slate-50 p-2 rounded">
+                  <ul className="list-disc pl-5 space-y-1 text-xs font-mono bg-slate-50 dark:bg-slate-900/50 p-2 rounded">
                     <li>日期 <span className="text-slate-400">(如: 2025/01/01)</span></li>
                     <li>類型 <span className="text-slate-400">(買入/賣出)</span></li>
                     <li>代號 <span className="text-slate-400">(如: 2330.TW, AAPL)</span></li>
@@ -1064,9 +1064,9 @@ export default function App() {
 
         {/* Manager Section (Toggleable) */}
         {showManager && (
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-800/10">
-            <div className="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
-              <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-800/10">
+            <div className="flex justify-between items-center mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
+              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                 <Database className="text-blue-600" />
                 設定與紀錄管理
               </h2>
@@ -1077,7 +1077,7 @@ export default function App() {
                 >
                   清除並載入範例
                 </button>
-                <button onClick={() => setShowManager(false)} className="text-slate-400 hover:text-slate-600">
+                <button onClick={() => setShowManager(false)} className="text-slate-400 hover:text-slate-600 dark:text-slate-400">
                   <X size={20} />
                 </button>
               </div>
@@ -1107,7 +1107,7 @@ export default function App() {
                       placeholder="請貼上您的 x-api-key (例如: A2sD8...)" 
                       value={apiKey} 
                       onChange={e => setApiKey(e.target.value)} 
-                      className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" 
+                      className="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" 
                     />
                     <button
                       onClick={handleSaveApiKey}
@@ -1118,8 +1118,8 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="bg-slate-50 border border-slate-200 p-5 rounded-xl">
-                  <label className="flex items-center gap-2 text-sm font-bold text-slate-800 mb-3">
+                <div className="bg-slate-50 dark:bg-slate-950 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 p-5 rounded-xl">
+                  <label className="flex items-center gap-2 text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">
                     <DollarSign size={16} />
                     總計面板基礎幣別 (Base Currency)
                   </label>
@@ -1127,7 +1127,7 @@ export default function App() {
                     <select 
                       value={baseCurrency} 
                       onChange={e => handleSaveBaseCurrency(e.target.value)}
-                      className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                      className="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none"
                     >
                       <option value="TWD">新台幣 (TWD)</option>
                       <option value="CNY">人民幣 (CNY)</option>
@@ -1136,14 +1136,14 @@ export default function App() {
                       <option value="JPY">日圓 (JPY)</option>
                     </select>
                   </div>
-                  <p className="text-xs text-slate-500 mt-2">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
                     * 所有的外幣資產都會透過即時匯率轉換成此幣別，以便在上方總計看板中進行加總計算。
                   </p>
                 </div>
             </div>
 
-            <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl mb-6 flex items-center justify-between">
-              <span className="text-sm font-bold text-slate-800">隱藏目前無持股的交易紀錄</span>
+            <div className="bg-slate-50 dark:bg-slate-950 dark:bg-slate-900/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-4 rounded-xl mb-6 flex items-center justify-between">
+              <span className="text-sm font-bold text-slate-800 dark:text-slate-200">隱藏目前無持股的交易紀錄</span>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" className="sr-only peer" checked={hideZeroHolding} onChange={() => setHideZeroHolding(!hideZeroHolding)} />
                 <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -1151,25 +1151,25 @@ export default function App() {
             </div>
 
             {/* 新增紀錄表單 */}
-            <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl mb-6">
-                <h4 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2 border-b border-slate-200 pb-2">
+            <div className="bg-slate-50 dark:bg-slate-950 dark:bg-slate-900/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-4 rounded-xl mb-6">
+                <h4 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700 pb-2">
                   <Plus size={16} /> 手動新增單筆紀錄
                 </h4>
                 <div className="flex flex-wrap gap-4 items-end">
                   <div className="w-[130px]">
-                    <label className="block text-xs font-semibold text-slate-500 mb-1">日期</label>
-                    <input type="date" value={newRec.date} onChange={e => setNewRec({...newRec, date: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
+                    <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">日期</label>
+                    <input type="date" value={newRec.date} onChange={e => setNewRec({...newRec, date: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm" />
                   </div>
                   <div className="w-[80px]">
-                    <label className="block text-xs font-semibold text-slate-500 mb-1">類型</label>
-                    <select value={newRec.type} onChange={e => setNewRec({...newRec, type: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white">
+                    <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">類型</label>
+                    <select value={newRec.type} onChange={e => setNewRec({...newRec, type: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 dark:text-slate-200">
                       <option>買入</option>
                       <option>賣出</option>
                     </select>
                   </div>
                   <div className="w-[100px]">
-                    <label className="block text-xs font-semibold text-slate-500 mb-1">市場</label>
-                    <select value={newRec.market} onChange={e => setNewRec({...newRec, market: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white font-medium text-blue-700">
+                    <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">市場</label>
+                    <select value={newRec.market} onChange={e => setNewRec({...newRec, market: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 dark:text-slate-200 font-medium text-blue-700">
                       <option>陸股</option>
                       <option>港股</option>
                       <option>台股</option>
@@ -1179,20 +1179,20 @@ export default function App() {
                     </select>
                   </div>
                   <div className="flex-1 min-w-[100px]">
-                    <label className="block text-xs font-semibold text-slate-500 mb-1">代號</label>
-                    <input type="text" placeholder="如: AAPL" value={newRec.code} onChange={e => setNewRec({...newRec, code: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
+                    <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">代號</label>
+                    <input type="text" placeholder="如: AAPL" value={newRec.code} onChange={e => setNewRec({...newRec, code: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm" />
                   </div>
                   <div className="flex-1 min-w-[100px]">
-                    <label className="block text-xs font-semibold text-slate-500 mb-1">數量</label>
-                    <input type="number" placeholder="股數" value={newRec.qty} onChange={e => setNewRec({...newRec, qty: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
+                    <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">數量</label>
+                    <input type="number" placeholder="股數" value={newRec.qty} onChange={e => setNewRec({...newRec, qty: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm" />
                   </div>
                   <div className="flex-1 min-w-[120px]">
-                    <label className="block text-xs font-semibold text-slate-500 mb-1">總金額 (原幣)</label>
-                    <input type="number" placeholder="依該市場幣別" value={newRec.amount} onChange={e => setNewRec({...newRec, amount: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
+                    <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">總金額 (原幣)</label>
+                    <input type="number" placeholder="依該市場幣別" value={newRec.amount} onChange={e => setNewRec({...newRec, amount: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm" />
                   </div>
                   <div className="flex-1 min-w-[120px]">
-                    <label className="block text-xs font-semibold text-slate-500 mb-1">損益 (賣出填,原幣)</label>
-                    <input type="number" placeholder="選填" value={newRec.pnl} onChange={e => setNewRec({...newRec, pnl: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
+                    <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">損益 (賣出填,原幣)</label>
+                    <input type="number" placeholder="選填" value={newRec.pnl} onChange={e => setNewRec({...newRec, pnl: e.target.value})} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm" />
                   </div>
                   <div className="flex gap-2">
                     {editingIndex !== null && (
@@ -1218,9 +1218,9 @@ export default function App() {
             </div>
 
             {/* 現有紀錄列表 */}
-            <div className="max-h-[350px] overflow-y-auto border border-slate-100 rounded-xl">
+            <div className="max-h-[350px] overflow-y-auto border border-slate-100 dark:border-slate-800 rounded-xl">
               <table className="w-full text-left text-sm whitespace-nowrap">
-                <thead className="bg-slate-100 text-slate-600 sticky top-0 shadow-sm z-10">
+                <thead className="bg-slate-100 dark:bg-slate-800 dark:bg-slate-800 text-slate-600 dark:text-slate-400 sticky top-0 shadow-sm z-10">
                   <tr>
                     <th className="px-4 py-3 font-semibold">日期</th>
                     <th className="px-4 py-3 font-semibold">類型</th>
@@ -1242,24 +1242,24 @@ export default function App() {
                       const symbol = formatSymbol(row['代號'], market);
                       const resolvedName = liveData[symbol]?.name || STOCK_MAPPING[symbol]?.name || '未知';
                       return (
-                        <tr key={row.originalIndex} className="hover:bg-slate-50 transition-colors">
-                          <td className="px-4 py-2 text-slate-600">{formatDate(row['日期'])}</td>
+                        <tr key={row.originalIndex} className="hover:bg-slate-50 dark:bg-slate-900/50 transition-colors">
+                          <td className="px-4 py-2 text-slate-600 dark:text-slate-400">{formatDate(row['日期'])}</td>
                           <td className="px-4 py-2">
                             <span className={`px-2 py-0.5 rounded text-xs font-medium ${row['類型'] === '買入' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>
                               {row['類型']}
                             </span>
                           </td>
                           <td className="px-4 py-2">
-                            <div className="font-bold text-slate-800 flex items-center gap-2">
+                            <div className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                               {symbol}
-                              <span className="text-[10px] font-medium bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">{market}</span>
+                              <span className="text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded">{market}</span>
                             </div>
-                            <div className="text-xs text-slate-500 mt-0.5">{resolvedName}</div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{resolvedName}</div>
                           </td>
                           <td className="px-4 py-2 text-right">{row['數量']}</td>
-                          <td className="px-4 py-2 text-right text-slate-500">{row['單價']}</td>
+                          <td className="px-4 py-2 text-right text-slate-500 dark:text-slate-400">{row['單價']}</td>
                           <td className="px-4 py-2 text-right font-medium">{row['總金額']}</td>
-                          <td className="px-4 py-2 text-right text-slate-500">{row['損益'] || '-'}</td>
+                          <td className="px-4 py-2 text-right text-slate-500 dark:text-slate-400">{row['損益'] || '-'}</td>
                           <td className="px-4 py-2 text-center">
                             <div className="flex items-center justify-center gap-2">
                               <button 
@@ -1295,13 +1295,13 @@ export default function App() {
         {/* Top KPI Cards (顯示 Base Currency) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center gap-2 relative overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center gap-2 relative overflow-hidden">
             <div className="absolute -right-4 -top-4 text-slate-50 opacity-50"><TrendingUp size={100} /></div>
             <div className="flex items-center gap-3 relative z-10">
               <div className={`p-3 rounded-full ${summary.totalRealizedPnl >= 0 ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
                 {summary.totalRealizedPnl >= 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
               </div>
-              <p className="text-sm font-medium text-slate-500">總已實現損益 (換算)</p>
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">總已實現損益 (換算)</p>
             </div>
             <div className="flex items-baseline gap-2 mt-2 relative z-10">
               <h3 className={`text-2xl font-bold ${summary.totalRealizedPnl >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
@@ -1313,13 +1313,13 @@ export default function App() {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center gap-2 relative overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center gap-2 relative overflow-hidden">
             <div className="absolute -right-4 -top-4 text-slate-50 opacity-50"><Activity size={100} /></div>
             <div className="flex items-center gap-3 relative z-10">
               <div className={`p-3 rounded-full ${summary.totalUnrealizedPnl >= 0 ? 'bg-blue-100 text-blue-600' : 'bg-rose-100 text-rose-600'}`}>
                 {summary.totalUnrealizedPnl >= 0 ? <Activity size={20} /> : <TrendingDown size={20} />}
               </div>
-              <p className="text-sm font-medium text-slate-500">總未實現損益 (換算)</p>
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">總未實現損益 (換算)</p>
             </div>
             <div className="flex items-baseline gap-2 mt-2 relative z-10">
               <h3 className={`text-2xl font-bold ${summary.totalUnrealizedPnl >= 0 ? 'text-blue-600' : 'text-rose-600'}`}>
@@ -1331,27 +1331,27 @@ export default function App() {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center gap-2">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center gap-2">
             <div className="flex items-center gap-3">
-              <div className="p-3 rounded-full bg-slate-100 text-slate-600">
+              <div className="p-3 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
                 <DollarSign size={20} />
               </div>
-              <p className="text-sm font-medium text-slate-500">目前持股總市值 (換算)</p>
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">目前持股總市值 (換算)</p>
             </div>
-            <h3 className="text-2xl font-bold text-slate-800 mt-2">
+            <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-2">
               {formatBaseCurrency(summary.totalValue)}
             </h3>
           </div>
 
-                      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center gap-2">
+                      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center gap-2">
                         <div className="flex items-center gap-3">
                           <div className="p-3 rounded-full bg-purple-100 text-purple-600">
                             <Layers size={20} />
                           </div>
-                          <p className="text-sm font-medium text-slate-500">持倉檔數</p>
+                          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">持倉檔數</p>
                         </div>
-                        <h3 className="text-2xl font-bold text-slate-800 mt-2">
-                          {processedData.filter(stock => stock.holdingQty > 0).length} <span className="text-base font-normal text-slate-500">檔股票</span>
+                        <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-2">
+                          {processedData.filter(stock => stock.holdingQty > 0).length} <span className="text-base font-normal text-slate-500 dark:text-slate-400">檔股票</span>
                         </h3>
                       </div>
         </div>
@@ -1361,14 +1361,14 @@ export default function App() {
           
           {/* Bar Chart: PnL (Base Currency) */}
           <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800" ref={barChartRef}>
-            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center justify-between">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 dark:text-white mb-6 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 各股已實現損益
                 <button onClick={() => exportChartAsImage(barChartRef, 'realized_pnl_chart')} className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-md transition-all" title="將圖表存為圖片">
                   <Camera size={16} />
                 </button>
               </div>
-              <span className="text-xs font-normal text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">統一換算為 {baseCurrency} 繪製</span>
+              <span className="text-xs font-normal text-slate-400 dark:text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 dark:bg-slate-800 px-2 py-1 rounded">統一換算為 {baseCurrency} 繪製</span>
             </h3>
             <div className="h-80">
               {chartData.pnlData.length > 0 ? (
@@ -1400,14 +1400,14 @@ export default function App() {
 
           {/* Pie Chart: Holdings (Base Currency) */}
           <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800" ref={pieChartRef}>
-            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center justify-between">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 dark:text-white mb-6 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 持股市值分佈 (Top 10)
                 <button onClick={() => exportChartAsImage(pieChartRef, 'portfolio_distribution')} className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-md transition-all" title="將圖表存為圖片">
                   <Camera size={16} />
                 </button>
               </div>
-              <span className="text-xs font-normal text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">統一換算為 {baseCurrency} 繪製</span>
+              <span className="text-xs font-normal text-slate-400 dark:text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 dark:bg-slate-800 px-2 py-1 rounded">統一換算為 {baseCurrency} 繪製</span>
             </h3>
             <div className="h-80">
               {chartData.holdingData.length > 0 ? (
@@ -1440,13 +1440,13 @@ export default function App() {
         </div>
 
         {/* Data Table */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-          <div className="p-4 md:p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+          <div className="p-4 md:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex flex-col gap-2">
-              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                 各股歷史交易記錄
               </h3>
-              <span className="text-xs font-normal text-slate-500 bg-slate-100 px-2 py-1 rounded w-fit">點擊列可查看買賣明細，金額皆為該市場原幣別</span>
+              <span className="text-xs font-normal text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded w-fit">點擊列可查看買賣明細，金額皆為該市場原幣別</span>
             </div>
             
             <div className="flex flex-wrap gap-2">
@@ -1457,7 +1457,7 @@ export default function App() {
                   className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                     marketFilter === m
                       ? 'bg-blue-600 text-white'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
                   }`}
                 >
                   {m}
@@ -1467,9 +1467,9 @@ export default function App() {
           </div>
           
           {/* Desktop Table View */}
-          <div className="hidden md:block overflow-x-auto">
+          <div className="hidden md:block overflow-x-auto overflow-y-visible">
             <table className="w-full text-left text-sm whitespace-nowrap">
-              <thead className="bg-slate-50 text-slate-600 sticky top-0 z-10 shadow-sm">
+              <thead className="bg-slate-50 dark:bg-slate-950 dark:bg-slate-900/50 text-slate-600 dark:text-slate-400 sticky top-0 z-10 shadow-sm">
                 <tr>
                   <th className="w-10"></th>
                   <th className="px-6 py-4 font-semibold cursor-pointer hover:bg-slate-200 transition-colors" onClick={() => requestSort('代號')}>
@@ -1487,7 +1487,7 @@ export default function App() {
                   <th className="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-slate-200 transition-colors" onClick={() => requestSort('已實現')}>
                     <div className="flex items-center justify-end gap-1">實際已實現(原幣) {historySortConfig?.key === '已實現' ? (historySortConfig.direction === 'asc' ? <ArrowUp size={14}/> : <ArrowDown size={14}/>) : <ArrowUpDown size={14} className="opacity-50"/>}</div>
                   </th>
-                  <th className="px-6 py-4 font-semibold text-right border-l border-slate-200">若今天才賣(原幣)</th>
+                  <th className="px-6 py-4 font-semibold text-right border-l border-slate-200 dark:border-slate-700">若今天才賣(原幣)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -1500,14 +1500,14 @@ export default function App() {
                   return (
                     <React.Fragment key={stock.symbol}>
                       <tr 
-                        className={`hover:bg-slate-50 transition-colors cursor-pointer ${isExpanded ? 'bg-slate-50' : ''}`}
+                        className={`hover:bg-slate-50 dark:bg-slate-900/50 transition-colors cursor-pointer ${isExpanded ? 'bg-slate-50 dark:bg-slate-900/50' : ''}`}
                         onClick={() => setExpandedStock(isExpanded ? null : stock.symbol)}
                       >
                         <td className="pl-4 text-slate-400">
                           {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                         </td>
                         <td className="px-6 py-4">
-                          <div className="font-bold text-slate-800 flex items-center gap-2" onClick={e=>e.stopPropagation()}>
+                          <div className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2" onClick={e=>e.stopPropagation()}>
                             {editingStockSymbol === stock.symbol ? (
                               <div className="flex flex-col gap-1">
                                 <input 
@@ -1519,13 +1519,13 @@ export default function App() {
                                 />
                                 <div className="flex gap-1">
                                   <button onClick={() => handleSaveManualStock(stock.symbol)} className="bg-blue-600 text-white p-1 rounded hover:bg-blue-700"><Save size={14}/></button>
-                                  <button onClick={() => setEditingStockSymbol(null)} className="bg-slate-200 text-slate-600 p-1 rounded hover:bg-slate-300"><X size={14}/></button>
+                                  <button onClick={() => setEditingStockSymbol(null)} className="bg-slate-200 text-slate-600 dark:text-slate-400 p-1 rounded hover:bg-slate-300"><X size={14}/></button>
                                 </div>
                               </div>
                             ) : (
                               <>
                                 {stock.symbol}
-                                <span className="text-[10px] font-medium bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
+                                <span className="text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded">
                                   {stock.market} &middot; {stock.currency}
                                 </span>
                                 <button 
@@ -1541,11 +1541,11 @@ export default function App() {
                               </>
                             )}
                           </div>
-                          {editingStockSymbol !== stock.symbol && <div className="text-xs text-slate-500 mt-0.5">{stock.name}</div>}
+                          {editingStockSymbol !== stock.symbol && <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{stock.name}</div>}
                         </td>
                         <td className="px-6 py-4 text-right font-medium">{stock.holdingQty.toLocaleString()}</td>
                         <td className="px-6 py-4 text-right">
-                          <div className="font-medium text-slate-800">
+                          <div className="font-medium text-slate-800 dark:text-slate-200">
                             {stock.currentValueOriginal > 0 ? formatOriginalCurrency(stock.currentValueOriginal, sym) : '-'}
                           </div>
                           <div className="text-xs text-slate-400 mt-1 flex items-center justify-end gap-1" onClick={e=>e.stopPropagation()}>
@@ -1564,25 +1564,25 @@ export default function App() {
                         </td>
                         <td className="px-6 py-4 text-right">
                           {stock.holdingQty > 0 ? (
-                            <div className={`flex flex-col items-end ${stock.unrealizedPnlOriginal > 0 ? 'text-blue-600' : stock.unrealizedPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500'}`}>
+                            <div className={`flex flex-col items-end ${stock.unrealizedPnlOriginal > 0 ? 'text-blue-600' : stock.unrealizedPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500 dark:text-slate-400'}`}>
                               <span className="font-bold">{stock.unrealizedPnlOriginal > 0 ? '+' : ''}{formatOriginalCurrency(stock.unrealizedPnlOriginal, sym)}</span>
-                              <span className="text-xs bg-slate-100 px-1.5 py-0.5 rounded mt-1">{formatPercent(stock.unrealizedPnlPercent)}</span>
+                              <span className="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded mt-1">{formatPercent(stock.unrealizedPnlPercent)}</span>
                             </div>
                           ) : '-'}
                         </td>
                         <td className="px-6 py-4 text-right">
                           {(stock.realizedPnlOriginal !== 0 || stock.tradeCount > 0) ? (
-                            <div className={`flex flex-col items-end ${stock.realizedPnlOriginal > 0 ? 'text-emerald-600' : stock.realizedPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500'}`}>
+                            <div className={`flex flex-col items-end ${stock.realizedPnlOriginal > 0 ? 'text-emerald-600' : stock.realizedPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500 dark:text-slate-400'}`}>
                               <span className="font-bold">{stock.realizedPnlOriginal > 0 ? '+' : ''}{stock.realizedPnlOriginal !== 0 ? formatOriginalCurrency(stock.realizedPnlOriginal, sym) : '-'}</span>
                               {stock.realizedPnlPercent !== 0 && (
-                                <span className="text-xs bg-slate-100 px-1.5 py-0.5 rounded mt-1">{formatPercent(stock.realizedPnlPercent)}</span>
+                                <span className="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded mt-1">{formatPercent(stock.realizedPnlPercent)}</span>
                               )}
                             </div>
                           ) : '-'}
                         </td>
-                        <td className="px-6 py-4 text-right border-l border-slate-200">
+                        <td className="px-6 py-4 text-right border-l border-slate-200 dark:border-slate-700">
                           {hasSold ? (
-                            <div className={`flex flex-col items-end ${stock.ifSoldTodayPnlOriginal > 0 ? 'text-emerald-600' : stock.ifSoldTodayPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500'}`}>
+                            <div className={`flex flex-col items-end ${stock.ifSoldTodayPnlOriginal > 0 ? 'text-emerald-600' : stock.ifSoldTodayPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500 dark:text-slate-400'}`}>
                               <span className="font-bold opacity-75">{stock.ifSoldTodayPnlOriginal > 0 ? '+' : ''}{formatOriginalCurrency(stock.ifSoldTodayPnlOriginal, sym)}</span>
                               <div className="mt-1 flex items-center gap-1">
                                 {percentDiff > 7 ? (
@@ -1596,11 +1596,11 @@ export default function App() {
                         </td>
                       </tr>
                       {isExpanded && (
-                        <tr className="bg-slate-50/50">
-                          <td colSpan="8" className="px-6 py-4 p-0 border-b border-slate-200">
-                            <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm m-2">
+                        <tr className="bg-slate-50 dark:bg-slate-950 dark:bg-slate-900/50/50">
+                          <td colSpan="8" className="px-6 py-4 p-0 border-b border-slate-200 dark:border-slate-700">
+                            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden shadow-sm m-2">
                               <table className="w-full text-xs text-left">
-                                <thead className="bg-slate-100 text-slate-600">
+                                <thead className="bg-slate-100 dark:bg-slate-800 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
                                   <tr>
                                     <th className="px-4 py-2 font-semibold">日期</th>
                                     <th className="px-4 py-2 font-semibold">類型</th>
@@ -1612,8 +1612,8 @@ export default function App() {
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                   {stock.history.map((hRow, idx) => (
-                                    <tr key={idx} className="hover:bg-slate-50">
-                                      <td className="px-4 py-2 text-slate-600">{formatDate(hRow['日期'])}</td>
+                                    <tr key={idx} className="hover:bg-slate-50 dark:bg-slate-900/50">
+                                      <td className="px-4 py-2 text-slate-600 dark:text-slate-400">{formatDate(hRow['日期'])}</td>
                                       <td className="px-4 py-2">
                                         <span className={`px-1.5 py-0.5 rounded font-medium ${hRow['類型'] === '買入' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>
                                           {hRow['類型']}
@@ -1622,7 +1622,7 @@ export default function App() {
                                       <td className="px-4 py-2 text-right">{hRow['數量']}</td>
                                       <td className="px-4 py-2 text-right">{hRow['單價']}</td>
                                       <td className="px-4 py-2 text-right font-medium">{hRow['總金額']}</td>
-                                      <td className="px-4 py-2 text-right text-slate-500">{hRow['損益'] || '-'}</td>
+                                      <td className="px-4 py-2 text-right text-slate-500 dark:text-slate-400">{hRow['損益'] || '-'}</td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -1639,7 +1639,7 @@ export default function App() {
           </div>
 
           {/* Mobile Card View for Main Data */}
-          <div className="md:hidden flex flex-col bg-slate-50 p-3 gap-3">
+          <div className="md:hidden flex flex-col bg-slate-50 dark:bg-slate-900/50 p-3 gap-3">
              {displayData.map((stock) => {
                 const percentDiff = stock.realizedPnlPercent - stock.ifSoldTodayPnlPercent;
                 const hasSold = stock.totalSoldQty > 0;
@@ -1647,23 +1647,23 @@ export default function App() {
                 const isExpanded = expandedStock === stock.symbol;
 
                 return (
-                  <div key={stock.symbol} className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                  <div key={stock.symbol} className="bg-white dark:bg-slate-900 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm overflow-hidden">
                     <div 
-                      className="p-4 flex flex-col gap-3 cursor-pointer hover:bg-slate-50 transition-colors"
+                      className="p-4 flex flex-col gap-3 cursor-pointer hover:bg-slate-50 dark:bg-slate-900/50 transition-colors"
                       onClick={() => setExpandedStock(isExpanded ? null : stock.symbol)}
                     >
                       <div className="flex justify-between items-start">
                         <div>
-                          <div className="font-bold text-slate-800 text-lg flex items-center gap-2">
+                          <div className="font-bold text-slate-800 dark:text-slate-200 text-lg flex items-center gap-2">
                             {stock.symbol}
-                            <span className="text-[10px] font-medium bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
+                            <span className="text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded">
                               {stock.market} &middot; {stock.currency}
                             </span>
                           </div>
-                          <div className="text-xs text-slate-500 mt-1">{stock.name}</div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">{stock.name}</div>
                         </div>
                         <div className="text-right">
-                          <div className="font-bold text-slate-800 text-lg">
+                          <div className="font-bold text-slate-800 dark:text-slate-200 text-lg">
                             {stock.currentValueOriginal > 0 ? formatOriginalCurrency(stock.currentValueOriginal, sym) : '-'}
                           </div>
                           <div className="text-xs text-slate-400 mt-0.5">
@@ -1680,7 +1680,7 @@ export default function App() {
                         <div className="flex flex-col items-end">
                           <span className="text-[10px] text-slate-400 uppercase tracking-wider">未實現損益</span>
                           {stock.holdingQty > 0 ? (
-                            <div className={`flex flex-col items-end mt-0.5 ${stock.unrealizedPnlOriginal > 0 ? 'text-blue-600' : stock.unrealizedPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500'}`}>
+                            <div className={`flex flex-col items-end mt-0.5 ${stock.unrealizedPnlOriginal > 0 ? 'text-blue-600' : stock.unrealizedPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500 dark:text-slate-400'}`}>
                               <span className="font-bold text-xs">{stock.unrealizedPnlOriginal > 0 ? '+' : ''}{formatOriginalCurrency(stock.unrealizedPnlOriginal, sym)}</span>
                               <span className="text-[10px] leading-none mt-1">{formatPercent(stock.unrealizedPnlPercent)}</span>
                             </div>
@@ -1689,7 +1689,7 @@ export default function App() {
                         <div className="flex flex-col items-end">
                           <span className="text-[10px] text-slate-400 uppercase tracking-wider">已實現損益</span>
                           {(stock.realizedPnlOriginal !== 0 || stock.tradeCount > 0) ? (
-                            <div className={`flex flex-col items-end mt-0.5 ${stock.realizedPnlOriginal > 0 ? 'text-emerald-600' : stock.realizedPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500'}`}>
+                            <div className={`flex flex-col items-end mt-0.5 ${stock.realizedPnlOriginal > 0 ? 'text-emerald-600' : stock.realizedPnlOriginal < 0 ? 'text-rose-600' : 'text-slate-500 dark:text-slate-400'}`}>
                               <span className="font-bold text-xs">{stock.realizedPnlOriginal > 0 ? '+' : ''}{stock.realizedPnlOriginal !== 0 ? formatOriginalCurrency(stock.realizedPnlOriginal, sym) : '-'}</span>
                               {stock.realizedPnlPercent !== 0 && (
                                 <span className="text-[10px] leading-none mt-1">{formatPercent(stock.realizedPnlPercent)}</span>
@@ -1706,19 +1706,19 @@ export default function App() {
                     
                     {/* Expanded History for Mobile */}
                     {isExpanded && (
-                      <div className="bg-slate-50/80 border-t border-slate-100 p-3">
-                         <div className="text-[10px] font-bold text-slate-500 mb-2 uppercase tracking-wider">交易明細</div>
+                      <div className="bg-slate-50 dark:bg-slate-950 dark:bg-slate-900/50/80 border-t border-slate-100 dark:border-slate-800 p-3">
+                         <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">交易明細</div>
                          <div className="flex flex-col gap-2">
                            {stock.history.map((hRow, idx) => (
-                             <div key={idx} className="bg-white p-2.5 rounded-lg border border-slate-200 text-xs flex justify-between items-center shadow-sm">
+                             <div key={idx} className="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs flex justify-between items-center shadow-sm">
                                <div className="flex flex-col gap-1">
                                  <div className="flex items-center gap-2">
                                     <span className={`px-1.5 py-0.5 text-[10px] rounded font-medium ${hRow['類型'] === '買入' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>
                                       {hRow['類型']}
                                     </span>
-                                    <span className="text-slate-500">{formatDate(hRow['日期'])}</span>
+                                    <span className="text-slate-500 dark:text-slate-400 dark:text-slate-400">{formatDate(hRow['日期'])}</span>
                                  </div>
-                                 <div className="text-slate-600">
+                                 <div className="text-slate-600 dark:text-slate-400 dark:text-slate-400">
                                    <span className="font-medium">{hRow['數量']}</span> 股 @ <span>{hRow['單價']}</span>
                                  </div>
                                </div>
