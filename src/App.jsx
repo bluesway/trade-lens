@@ -547,6 +547,7 @@ export default function App() {
         }
         agg[symbol].holdingQty -= qty;
 
+        // 避免浮點數誤差導致的極小殘留
         if (agg[symbol].holdingQty <= 0.01) {
           agg[symbol].holdingQty = 0;
           agg[symbol].totalCost = 0;
