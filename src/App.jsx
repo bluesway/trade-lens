@@ -202,7 +202,7 @@ export default function App() {
   const [hideZeroHolding, setHideZeroHolding] = useState(false);
   const [expandedStock, setExpandedStock] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null);
-  const [newRec, setNewRec] = useState({ date: '', type: '買入', code: '', market: '陸股', qty: '', amount: '', pnl: '' });
+  const [newRec, setNewRec] = useState({ date: '', type: '買入', code: '', market: '陸股', qty: '', price: '', amount: '', pnl: '' });
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -470,7 +470,7 @@ export default function App() {
     
     setRawData(newData);
     asyncStorage.set('tr_dashboard_data', JSON.stringify(newData));
-    setNewRec({ ...newRec, date: '', code: '', qty: '', amount: '', pnl: '' });
+    setNewRec({ ...newRec, date: '', code: '', qty: '', price: '', amount: '', pnl: '' });
   };
 
   const handleDeleteRecord = (idx) => {
@@ -480,7 +480,7 @@ export default function App() {
     if (newData.length === 0) setIsDemo(true);
     if (editingIndex === idx) {
       setEditingIndex(null);
-      setNewRec({ ...newRec, date: '', code: '', qty: '', amount: '', pnl: '' });
+      setNewRec({ ...newRec, date: '', code: '', qty: '', price: '', amount: '', pnl: '' });
     }
   };
 
@@ -500,6 +500,7 @@ export default function App() {
       code: row['代號'],
       market: row['市場'] || guessMarket(row['代號']),
       qty: row['數量'],
+      price: row['單價'],
       amount: row['總金額'],
       pnl: row['損益'] || ''
     });
@@ -970,11 +971,49 @@ export default function App() {
                   </div>
                   <div className="flex-1 min-w-[100px]">
                     <label className="block text-xs font-semibold text-slate-500 mb-1">數量</label>
-                    <input type="number" placeholder="股數" value={newRec.qty} onChange={e => setNewRec({...newRec, qty: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
+                    <input 
+                      type="number" 
+                      placeholder="股數" 
+                      value={newRec.qty} 
+                      onChange={e => {
+                        const q = e.target.value;
+                        let updates = { qty: q };
+                        if (q && newRec.price) updates.amount = (parseFloat(q) * parseFloat(newRec.price)).toFixed(2);
+                        else if (q && newRec.amount) updates.price = (parseFloat(newRec.amount) / parseFloat(q)).toFixed(4);
+                        setNewRec({...newRec, ...updates});
+                      }} 
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" 
+                    />
+                  </div>
+                  <div className="flex-1 min-w-[100px]">
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">單價 (原幣)</label>
+                    <input 
+                      type="number" 
+                      placeholder="單股價格" 
+                      value={newRec.price} 
+                      onChange={e => {
+                        const p = e.target.value;
+                        let updates = { price: p };
+                        if (p && newRec.qty) updates.amount = (parseFloat(p) * parseFloat(newRec.qty)).toFixed(2);
+                        setNewRec({...newRec, ...updates});
+                      }} 
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" 
+                    />
                   </div>
                   <div className="flex-1 min-w-[120px]">
                     <label className="block text-xs font-semibold text-slate-500 mb-1">總金額 (原幣)</label>
-                    <input type="number" placeholder="依該市場幣別" value={newRec.amount} onChange={e => setNewRec({...newRec, amount: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
+                    <input 
+                      type="number" 
+                      placeholder="依該市場幣別" 
+                      value={newRec.amount} 
+                      onChange={e => {
+                        const a = e.target.value;
+                        let updates = { amount: a };
+                        if (a && newRec.qty && parseFloat(newRec.qty) !== 0) updates.price = (parseFloat(a) / parseFloat(newRec.qty)).toFixed(4);
+                        setNewRec({...newRec, ...updates});
+                      }} 
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" 
+                    />
                   </div>
                   <div className="flex-1 min-w-[120px]">
                     <label className="block text-xs font-semibold text-slate-500 mb-1">損益 (賣出填,原幣)</label>
