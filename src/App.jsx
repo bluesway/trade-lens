@@ -3,7 +3,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell,
   PieChart, Pie
 } from 'recharts';
-import { Upload, Download, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, Activity, Layers, RefreshCw, Clock, Trash2, Edit2, Plus, Database, X, Key, Info, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { Upload, Download, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, Activity, Layers, RefreshCw, Clock, Trash2, Edit2, Plus, Database, X, Key, Info, HelpCircle, ChevronDown, ChevronUp, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 // 股票資料對應表 (當 API 抓不到名稱或價格時的備援)
 const STOCK_MAPPING = {
@@ -202,6 +202,7 @@ export default function App() {
   const [hideZeroHolding, setHideZeroHolding] = useState(false);
   const [expandedStock, setExpandedStock] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null);
+  const [historySortConfig, setHistorySortConfig] = useState({ key: '日期', direction: 'desc' });
   const [newRec, setNewRec] = useState({ date: '', type: '買入', code: '', market: '陸股', qty: '', price: '', amount: '', pnl: '' });
 
   useEffect(() => {
@@ -713,6 +714,38 @@ export default function App() {
     );
   };
 
+  const requestSort = (key) => {
+    let direction = 'asc';
+    if (historySortConfig.key === key && historySortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setHistorySortConfig({ key, direction });
+  };
+
+  const sortedHistoryData = useMemo(() => {
+    let sortableItems = rawData.map((row, originalIndex) => ({ ...row, originalIndex }));
+    if (historySortConfig !== null) {
+      sortableItems.sort((a, b) => {
+        let valA = a[historySortConfig.key];
+        let valB = b[historySortConfig.key];
+
+        // Handle numeric parsing for specific columns
+        if (['數量', '單價', '總金額', '損益'].includes(historySortConfig.key)) {
+          valA = parseFloat(String(valA).replace(/[^0-9.-]+/g, "")) || 0;
+          valB = parseFloat(String(valB).replace(/[^0-9.-]+/g, "")) || 0;
+        } else if (historySortConfig.key === '日期') {
+          valA = new Date(valA || 0).getTime();
+          valB = new Date(valB || 0).getTime();
+        }
+
+        if (valA < valB) return historySortConfig.direction === 'asc' ? -1 : 1;
+        if (valA > valB) return historySortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [rawData, historySortConfig]);
+
   if (!isAppLoaded) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -1042,26 +1075,31 @@ export default function App() {
                 </div>
             </div>
 
-            {/* 現有紀錄列表 */}
-            <div className="max-h-[350px] overflow-y-auto border border-slate-100 rounded-xl">
-              <table className="w-full text-left text-sm whitespace-nowrap">
-                <thead className="bg-slate-100 text-slate-600 sticky top-0 shadow-sm z-10">
-                  <tr>
-                    <th className="px-4 py-3 font-semibold">日期</th>
-                    <th className="px-4 py-3 font-semibold">類型</th>
-                    <th className="px-4 py-3 font-semibold">代號 / 股名 (市場)</th>
-                    <th className="px-4 py-3 font-semibold text-right">數量</th>
-                    <th className="px-4 py-3 font-semibold text-right">單價(原幣)</th>
-                    <th className="px-4 py-3 font-semibold text-right">總金額(原幣)</th>
-                    <th className="px-4 py-3 font-semibold text-right">損益(原幣)</th>
-                    <th className="px-4 py-3 font-semibold text-center w-16">操作</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {rawData
-                    .map((row, originalIndex) => ({ ...row, originalIndex }))
-                    .sort((a, b) => new Date(b['日期'] || 0) - new Date(a['日期'] || 0))
-                    .map((row) => {
+            {/* 現有紀錄列表 (RWD Card View) */}
+            <div className="border border-slate-100 rounded-xl overflow-hidden bg-slate-50">
+              <div className="hidden md:block max-h-[350px] overflow-y-auto">
+                <table className="w-full text-left text-sm whitespace-nowrap bg-white">
+                  <thead className="bg-slate-100 text-slate-600 sticky top-0 shadow-sm z-10">
+                    <tr>
+                      {['日期', '類型', '代號', '數量', '單價', '總金額', '損益'].map((col) => (
+                        <th key={col} className={`px-4 py-3 font-semibold cursor-pointer hover:bg-slate-200 transition-colors ${['數量', '單價', '總金額', '損益'].includes(col) ? 'text-right' : ''}`} onClick={() => requestSort(col === '代號' ? '代號' : col === '單價' ? '單價' : col === '總金額' ? '總金額' : col === '損益' ? '損益' : col)}>
+                          <div className={`flex items-center gap-1 ${['數量', '單價', '總金額', '損益'].includes(col) ? 'justify-end' : ''}`}>
+                            {col === '代號' ? '代號 / 股名 (市場)' : col === '單價' ? '單價(原幣)' : col === '總金額' ? '總金額(原幣)' : col === '損益' ? '損益(原幣)' : col}
+                            <span className="text-slate-400">
+                              {historySortConfig?.key === (col === '代號' ? '代號' : col) ? (
+                                historySortConfig.direction === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />
+                              ) : (
+                                <ArrowUpDown size={14} className="opacity-50" />
+                              )}
+                            </span>
+                          </div>
+                        </th>
+                      ))}
+                      <th className="px-4 py-3 font-semibold text-center w-16">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {sortedHistoryData.map((row) => {
                       let market = row['市場'] || '未知';
                       if (market === '未知' || !market) market = guessMarket(row['代號']);
                       const symbol = formatSymbol(row['代號'], market);
@@ -1114,7 +1152,48 @@ export default function App() {
                 </tbody>
               </table>
             </div>
+
+            {/* Mobile Card View for Manager List */}
+            <div className="md:hidden flex flex-col gap-3 p-3 max-h-[400px] overflow-y-auto">
+              <div className="flex justify-between items-center px-1 text-xs font-semibold text-slate-500 mb-1">
+                <span>排序依據: {historySortConfig.key} ({historySortConfig.direction === 'asc' ? '小到大' : '大到小'})</span>
+              </div>
+              {sortedHistoryData.length === 0 ? (
+                <div className="text-center text-slate-400 py-8">目前沒有任何紀錄</div>
+              ) : (
+                sortedHistoryData.map((row) => {
+                  let market = row['市場'] || '未知';
+                  if (market === '未知' || !market) market = guessMarket(row['代號']);
+                  const symbol = formatSymbol(row['代號'], market);
+                  const resolvedName = liveData[symbol]?.name || STOCK_MAPPING[symbol]?.name || '未知';
+                  return (
+                    <div key={row.originalIndex} className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex flex-col gap-2 relative">
+                      <div className="absolute top-4 right-4 flex gap-3">
+                         <button onClick={() => handleEditRecord(row.originalIndex)} className="text-slate-400 hover:text-blue-500"><Edit2 size={16} /></button>
+                         <button onClick={() => handleDeleteRecord(row.originalIndex)} className="text-slate-400 hover:text-rose-500"><Trash2 size={16} /></button>
+                      </div>
+                      <div className="flex justify-between items-center pr-16">
+                        <div className="font-bold text-slate-800 text-lg flex items-center gap-2">
+                          {symbol} <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-normal">{market}</span>
+                        </div>
+                      </div>
+                      <div className="text-sm text-slate-500 mb-1">{resolvedName}</div>
+                      
+                      <div className="grid grid-cols-2 gap-y-2 text-sm mt-2 pt-2 border-t border-slate-50">
+                        <div className="flex flex-col"><span className="text-xs text-slate-400">日期</span> <span className="font-medium">{formatDate(row['日期'])}</span></div>
+                        <div className="flex flex-col"><span className="text-xs text-slate-400">類型</span> <span className={`font-medium ${row['類型'] === '買入' ? 'text-blue-600' : 'text-purple-600'}`}>{row['類型']}</span></div>
+                        <div className="flex flex-col"><span className="text-xs text-slate-400">數量</span> <span className="font-medium">{row['數量']}</span></div>
+                        <div className="flex flex-col"><span className="text-xs text-slate-400">單價</span> <span>{row['單價']}</span></div>
+                        <div className="flex flex-col"><span className="text-xs text-slate-400">總金額</span> <span className="font-bold text-slate-700">{row['總金額']}</span></div>
+                        <div className="flex flex-col"><span className="text-xs text-slate-400">損益</span> <span className={`font-bold ${parseFloat(row['損益']) > 0 ? 'text-emerald-500' : parseFloat(row['損益']) < 0 ? 'text-rose-500' : ''}`}>{row['損益'] || '-'}</span></div>
+                      </div>
+                    </div>
+                  )
+                })
+              )}
+            </div>
           </div>
+        </div>
         )}
 
         {/* Top KPI Cards (顯示 Base Currency) */}
