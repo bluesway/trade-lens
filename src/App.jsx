@@ -3,7 +3,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell,
   PieChart, Pie
 } from 'recharts';
-import { Upload, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, Activity, Layers, RefreshCw, Clock, Trash2, Edit2, Plus, Database, X, Key, Info, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { Upload, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, Activity, Layers, RefreshCw, Clock, Trash2, Edit2, Plus, Database, X, Key, Info, HelpCircle, ChevronDown, ChevronUp, Save } from 'lucide-react';
 
 // 股票資料對應表 (當 API 抓不到名稱或價格時的備援)
 const STOCK_MAPPING = {
@@ -344,6 +344,7 @@ export default function App() {
       const newData = { ...liveData };
       const newRates = { ...exchangeRates };
       let fetchedCount = 0;
+      const fetchedSymbols = new Set();
 
       // 1. 抓股價
       for (let i = 0; i < codesToFetch.length; i += 10) {
@@ -366,6 +367,7 @@ export default function App() {
               timestamp: now
             };
             fetchedCount++;
+            fetchedSymbols.add(item.symbol);
             
             // 順便把需要的匯率加進去
             if(item.currency && item.currency !== targetBaseCurrency) {
@@ -380,7 +382,7 @@ export default function App() {
       if (fetchedCount > 0) {
         const newManual = { ...manualStockData };
         let manualChanged = false;
-        Object.keys(newData).forEach(sym => {
+        fetchedSymbols.forEach(sym => {
            if (newManual[sym]) {
                delete newManual[sym];
                manualChanged = true;
@@ -1121,18 +1123,17 @@ export default function App() {
             </h3>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center gap-2">
-            <div className="flex items-center gap-3">
-              <div className="p-3 rounded-full bg-purple-100 text-purple-600">
-                <Layers size={20} />
-              </div>
-              <p className="text-sm font-medium text-slate-500">持倉檔數</p>
-            </div>
-            <h3 className="text-2xl font-bold text-slate-800 mt-2">
-              {chartData.holdingData.length} <span className="text-base font-normal text-slate-500">檔股票</span>
-            </h3>
-          </div>
-
+                      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center gap-2">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 rounded-full bg-purple-100 text-purple-600">
+                            <Layers size={20} />
+                          </div>
+                          <p className="text-sm font-medium text-slate-500">持倉檔數</p>
+                        </div>
+                        <h3 className="text-2xl font-bold text-slate-800 mt-2">
+                          {processedData.filter(stock => stock.holdingQty > 0).length} <span className="text-base font-normal text-slate-500">檔股票</span>
+                        </h3>
+                      </div>
         </div>
 
         {/* Charts Section */}
