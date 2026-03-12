@@ -689,10 +689,18 @@ export default function App() {
   };
 
   const handleClearData = () => {
-    asyncStorage.remove('tr_dashboard_data');
-    setRawData(parseCSV(DEFAULT_CSV));
-    setIsDemo(true);
-    setShowManager(false);
+    if (window.confirm('確定要清除所有資料並載入範例嗎？此動作無法復原！')) {
+      if (rawData.length > 0 && !isDemo) {
+        if (window.confirm('在清除之前，是否需要先將目前的資料匯出為 CSV 備份？')) {
+          handleExportCSV();
+        }
+      }
+      asyncStorage.remove('tr_dashboard_data');
+      setRawData(parseCSV(DEFAULT_CSV));
+      setIsDemo(true);
+      setShowManager(false);
+      showToast('已清除資料並載入範例');
+    }
   };
   
   // 取得匯率輔助函數
@@ -1127,7 +1135,7 @@ export default function App() {
                     <select 
                       value={baseCurrency} 
                       onChange={e => handleSaveBaseCurrency(e.target.value)}
-                      className="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                      className="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
                     >
                       <option value="TWD">新台幣 (TWD)</option>
                       <option value="CNY">人民幣 (CNY)</option>
