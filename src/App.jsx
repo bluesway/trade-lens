@@ -189,9 +189,11 @@ export default function App() {
   const [rawData, setRawData] = useState([]);
   const [isDemo, setIsDemo] = useState(true);
   const [liveData, setLiveData] = useState({});
+  const [manualStockData, setManualStockData] = useState({});
   const [exchangeRates, setExchangeRates] = useState({});
   const [apiKey, setApiKey] = useState('');
   const [baseCurrency, setBaseCurrency] = useState('TWD');
+  const [marketFilter, setMarketFilter] = useState('全部');
   
   const [isLoadingPrices, setIsLoadingPrices] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(null);
@@ -202,6 +204,8 @@ export default function App() {
   const [hideZeroHolding, setHideZeroHolding] = useState(false);
   const [expandedStock, setExpandedStock] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null);
+  const [editingStockSymbol, setEditingStockSymbol] = useState(null);
+  const [tempStockEdit, setTempStockEdit] = useState({ name: '', price: '' });
   const [newRec, setNewRec] = useState({ date: '', type: '買入', code: '', market: '陸股', qty: '', amount: '', pnl: '' });
 
   useEffect(() => {
@@ -215,6 +219,9 @@ export default function App() {
 
         const savedCache = await asyncStorage.get('tr_dashboard_cache');
         if (savedCache) setLiveData(JSON.parse(savedCache));
+
+        const savedManual = await asyncStorage.get('tr_manual_stock_data');
+        if (savedManual) setManualStockData(JSON.parse(savedManual));
         
         const savedRates = await asyncStorage.get('tr_exchange_rates');
         if (savedRates) setExchangeRates(JSON.parse(savedRates));
@@ -256,6 +263,14 @@ export default function App() {
   const handleSaveApiKey = () => {
     asyncStorage.set('yfapi_net_key', apiKey);
     showToast('API 金鑰已更新並儲存！');
+  };
+
+  const handleSaveManualStock = (symbol) => {
+    const newData = { ...manualStockData, [symbol]: { name: tempStockEdit.name, price: parseFloat(tempStockEdit.price) || 0, timestamp: Date.now() } };
+    setManualStockData(newData);
+    asyncStorage.set('tr_manual_stock_data', JSON.stringify(newData));
+    setEditingStockSymbol(null);
+    showToast(`已手動更新 ${symbol} 的資訊`);
   };
 
   const handleSaveBaseCurrency = (currency) => {
@@ -361,6 +376,22 @@ export default function App() {
         if (i + 10 < codesToFetch.length) await new Promise(r => setTimeout(r, 1000));
       }
       
+      // API 抓成功了，清除我們曾經手動輸入過的覆蓋值 (相信 API)
+      if (fetchedCount > 0) {
+        const newManual = { ...manualStockData };
+        let manualChanged = false;
+        Object.keys(newData).forEach(sym => {
+           if (newManual[sym]) {
+               delete newManual[sym];
+               manualChanged = true;
+           }
+        });
+        if (manualChanged) {
+            setManualStockData(newManual);
+            asyncStorage.set('tr_manual_stock_data', JSON.stringify(newManual));
+        }
+      }
+
       // 2. 抓匯率
       const rateSymbols = Array.from(currenciesToFetch);
       for (let i = 0; i < rateSymbols.length; i += 10) {
@@ -557,8 +588,9 @@ export default function App() {
 
     return Object.values(agg).map(stock => {
       const apiData = liveData[stock.symbol];
-      const currentPrice = apiData?.price || stock.currentPrice; 
-      const currentName = apiData?.name || stock.name;
+      const manualData = manualStockData[stock.symbol];
+      const currentPrice = manualData?.price || apiData?.price || stock.currentPrice; 
+      const currentName = manualData?.name || apiData?.name || stock.name;
       const currency = apiData?.currency || (stock.market === '美股' ? 'USD' : stock.market === '台股' ? 'TWD' : stock.market === '港股' ? 'HKD' : stock.market === '日股' ? 'JPY' : 'CNY');
       const rate = getExchangeRate(currency, baseCurrency);
 
@@ -604,7 +636,7 @@ export default function App() {
         ifSoldTodayPnlBase
       };
     }).sort((a, b) => b.realizedPnlBase - a.realizedPnlBase);
-  }, [rawData, liveData, exchangeRates, baseCurrency, isAppLoaded]);
+  }, [rawData, liveData, manualStockData, exchangeRates, baseCurrency, isAppLoaded]);
 
   const chartData = useMemo(() => {
     const holdingData = useMemo(() => {
