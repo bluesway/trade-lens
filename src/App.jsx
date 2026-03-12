@@ -990,7 +990,7 @@ export default function App() {
             <button 
               onClick={() => fetchLivePrices(false)}
               disabled={isLoadingPrices || rawData.length === 0}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 ${apiKey ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700' : 'bg-rose-50 text-rose-600 hover:bg-rose-100'}`}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 ${apiKey ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300' : 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 hover:bg-rose-100'}`}
               title={apiKey ? "手動更新即時股價 (使用快取)" : "請先設定 API Key"}
             >
               <RefreshCw size={18} className={isLoadingPrices ? "animate-spin" : ""} />
@@ -1003,7 +1003,7 @@ export default function App() {
                 }
               }}
               disabled={isLoadingPrices || rawData.length === 0}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 ${apiKey ? 'bg-amber-100 hover:bg-amber-200 text-amber-700' : 'bg-rose-50 text-rose-600 hover:bg-rose-100'}`}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 ${apiKey ? 'bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-400' : 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 hover:bg-rose-100'}`}
               title={apiKey ? "強制更新並消耗額度" : "請先設定 API Key"}
             >
               <Activity size={18} className={isLoadingPrices ? "animate-pulse" : ""} />
@@ -1469,25 +1469,25 @@ export default function App() {
           {/* Desktop Table View */}
           <div className="hidden md:block overflow-auto max-h-[calc(100vh-100px)] custom-scrollbar">
             <table className="w-full text-left text-sm whitespace-nowrap">
-              <thead className="bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 sticky top-0 z-30 shadow-sm">
+              <thead className="bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 z-30 shadow-sm">
                 <tr>
-                  <th className="w-10"></th>
-                  <th className="px-6 py-4 font-semibold cursor-pointer hover:bg-slate-200 transition-colors" onClick={() => requestSort('代號')}>
+                  <th className="w-10 sticky top-0 bg-slate-50 dark:bg-slate-800 z-30"></th>
+                  <th className="px-6 py-4 font-semibold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors sticky top-0 bg-slate-50 dark:bg-slate-800 z-30" onClick={() => requestSort('代號')}>
                     <div className="flex items-center gap-1">代號 / 股名 (市場·幣別) {historySortConfig?.key === '代號' ? (historySortConfig.direction === 'asc' ? <ArrowUp size={14}/> : <ArrowDown size={14}/>) : <ArrowUpDown size={14} className="opacity-50"/>}</div>
                   </th>
-                  <th className="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-slate-200 transition-colors" onClick={() => requestSort('持股數')}>
+                  <th className="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors sticky top-0 bg-slate-50 dark:bg-slate-800 z-30" onClick={() => requestSort('持股數')}>
                     <div className="flex items-center justify-end gap-1">當前持股數 {historySortConfig?.key === '持股數' ? (historySortConfig.direction === 'asc' ? <ArrowUp size={14}/> : <ArrowDown size={14}/>) : <ArrowUpDown size={14} className="opacity-50"/>}</div>
                   </th>
-                  <th className="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-slate-200 transition-colors" onClick={() => requestSort('市值')}>
+                  <th className="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors sticky top-0 bg-slate-50 dark:bg-slate-800 z-30" onClick={() => requestSort('市值')}>
                     <div className="flex items-center justify-end gap-1">目前股價 / 市值(原幣) {historySortConfig?.key === '市值' ? (historySortConfig.direction === 'asc' ? <ArrowUp size={14}/> : <ArrowDown size={14}/>) : <ArrowUpDown size={14} className="opacity-50"/>}</div>
                   </th>
-                  <th className="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-slate-200 transition-colors" onClick={() => requestSort('未實現')}>
+                  <th className="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors sticky top-0 bg-slate-50 dark:bg-slate-800 z-30" onClick={() => requestSort('未實現')}>
                     <div className="flex items-center justify-end gap-1">未實現損益(原幣) {historySortConfig?.key === '未實現' ? (historySortConfig.direction === 'asc' ? <ArrowUp size={14}/> : <ArrowDown size={14}/>) : <ArrowUpDown size={14} className="opacity-50"/>}</div>
                   </th>
-                  <th className="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-slate-200 transition-colors" onClick={() => requestSort('已實現')}>
+                  <th className="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors sticky top-0 bg-slate-50 dark:bg-slate-800 z-30" onClick={() => requestSort('已實現')}>
                     <div className="flex items-center justify-end gap-1">實際已實現(原幣) {historySortConfig?.key === '已實現' ? (historySortConfig.direction === 'asc' ? <ArrowUp size={14}/> : <ArrowDown size={14}/>) : <ArrowUpDown size={14} className="opacity-50"/>}</div>
                   </th>
-                  <th className="px-6 py-4 font-semibold text-right border-l border-slate-200 dark:border-slate-700">若今天才賣(原幣)</th>
+                  <th className="px-6 py-4 font-semibold text-right border-l border-slate-200 dark:border-slate-700 sticky top-0 bg-slate-50 dark:bg-slate-800 z-30">若今天才賣(原幣)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
