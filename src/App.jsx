@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell,
-  PieChart, Pie
+  PieChart, Pie, AreaChart, Area
 } from 'recharts';
 import { Upload, Download, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, Activity, Layers, RefreshCw, Clock, Trash2, Edit2, Plus, Database, X, Key, Info, HelpCircle, ChevronDown, ChevronUp, Save, ArrowUpDown, ArrowUp, ArrowDown, Moon, Sun, Camera, FileText, Settings, ShieldCheck } from 'lucide-react';
 import { toPng } from 'html-to-image';
@@ -302,9 +302,11 @@ export default function App() {
   const [marketFilter, setMarketFilter] = useState('全部');
   const [historySortConfig, setHistorySortConfig] = useState({ key: '日期', direction: 'desc' });
   const [darkMode, setDarkMode] = useState(false);
+  const [trendTimeRange, setTrendTimeRange] = useState('全部');
   
   const pieChartRef = useRef(null);
   const barChartRef = useRef(null);
+  const trendChartRef = useRef(null);
 
   useEffect(() => {
     const savedDarkMode = localStorage.getItem('tr_dark_mode') === 'true';
@@ -892,6 +894,104 @@ export default function App() {
     });
   }, [processedData]);
 
+  const trendData = useMemo(() => {
+    if (!isAppLoaded || rawData.length === 0) return [];
+    
+    const sortedData = [...rawData].sort((a, b) => new Date(a['日期'] || 0) - new Date(b['日期'] || 0));
+    
+    let stockStates = {};
+    let dailySnapshots = [];
+    let runningTotalCostBase = 0;
+    let runningRealizedPnlBase = 0;
+
+    sortedData.forEach(row => {
+      let rawCode = String(row['代號'] || '').trim();
+      let type = row['類型'];
+      if (!rawCode || !type) return;
+      
+      let market = row['市場'] || '未知';
+      if (market === '未知') market = guessMarket(rawCode);
+      let symbol = formatSymbol(rawCode, market);
+      let dateStr = row['日期'];
+      let dateObj = new Date(dateStr);
+      if (isNaN(dateObj)) return;
+      
+      let qty = parseFloat(row['數量']) || 0;
+      let amountStr = String(row['總金額'] || '0').replace(/[^0-9.-]+/g, "");
+      let amount = parseFloat(amountStr) || 0;
+      let pnlStr = String(row['損益'] || '0').replace(/[^0-9.-]+/g, "");
+      let pnl = parseFloat(pnlStr) || 0;
+
+      const currency = (market === '美股' ? 'USD' : market === '台股' ? 'TWD' : market === '港股' ? 'HKD' : market === '日股' ? 'JPY' : 'CNY');
+      const rate = getExchangeRate(currency, baseCurrency);
+
+      if (!stockStates[symbol]) {
+        stockStates[symbol] = { holdingQty: 0, totalCost: 0 };
+      }
+
+      if (type === '買入') {
+        stockStates[symbol].holdingQty += qty;
+        stockStates[symbol].totalCost += amount;
+        runningTotalCostBase += (amount * rate);
+      } else if (type === '賣出') {
+        runningRealizedPnlBase += (pnl * rate);
+        if (stockStates[symbol].holdingQty > 0) {
+          let avgCost = stockStates[symbol].totalCost / stockStates[symbol].holdingQty;
+          let costOfSold = avgCost * qty;
+          stockStates[symbol].totalCost -= costOfSold;
+          runningTotalCostBase -= (costOfSold * rate);
+        }
+        stockStates[symbol].holdingQty -= qty;
+        if (stockStates[symbol].holdingQty <= 0.01) {
+          stockStates[symbol].holdingQty = 0;
+          stockStates[symbol].totalCost = 0;
+        }
+      }
+      
+      dailySnapshots.push({
+        date: dateStr,
+        timestamp: dateObj.getTime(),
+        costBase: runningTotalCostBase,
+        realizedPnlBase: runningRealizedPnlBase
+      });
+    });
+
+    const aggregatedByDate = [];
+    dailySnapshots.forEach(snap => {
+       const last = aggregatedByDate[aggregatedByDate.length - 1];
+       if (last && last.date === snap.date) {
+           last.costBase = snap.costBase;
+           last.realizedPnlBase = snap.realizedPnlBase;
+       } else {
+           aggregatedByDate.push(snap);
+       }
+    });
+
+    const now = new Date().getTime();
+    const rangeMsMap = {
+      '1週': 7 * 24 * 60 * 60 * 1000,
+      '1月': 30 * 24 * 60 * 60 * 1000,
+      '3月': 90 * 24 * 60 * 60 * 1000,
+      '半年': 180 * 24 * 60 * 60 * 1000,
+      '1年': 365 * 24 * 60 * 60 * 1000,
+      '5年': 5 * 365 * 24 * 60 * 60 * 1000
+    };
+
+    let filtered = aggregatedByDate;
+    if (trendTimeRange === 'YTD') {
+      const ytd = new Date(new Date().getFullYear(), 0, 1).getTime();
+      filtered = aggregatedByDate.filter(d => d.timestamp >= ytd);
+    } else if (rangeMsMap[trendTimeRange]) {
+      const cutoff = now - rangeMsMap[trendTimeRange];
+      filtered = aggregatedByDate.filter(d => d.timestamp >= cutoff);
+    }
+
+    return filtered.map(d => ({
+       ...d,
+       displayDate: d.date.substring(5) // e.g., "05/28"
+    }));
+  }, [rawData, exchangeRates, baseCurrency, trendTimeRange, isAppLoaded]);
+
   const overallRealizedPercent = summary.totalRealizedCost > 0 
     ? (summary.totalRealizedPnl / summary.totalRealizedCost) * 100 : 0;
   const overallUnrealizedPercent = summary.totalHoldingCost > 0 
@@ -1365,6 +1465,61 @@ export default function App() {
         </div>
 
         {/* Charts Section */}
+        
+        {/* Trend Chart (Full Width) */}
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800" ref={trendChartRef}>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+              累積投資趨勢變化
+              <button onClick={() => exportChartAsImage(trendChartRef, 'net_worth_trend')} className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-md transition-all" title="將圖表存為圖片">
+                <Camera size={16} />
+              </button>
+            </h3>
+            <div className="flex flex-wrap gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+              {['1週', '1月', '3月', '半年', 'YTD', '1年', '5年', '全部'].map(t => (
+                <button
+                  key={t}
+                  onClick={() => setTrendTimeRange(t)}
+                  className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors ${
+                    trendTimeRange === t
+                      ? 'bg-white dark:bg-slate-600 text-blue-600 dark:text-white shadow-sm'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="h-72">
+            {trendData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={trendData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorCost" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorPnl" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={darkMode ? "#334155" : "#E2E8F0"} />
+                  <XAxis dataKey="displayDate" tick={{fontSize: 12, fill: darkMode ? '#94a3b8' : '#64748b'}} tickMargin={10} minTickGap={30} />
+                  <YAxis tickFormatter={(val) => `${val>1000? (val/1000).toFixed(0)+'k' : val}`} tick={{fontSize: 12, fill: darkMode ? '#94a3b8' : '#64748b'}} />
+                  <Tooltip content={<CustomTooltip />} cursor={{fill: darkMode ? '#1e293b' : '#f1f5f9'}} />
+                  <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: '10px' }} />
+                  <Area type="monotone" dataKey="costBase" name="累積投入本金" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorCost)" />
+                  <Area type="monotone" dataKey="realizedPnlBase" name="累積已實現損益" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorPnl)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex h-full items-center justify-center text-slate-400">目前尚無足夠的交易紀錄以繪製走勢</div>
+            )}
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
           {/* Bar Chart: PnL (Base Currency) */}
