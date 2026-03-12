@@ -607,7 +607,14 @@ export default function App() {
   }, [rawData, liveData, exchangeRates, baseCurrency, isAppLoaded]);
 
   const chartData = useMemo(() => {
-    const holdingData = processedData.filter(d => d.currentValueBase > 0).sort((a, b) => b.currentValueBase - a.currentValueBase);
+    const holdingData = useMemo(() => {
+    const sorted = processedData.filter(d => d.currentValueBase > 0).sort((a, b) => b.currentValueBase - a.currentValueBase);
+    if (sorted.length <= 10) return sorted;
+    const top = sorted.slice(0, 10);
+    const othersValue = sorted.slice(10).reduce((sum, s) => sum + s.currentValueBase, 0);
+    top.push({ name: '其它', currentValueBase: othersValue, symbol: 'OTHERS' });
+    return top;
+  }, [processedData]);
     const pnlData = processedData.filter(d => d.realizedPnlBase !== 0);
     return { holdingData, pnlData };
   }, [processedData]);
@@ -1146,6 +1153,7 @@ export default function App() {
                       paddingAngle={5}
                       dataKey="currentValueBase"
                       nameKey="name"
+                      labelLine={true}
                       label={({name, percent}) => `${name.substring(0,4)} ${(percent * 100).toFixed(0)}%`}
                     >
                       {chartData.holdingData.map((entry, index) => (
