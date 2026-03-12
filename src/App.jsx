@@ -620,11 +620,15 @@ export default function App() {
   }, [processedData]);
 
   const displayData = useMemo(() => {
+    let filtered = processedData;
     if (hideZeroHolding) {
-      return processedData.filter(stock => stock.holdingQty > 0);
+      filtered = filtered.filter(stock => stock.holdingQty > 0);
     }
-    return processedData;
-  }, [processedData, hideZeroHolding]);
+    if (marketFilter !== '全部') {
+      filtered = filtered.filter(stock => stock.market === marketFilter);
+    }
+    return filtered;
+  }, [processedData, hideZeroHolding, marketFilter]);
 
   const summary = useMemo(() => {
     return processedData.reduce((acc, curr) => ({
@@ -1172,11 +1176,29 @@ export default function App() {
 
         {/* Data Table */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-          <div className="p-4 md:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-              各股歷史交易記錄
-            </h3>
-            <span className="text-xs font-normal text-slate-500 bg-slate-100 px-2 py-1 rounded w-fit">點擊列可查看買賣明細，金額皆為該市場原幣別</span>
+          <div className="p-4 md:p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-col gap-2">
+              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                各股歷史交易記錄
+              </h3>
+              <span className="text-xs font-normal text-slate-500 bg-slate-100 px-2 py-1 rounded w-fit">點擊列可查看買賣明細，金額皆為該市場原幣別</span>
+            </div>
+            
+            <div className="flex flex-wrap gap-2">
+              {['全部', '陸股', '港股', '台股', '美股', '日股'].map(m => (
+                <button
+                  key={m}
+                  onClick={() => setMarketFilter(m)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                    marketFilter === m
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
           </div>
           
           {/* Desktop Table View */}
@@ -1210,21 +1232,59 @@ export default function App() {
                           {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                         </td>
                         <td className="px-6 py-4">
-                          <div className="font-bold text-slate-800 flex items-center gap-2">
-                            {stock.symbol}
-                            <span className="text-[10px] font-medium bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
-                              {stock.market} &middot; {stock.currency}
-                            </span>
+                          <div className="font-bold text-slate-800 flex items-center gap-2" onClick={e=>e.stopPropagation()}>
+                            {editingStockSymbol === stock.symbol ? (
+                              <div className="flex flex-col gap-1">
+                                <input 
+                                  type="text" 
+                                  value={tempStockEdit.name} 
+                                  onChange={e=>setTempStockEdit({...tempStockEdit, name: e.target.value})} 
+                                  className="px-2 py-1 border rounded text-xs w-28" 
+                                  placeholder="手動股名"
+                                />
+                                <div className="flex gap-1">
+                                  <button onClick={() => handleSaveManualStock(stock.symbol)} className="bg-blue-600 text-white p-1 rounded hover:bg-blue-700"><Save size={14}/></button>
+                                  <button onClick={() => setEditingStockSymbol(null)} className="bg-slate-200 text-slate-600 p-1 rounded hover:bg-slate-300"><X size={14}/></button>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                {stock.symbol}
+                                <span className="text-[10px] font-medium bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
+                                  {stock.market} &middot; {stock.currency}
+                                </span>
+                                <button 
+                                  onClick={(e) => { 
+                                    e.stopPropagation(); 
+                                    setEditingStockSymbol(stock.symbol); 
+                                    setTempStockEdit({ name: stock.name, price: stock.currentPrice }); 
+                                  }} 
+                                  className="text-slate-300 hover:text-blue-500 ml-1"
+                                >
+                                  <Edit2 size={12} />
+                                </button>
+                              </>
+                            )}
                           </div>
-                          <div className="text-xs text-slate-500 mt-0.5">{stock.name}</div>
+                          {editingStockSymbol !== stock.symbol && <div className="text-xs text-slate-500 mt-0.5">{stock.name}</div>}
                         </td>
                         <td className="px-6 py-4 text-right font-medium">{stock.holdingQty.toLocaleString()}</td>
                         <td className="px-6 py-4 text-right">
                           <div className="font-medium text-slate-800">
                             {stock.currentValueOriginal > 0 ? formatOriginalCurrency(stock.currentValueOriginal, sym) : '-'}
                           </div>
-                          <div className="text-xs text-slate-400 mt-1">
-                            {stock.currentPrice > 0 ? `@ ${sym}${stock.currentPrice.toFixed(2)}` : '-'}
+                          <div className="text-xs text-slate-400 mt-1 flex items-center justify-end gap-1" onClick={e=>e.stopPropagation()}>
+                            {editingStockSymbol === stock.symbol ? (
+                              <input 
+                                type="number" 
+                                value={tempStockEdit.price} 
+                                onChange={e=>setTempStockEdit({...tempStockEdit, price: e.target.value})} 
+                                className="px-1 border rounded w-20 text-right text-xs" 
+                                placeholder="現價"
+                              />
+                            ) : (
+                              <span>{stock.currentPrice > 0 ? `@ ${sym}${stock.currentPrice.toFixed(2)}` : '-'}</span>
+                            )}
                           </div>
                         </td>
                         <td className="px-6 py-4 text-right">
