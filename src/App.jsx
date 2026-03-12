@@ -934,12 +934,24 @@ export default function App() {
                     <label className="block text-xs font-semibold text-slate-500 mb-1">日期</label>
                     <input type="date" value={newRec.date} onChange={e => setNewRec({...newRec, date: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
                   </div>
-                  <div className="w-[80px]">
+                  <div className="w-[120px]">
                     <label className="block text-xs font-semibold text-slate-500 mb-1">類型</label>
-                    <select value={newRec.type} onChange={e => setNewRec({...newRec, type: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white">
-                      <option>買入</option>
-                      <option>賣出</option>
-                    </select>
+                    <div className="flex bg-slate-200/70 p-0.5 rounded-lg border border-slate-200 h-[38px]">
+                      <button
+                        type="button"
+                        onClick={() => setNewRec({...newRec, type: '買入'})}
+                        className={`flex-1 text-sm font-medium rounded-md transition-colors ${newRec.type === '買入' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                      >
+                        買入
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setNewRec({...newRec, type: '賣出'})}
+                        className={`flex-1 text-sm font-medium rounded-md transition-colors ${newRec.type === '賣出' ? 'bg-white text-purple-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                      >
+                        賣出
+                      </button>
+                    </div>
                   </div>
                   <div className="w-[100px]">
                     <label className="block text-xs font-semibold text-slate-500 mb-1">市場</label>
