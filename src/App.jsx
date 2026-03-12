@@ -639,14 +639,16 @@ export default function App() {
   }, [rawData, liveData, manualStockData, exchangeRates, baseCurrency, isAppLoaded]);
 
   const chartData = useMemo(() => {
-    const holdingData = useMemo(() => {
+    let holdingData = [];
     const sorted = processedData.filter(d => d.currentValueBase > 0).sort((a, b) => b.currentValueBase - a.currentValueBase);
-    if (sorted.length <= 10) return sorted;
-    const top = sorted.slice(0, 10);
-    const othersValue = sorted.slice(10).reduce((sum, s) => sum + s.currentValueBase, 0);
-    top.push({ name: '其它', currentValueBase: othersValue, symbol: 'OTHERS' });
-    return top;
-  }, [processedData]);
+    if (sorted.length <= 10) {
+      holdingData = sorted;
+    } else {
+      const top = sorted.slice(0, 10);
+      const othersValue = sorted.slice(10).reduce((sum, s) => sum + s.currentValueBase, 0);
+      top.push({ name: '其它', currentValueBase: othersValue, symbol: 'OTHERS' });
+      holdingData = top;
+    }
     const pnlData = processedData.filter(d => d.realizedPnlBase !== 0);
     return { holdingData, pnlData };
   }, [processedData]);
