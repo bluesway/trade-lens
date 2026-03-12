@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import {
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell,
   PieChart, Pie
 } from 'recharts';
-import { Upload, Download, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, Activity, Layers, RefreshCw, Clock, Trash2, Edit2, Plus, Database, X, Key, Info, HelpCircle, ChevronDown, ChevronUp, Save, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Upload, Download, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, Activity, Layers, RefreshCw, Clock, Trash2, Edit2, Plus, Database, X, Key, Info, HelpCircle, ChevronDown, ChevronUp, Save, ArrowUpDown, ArrowUp, ArrowDown, Moon, Sun, Camera, FileText, Settings, ShieldCheck } from 'lucide-react';
+import { toPng } from 'html-to-image';
 
 // 股票資料對應表 (當 API 抓不到名稱或價格時的備援)
 const STOCK_MAPPING = {
@@ -113,43 +114,148 @@ const asyncStorage = {
   }
 };
 
+// 智慧型 CSV 解析器：支援不同券商的欄位對應
+
 const parseCSV = (text) => {
-  const lines = text.split('\n');
-  let headerIdx = lines.findIndex(l => l.includes('代號') && l.includes('類型'));
+
+  const lines = text.split('\n').filter(line => line.trim() !== '');
+
+  if (lines.length === 0) return [];
+
+
+
+  // 嘗試找到包含關鍵字的 Header 列
+
+  let headerIdx = lines.findIndex(l => 
+
+    (l.includes('代號') || l.includes('代碼') || l.includes('Symbol')) && 
+
+    (l.includes('類型') || l.includes('動作') || l.includes('Type'))
+
+  );
+
   if (headerIdx === -1) headerIdx = 0; 
 
-  const headers = lines[headerIdx].replace(/^\uFEFF/, '').split(',').map(h => h.trim());
+
+
+  const rawHeaders = lines[headerIdx].replace(/^\uFEFF/, '').split(',').map(h => h.trim());
+
+  
+
+  // 定義欄位映射規則 (常見券商關鍵字 -> 標準欄位)
+
+  const mapping = {
+
+    '日期': ['日期', '交易日期', '成交日期', 'Date', 'Trade Date'],
+
+    '類型': ['類型', '交易類別', '動作', 'Type', 'Action', 'Side'],
+
+    '代號': ['代號', '股票代號', '代碼', 'Symbol', 'Ticker', 'Stock Code'],
+
+    '市場': ['市場', '交易所', 'Market', 'Exchange'],
+
+    '數量': ['數量', '成交股數', '股數', 'Quantity', 'Qty', 'Shares'],
+
+    '單價': ['單價', '成交價', '成交單價', 'Price', 'Execution Price'],
+
+    '總金額': ['總金額', '成交金額', '淨額', 'Amount', 'Total Amount', 'Net Amount'],
+
+    '損益': ['損益', '實現損益', 'PnL', 'Realized PnL', 'Profit']
+
+  };
+
+
+
+  // 建立索引映射
+
+  const headerMap = {};
+
+  rawHeaders.forEach((h, idx) => {
+
+    for (const [standard, keywords] of Object.entries(mapping)) {
+
+      if (keywords.some(k => h.includes(standard) || standard.includes(h) || h.toLowerCase() === k.toLowerCase())) {
+
+        if (!headerMap[standard]) headerMap[standard] = idx;
+
+      }
+
+    }
+
+  });
+
+
+
   const result = [];
 
   for (let i = headerIdx + 1; i < lines.length; i++) {
+
     const line = lines[i].trim();
+
     if (!line) continue;
+
     
+
     let row = [];
+
     let inQuotes = false;
+
     let currentVal = "";
+
     
+
     for (let char of line) {
-      if (char === '"') {
-        inQuotes = !inQuotes;
-      } else if (char === ',' && !inQuotes) {
-        row.push(currentVal.trim());
-        currentVal = "";
-      } else {
-        currentVal += char;
-      }
+
+      if (char === '"') inQuotes = !inQuotes;
+
+      else if (char === ',' && !inQuotes) { row.push(currentVal.trim()); currentVal = ""; }
+
+      else currentVal += char;
+
     }
+
     row.push(currentVal.trim());
 
+
+
     if (row.length >= 3) {
+
       let obj = {};
-      headers.forEach((h, idx) => {
-        obj[h] = row[idx] || "";
+
+      // 根據映射填入標準欄位
+
+      Object.keys(mapping).forEach(standard => {
+
+        const idx = headerMap[standard];
+
+        obj[standard] = (idx !== undefined) ? row[idx] || "" : "";
+
       });
+
+      
+
+      // 智慧型類型轉換 (例如：Buy -> 買入)
+
+      if (obj['類型']) {
+
+        const t = obj['類型'].toLowerCase();
+
+        if (t.includes('買') || t.includes('buy') || t.includes('bot')) obj['類型'] = '買入';
+
+        else if (t.includes('賣') || t.includes('sell') || t.includes('sld')) obj['類型'] = '賣出';
+
+      }
+
+
+
       result.push(obj);
+
     }
+
   }
+
   return result;
+
 };
 
 // 自動推測市場 (給舊版 CSV 或是缺少市場欄位的資料使用)
@@ -194,7 +300,49 @@ export default function App() {
   const [apiKey, setApiKey] = useState('');
   const [baseCurrency, setBaseCurrency] = useState('TWD');
   const [marketFilter, setMarketFilter] = useState('全部');
+  const [historySortConfig, setHistorySortConfig] = useState({ key: '日期', direction: 'desc' });
+  const [darkMode, setDarkMode] = useState(false);
   
+  const pieChartRef = useRef(null);
+  const barChartRef = useRef(null);
+
+  useEffect(() => {
+    const savedDarkMode = localStorage.getItem('tr_dark_mode') === 'true';
+    if (savedDarkMode) {
+      setDarkMode(true);
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    localStorage.setItem('tr_dark_mode', newMode);
+    if (newMode) document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+  };
+
+  const exportChartAsImage = async (ref, fileName) => {
+    if (!ref.current) return;
+    try {
+      showToast('正在產生圖片...');
+      const dataUrl = await toPng(ref.current, { 
+        backgroundColor: darkMode ? '#0f172a' : '#ffffff',
+        style: {
+          borderRadius: '16px'
+        }
+      });
+      const link = document.createElement('a');
+      link.download = `${fileName}.png`;
+      link.href = dataUrl;
+      link.click();
+      showToast('圖片匯出成功！');
+    } catch (e) {
+      console.error(e);
+      showToast('圖片匯出失敗');
+    }
+  };
+
   const [isLoadingPrices, setIsLoadingPrices] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(null);
   const [toastMsg, setToastMsg] = useState('');
@@ -206,7 +354,6 @@ export default function App() {
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingStockSymbol, setEditingStockSymbol] = useState(null);
   const [tempStockEdit, setTempStockEdit] = useState({ name: '', price: '' });
-  const [historySortConfig, setHistorySortConfig] = useState({ key: '日期', direction: 'desc' });
   const [newRec, setNewRec] = useState({ date: '', type: '買入', code: '', market: '陸股', qty: '', amount: '', pnl: '' });
 
   useEffect(() => {
@@ -796,43 +943,50 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-800 relative">
-      {toastMsg && (
-        <div className="fixed bottom-6 right-6 bg-slate-800 text-white px-5 py-3 rounded-xl shadow-2xl z-50 animate-fade-in-up flex items-center gap-3">
-          <Activity size={18} className="text-blue-400" />
-          <span className="text-sm font-medium">{toastMsg}</span>
-        </div>
-      )}
-
-      <div className="max-w-7xl mx-auto space-y-6"> 
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-              <Activity className="text-blue-600" />
-              全球交易組合視覺化儀表板
-            </h1>
-            <div className="flex flex-col gap-2 md:flex-row md:items-center mt-2">
-              <p className="text-sm text-slate-500">
-                {isDemo ? "目前顯示為部分預設範例資料。請上傳完整 CSV 以查看全貌。" : `已成功載入並分析 ${rawData.length} 筆交易紀錄`}
-              </p>
-              {lastUpdate && (
-                <span className="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded-md flex items-center gap-1 w-fit">
-                  <Clock size={12} />
-                  快取: {lastUpdate.toLocaleTimeString()}
-                </span>
-              )}
+        <div className={`min-h-screen ${darkMode ? 'dark bg-slate-950 text-slate-200' : 'bg-slate-50 text-slate-800'} transition-colors duration-300 p-4 md:p-8 font-sans`}>
+          {toastMsg && (
+            <div className="fixed bottom-6 right-6 bg-slate-800 dark:bg-blue-600 text-white px-5 py-3 rounded-xl shadow-2xl z-50 animate-fade-in-up border border-white/10 flex items-center gap-2">
+              <ShieldCheck size={18} /> {toastMsg}
             </div>
-          </div>
-          
-          <div className="flex flex-wrap items-center gap-3">
-            <button 
-              onClick={() => setShowManager(!showManager)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors shadow-sm ${showManager ? 'bg-slate-800 text-white' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'}`}
-            >
-              <Database size={18} />
-              <span className="hidden md:inline">設定與紀錄</span>
-            </button>
+          )}
+    
+          <div className="max-w-7xl mx-auto space-y-6">
+            
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+              <div>
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Activity className="text-blue-600" />
+                  全球交易組合視覺化儀表板
+                </h1>
+                <div className="flex flex-col gap-2 md:flex-row md:items-center mt-2">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    {isDemo ? "目前顯示為部分預設範例資料。請上傳完整 CSV 以查看全貌。" : `已成功載入並分析 ${rawData.length} 筆交易紀錄`}
+                  </p>
+                  {lastUpdate && (
+                    <span className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-1 rounded-md flex items-center gap-1 w-fit">
+                      <Clock size={12} />
+                      快取: {lastUpdate.toLocaleTimeString()}
+                    </span>
+                  )}
+                </div>
+              </div>
+              
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  onClick={toggleDarkMode}
+                  className="p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm"
+                  title={darkMode ? "切換至淺色模式" : "切換至深色模式"}
+                >
+                  {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+                </button>
+                <button 
+                  onClick={() => setShowManager(!showManager)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors shadow-sm ${showManager ? 'bg-slate-800 text-white' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
+                >
+                  <Database size={18} />
+                  <span className="hidden md:inline">設定與紀錄</span>
+                </button>
             <button 
               onClick={() => fetchLivePrices(false)}
               disabled={isLoadingPrices || rawData.length === 0}
@@ -1206,20 +1360,25 @@ export default function App() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
           {/* Bar Chart: PnL (Base Currency) */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-            <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center justify-between">
-              各股已實現損益
-              <span className="text-xs font-normal text-slate-400 bg-slate-100 px-2 py-1 rounded">統一換算為 {baseCurrency} 繪製</span>
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800" ref={barChartRef}>
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                各股已實現損益
+                <button onClick={() => exportChartAsImage(barChartRef, 'realized_pnl_chart')} className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-md transition-all" title="將圖表存為圖片">
+                  <Camera size={16} />
+                </button>
+              </div>
+              <span className="text-xs font-normal text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">統一換算為 {baseCurrency} 繪製</span>
             </h3>
             <div className="h-80">
               {chartData.pnlData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData.pnlData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                    <XAxis xAxisId={0} dataKey="name" tick={{fontSize: 12}} tickFormatter={(val) => val.length > 4 ? val.substring(0,4)+'..' : val} />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={darkMode ? "#334155" : "#E2E8F0"} />
+                    <XAxis xAxisId={0} dataKey="name" tick={{fontSize: 12, fill: darkMode ? '#94a3b8' : '#64748b'}} tickFormatter={(val) => val.length > 4 ? val.substring(0,4)+'..' : val} />
                     <XAxis xAxisId={1} dataKey="name" hide />
-                    <YAxis tickFormatter={(val) => `${val>1000? (val/1000).toFixed(0)+'k' : val}`} tick={{fontSize: 12}} />
-                    <Tooltip content={<CustomTooltip />} cursor={{fill: '#f1f5f9'}} />
+                    <YAxis tickFormatter={(val) => `${val>1000? (val/1000).toFixed(0)+'k' : val}`} tick={{fontSize: 12, fill: darkMode ? '#94a3b8' : '#64748b'}} />
+                    <Tooltip content={<CustomTooltip />} cursor={{fill: darkMode ? '#1e293b' : '#f1f5f9'}} />
                     <Legend content={renderCustomLegend} verticalAlign="top" wrapperStyle={{ paddingBottom: '20px' }} />
                     <Bar xAxisId={1} dataKey="ifSoldTodayPnlBase" name="若今天才賣" radius={[4, 4, 0, 0]}>
                       {chartData.pnlData.map((entry, index) => (
@@ -1240,10 +1399,15 @@ export default function App() {
           </div>
 
           {/* Pie Chart: Holdings (Base Currency) */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-            <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center justify-between">
-              目前持股價值分佈
-              <span className="text-xs font-normal text-slate-400 bg-slate-100 px-2 py-1 rounded">統一換算為 {baseCurrency} 繪製</span>
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800" ref={pieChartRef}>
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                持股市值分佈 (Top 10)
+                <button onClick={() => exportChartAsImage(pieChartRef, 'portfolio_distribution')} className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-md transition-all" title="將圖表存為圖片">
+                  <Camera size={16} />
+                </button>
+              </div>
+              <span className="text-xs font-normal text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">統一換算為 {baseCurrency} 繪製</span>
             </h3>
             <div className="h-80">
               {chartData.holdingData.length > 0 ? (
