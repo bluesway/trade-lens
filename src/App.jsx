@@ -3,7 +3,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell,
   PieChart, Pie
 } from 'recharts';
-import { Upload, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, Activity, Layers, RefreshCw, Clock, Trash2, Edit2, Plus, Database, X, Key, Info, HelpCircle, ChevronDown, ChevronUp, Save } from 'lucide-react';
+import { Upload, Download, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, Activity, Layers, RefreshCw, Clock, Trash2, Edit2, Plus, Database, X, Key, Info, HelpCircle, ChevronDown, ChevronUp, Save, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 // 股票資料對應表 (當 API 抓不到名稱或價格時的備援)
 const STOCK_MAPPING = {
@@ -206,6 +206,7 @@ export default function App() {
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingStockSymbol, setEditingStockSymbol] = useState(null);
   const [tempStockEdit, setTempStockEdit] = useState({ name: '', price: '' });
+  const [historySortConfig, setHistorySortConfig] = useState({ key: '日期', direction: 'desc' });
   const [newRec, setNewRec] = useState({ date: '', type: '買入', code: '', market: '陸股', qty: '', amount: '', pnl: '' });
 
   useEffect(() => {
@@ -443,6 +444,37 @@ export default function App() {
     }
   };
 
+  const handleExportCSV = () => {
+    if (rawData.length === 0) {
+      showToast('目前沒有資料可匯出！');
+      return;
+    }
+
+    const headers = ['日期', '類型', '代號', '市場', '數量', '單價', '總金額', '損益'];
+    const csvContent = [
+      headers.join(','),
+      ...rawData.map(row => 
+        headers.map(header => {
+          let val = row[header] || '';
+          if (String(val).includes(',')) {
+            val = `"${val}"`;
+          }
+          return val;
+        }).join(',')
+      )
+    ].join('\n');
+
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `trade_records_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleAddRecord = () => {
     if (!newRec.code || !newRec.qty || !newRec.amount || !newRec.date) return; 
     const row = {
@@ -655,6 +687,14 @@ export default function App() {
     return { holdingData, pnlData };
   }, [processedData]);
 
+  const requestSort = (key) => {
+    let direction = 'desc';
+    if (historySortConfig.key === key && historySortConfig.direction === 'desc') {
+      direction = 'asc';
+    }
+    setHistorySortConfig({ key, direction });
+  };
+
   const displayData = useMemo(() => {
     let filtered = processedData;
     if (hideZeroHolding) {
@@ -663,8 +703,25 @@ export default function App() {
     if (marketFilter !== '全部') {
       filtered = filtered.filter(stock => stock.market === marketFilter);
     }
+    
+    if (historySortConfig) {
+      filtered.sort((a, b) => {
+        let valA, valB;
+        if (historySortConfig.key === '市值') { valA = a.currentValueBase; valB = b.currentValueBase; }
+        else if (historySortConfig.key === '持股數') { valA = a.holdingQty; valB = b.holdingQty; }
+        else if (historySortConfig.key === '未實現') { valA = a.unrealizedPnlBase; valB = b.unrealizedPnlBase; }
+        else if (historySortConfig.key === '已實現') { valA = a.realizedPnlBase; valB = b.realizedPnlBase; }
+        else if (historySortConfig.key === '代號') { valA = a.symbol; valB = b.symbol; }
+        else { valA = a.realizedPnlBase; valB = b.realizedPnlBase; }
+
+        if (valA < valB) return historySortConfig.direction === 'asc' ? -1 : 1;
+        if (valA > valB) return historySortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
     return filtered;
-  }, [processedData, hideZeroHolding, marketFilter]);
+  }, [processedData, hideZeroHolding, marketFilter, historySortConfig]);
 
   const summary = useMemo(() => {
     return processedData.reduce((acc, curr) => ({
@@ -799,16 +856,25 @@ export default function App() {
               <span className="hidden md:inline">強制刷新</span>
             </button>
             
-            <div className="relative">
-              <input 
-                type="file" 
-                accept=".csv" 
-                onChange={handleFileUpload} 
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
-              <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap">
-                <Upload size={18} />
-                匯入 CSV
+            <div className="relative flex items-center gap-2">
+              <div className="relative group">
+                <input 
+                  type="file" 
+                  accept=".csv" 
+                  onChange={handleFileUpload} 
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                />
+                <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap relative">
+                  <Upload size={18} />
+                  匯入 CSV
+                </button>
+              </div>
+              <button 
+                onClick={handleExportCSV}
+                className="flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap"
+              >
+                <Download size={18} />
+                匯出 CSV
               </button>
             </div>
 
@@ -1220,7 +1286,7 @@ export default function App() {
             </div>
             
             <div className="flex flex-wrap gap-2">
-              {['全部', '陸股', '港股', '台股', '美股', '日股'].map(m => (
+              {['全部', ...Array.from(new Set(processedData.map(s => s.market))).filter(Boolean)].map(m => (
                 <button
                   key={m}
                   onClick={() => setMarketFilter(m)}
