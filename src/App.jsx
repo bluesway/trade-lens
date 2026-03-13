@@ -1567,7 +1567,24 @@ export default function App() {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={darkMode ? "#334155" : "#E2E8F0"} />
                   <XAxis dataKey="displayDate" tick={{fontSize: 12, fill: darkMode ? '#94a3b8' : '#64748b'}} tickMargin={10} minTickGap={30} axisLine={false} tickLine={false} />
                   <YAxis yAxisId="left" tickFormatter={(val) => `${val>1000? (val/1000).toFixed(0)+'k' : val}`} tick={{fontSize: 11, fill: '#818cf8'}} orientation="left" stroke="#818cf8" axisLine={false} tickLine={false} />
-                  <YAxis yAxisId="right" tickFormatter={(val) => `${val>1000? (val/1000).toFixed(0)+'k' : val}`} tick={{fontSize: 11, fill: '#34d399'}} orientation="right" stroke="#34d399" axisLine={false} tickLine={false} />
+                  <YAxis 
+                    yAxisId="right" 
+                    orientation="right" 
+                    axisLine={false} 
+                    tickLine={false}
+                    tick={(props) => {
+                      const { x, y, payload } = props;
+                      const val = payload.value;
+                      const isNegative = val < 0;
+                      const fill = isNegative ? '#ef4444' : '#10b981';
+                      const formattedVal = val > 1000 ? (val/1000).toFixed(0)+'k' : (val < -1000 ? (val/1000).toFixed(0)+'k' : val);
+                      return (
+                        <text x={x} y={y} dy={4} fill={fill} fontSize={11} textAnchor="start">
+                          {formattedVal}
+                        </text>
+                      );
+                    }}
+                  />
                   <Tooltip content={<CustomTooltip />} cursor={{fill: darkMode ? '#1e293b' : '#f1f5f9'}} />
                   <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: '20px' }} />
                   <Area yAxisId="left" type="monotone" dataKey="costBase" name="累積投入本金" stroke="#818cf8" strokeWidth={3} fillOpacity={1} fill="url(#colorCost)" />
