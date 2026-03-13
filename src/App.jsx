@@ -1553,11 +1553,12 @@ export default function App() {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={darkMode ? "#334155" : "#E2E8F0"} />
                   <XAxis dataKey="displayDate" tick={{fontSize: 12, fill: darkMode ? '#94a3b8' : '#64748b'}} tickMargin={10} minTickGap={30} />
-                  <YAxis tickFormatter={(val) => `${val>1000? (val/1000).toFixed(0)+'k' : val}`} tick={{fontSize: 12, fill: darkMode ? '#94a3b8' : '#64748b'}} />
+                  <YAxis yAxisId="left" tickFormatter={(val) => `${val>1000? (val/1000).toFixed(0)+'k' : val}`} tick={{fontSize: 12, fill: darkMode ? '#94a3b8' : '#64748b'}} orientation="left" stroke="#3b82f6" />
+                  <YAxis yAxisId="right" tickFormatter={(val) => `${val>1000? (val/1000).toFixed(0)+'k' : val}`} tick={{fontSize: 12, fill: darkMode ? '#94a3b8' : '#64748b'}} orientation="right" stroke="#10b981" />
                   <Tooltip content={<CustomTooltip />} cursor={{fill: darkMode ? '#1e293b' : '#f1f5f9'}} />
                   <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: '10px' }} />
-                  <Area type="monotone" dataKey="costBase" name="累積投入本金" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorCost)" />
-                  <Area type="monotone" dataKey="realizedPnlBase" name="累積已實現損益" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorPnl)" />
+                  <Area yAxisId="left" type="monotone" dataKey="costBase" name="累積投入本金" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorCost)" />
+                  <Area yAxisId="right" type="monotone" dataKey="realizedPnlBase" name="累積已實現損益" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorPnl)" />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
