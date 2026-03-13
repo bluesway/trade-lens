@@ -1558,8 +1558,10 @@ export default function App() {
                       <stop offset="95%" stopColor="#818cf8" stopOpacity={0}/>
                     </linearGradient>
                     <linearGradient id="colorPnlSplit" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset={pnlGradientOffset} stopColor="#10b981" stopOpacity={0.8}/>
-                      <stop offset={pnlGradientOffset} stopColor="#ef4444" stopOpacity={0.8}/>
+                      <stop offset="0%" stopColor="#10b981" stopOpacity={0.8}/>
+                      <stop offset={pnlGradientOffset} stopColor="#10b981" stopOpacity={0.1}/>
+                      <stop offset={pnlGradientOffset} stopColor="#ef4444" stopOpacity={0.1}/>
+                      <stop offset="100%" stopColor="#ef4444" stopOpacity={0.8}/>
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={darkMode ? "#334155" : "#E2E8F0"} />
@@ -1569,7 +1571,7 @@ export default function App() {
                   <Tooltip content={<CustomTooltip />} cursor={{fill: darkMode ? '#1e293b' : '#f1f5f9'}} />
                   <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: '20px' }} />
                   <Area yAxisId="left" type="monotone" dataKey="costBase" name="累積投入本金" stroke="#818cf8" strokeWidth={3} fillOpacity={1} fill="url(#colorCost)" />
-                  <Area yAxisId="right" type="monotone" dataKey="realizedPnlBase" name="累積已實現損益" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorPnlSplit)" />
+                  <Area yAxisId="right" type="monotone" dataKey="realizedPnlBase" name="累積已實現損益" stroke="url(#colorPnlSplit)" strokeWidth={2} fillOpacity={1} fill="url(#colorPnlSplit)" />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
