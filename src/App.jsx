@@ -1039,6 +1039,17 @@ export default function App() {
     );
   };
 
+  const pnlGradientOffset = useMemo(() => {
+    if (!trendData || trendData.length === 0) return 0;
+    const dataMax = Math.max(...trendData.map(i => i.realizedPnlBase));
+    const dataMin = Math.min(...trendData.map(i => i.realizedPnlBase));
+
+    if (dataMax <= 0) return 0;
+    if (dataMin >= 0) return 1;
+
+    return dataMax / (dataMax - dataMin);
+  }, [trendData]);
+
   if (!isAppLoaded) {
     return (
       <div className="min-h-screen transition-colors duration-300 bg-slate-50 dark:bg-slate-900/50 flex items-center justify-center">
