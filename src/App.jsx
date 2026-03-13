@@ -368,7 +368,16 @@ export default function App() {
         if (savedCurrency) setBaseCurrency(savedCurrency);
 
         const savedCache = await asyncStorage.get('tr_dashboard_cache');
-        if (savedCache) setLiveData(JSON.parse(savedCache));
+        if (savedCache) {
+          const parsedCache = JSON.parse(savedCache);
+          setLiveData(parsedCache);
+          
+          // Find the most recent timestamp in the cache to initialize lastUpdate
+          const timestamps = Object.values(parsedCache).map(d => d.timestamp).filter(Boolean);
+          if (timestamps.length > 0) {
+            setLastUpdate(new Date(Math.max(...timestamps)));
+          }
+        }
 
         const savedManual = await asyncStorage.get('tr_manual_stock_data');
         if (savedManual) setManualStockData(JSON.parse(savedManual));
