@@ -780,8 +780,15 @@ export default function App() {
     return Object.values(agg).map(stock => {
       const apiData = liveData[stock.symbol];
       const manualData = manualStockData[stock.symbol];
-      const currentPrice = manualData?.price || apiData?.price || stock.currentPrice; 
-      const currentName = manualData?.name || apiData?.name || stock.name;
+      
+      const isManualPrice = manualData?.price !== undefined;
+      const isManualName = manualData?.name !== undefined && manualData?.name !== '';
+      
+      const currentPrice = isManualPrice ? manualData.price : (apiData?.price || stock.currentPrice); 
+      const currentName = isManualName ? manualData.name : (apiData?.name || stock.name);
+      
+      const lastUpdateTimestamp = isManualPrice ? manualData.timestamp : (apiData?.timestamp || null);
+
       const currency = apiData?.currency || (stock.market === '美股' ? 'USD' : stock.market === '台股' ? 'TWD' : stock.market === '港股' ? 'HKD' : stock.market === '日股' ? 'JPY' : 'CNY');
       const rate = getExchangeRate(currency, baseCurrency);
 
@@ -806,6 +813,9 @@ export default function App() {
         ...stock,
         name: currentName,
         currentPrice,
+        isManualPrice,
+        isManualName,
+        lastUpdateTimestamp,
         currency,
         currencySymbol: CURRENCY_SYMBOLS[currency] || currency,
         exchangeRate: rate,
@@ -1781,14 +1791,31 @@ export default function App() {
                               </>
                             )}
                           </div>
-                          {editingStockSymbol !== stock.symbol && <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{stock.name}</div>}
+                          {editingStockSymbol !== stock.symbol && (
+                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1 group/name">
+                              {stock.name}
+                              {stock.isManualName && (
+                                <span className="px-1 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-500 rounded text-[10px] cursor-help relative">
+                                  手動
+                                  <div className="absolute left-0 bottom-full mb-1 hidden group-hover/name:block bg-slate-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap z-50 shadow-lg">
+                                    最後更新: {stock.lastUpdateTimestamp ? new Date(stock.lastUpdateTimestamp).toLocaleString() : '未知'}
+                                  </div>
+                                </span>
+                              )}
+                              {!stock.isManualName && stock.lastUpdateTimestamp && (
+                                <span className="hidden group-hover/name:block text-[10px] text-slate-400 bg-slate-100 dark:bg-slate-800 px-1 rounded absolute mt-5 z-50 shadow-sm border border-slate-200 dark:border-slate-700">
+                                  API 更新: {new Date(stock.lastUpdateTimestamp).toLocaleString()}
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </td>
                         <td className="px-6 py-4 text-right font-medium">{stock.holdingQty.toLocaleString()}</td>
                         <td className="px-6 py-4 text-right">
                           <div className="font-medium text-slate-800 dark:text-slate-200">
                             {stock.currentValueOriginal > 0 ? formatOriginalCurrency(stock.currentValueOriginal, sym) : '-'}
                           </div>
-                          <div className="text-xs text-slate-400 mt-1 flex items-center justify-end gap-1" onClick={e=>e.stopPropagation()}>
+                          <div className="text-xs text-slate-400 mt-1 flex items-center justify-end gap-1 group/price" onClick={e=>e.stopPropagation()}>
                             {editingStockSymbol === stock.symbol ? (
                               <input 
                                 type="number" 
@@ -1798,7 +1825,22 @@ export default function App() {
                                 placeholder="現價"
                               />
                             ) : (
-                              <span>{stock.currentPrice > 0 ? `@ ${sym}${stock.currentPrice.toFixed(2)}` : '-'}</span>
+                              <>
+                                {stock.isManualPrice && (
+                                  <span className="px-1 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-500 rounded text-[10px] cursor-help relative mr-1">
+                                    手動
+                                    <div className="absolute right-0 bottom-full mb-1 hidden group-hover/price:block bg-slate-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap z-50 shadow-lg">
+                                      最後更新: {stock.lastUpdateTimestamp ? new Date(stock.lastUpdateTimestamp).toLocaleString() : '未知'}
+                                    </div>
+                                  </span>
+                                )}
+                                {!stock.isManualPrice && stock.lastUpdateTimestamp && (
+                                  <span className="hidden group-hover/price:block text-[10px] text-slate-400 bg-slate-100 dark:bg-slate-800 px-1 rounded absolute mt-5 mr-16 z-50 shadow-sm border border-slate-200 dark:border-slate-700">
+                                    API 更新: {new Date(stock.lastUpdateTimestamp).toLocaleString()}
+                                  </span>
+                                )}
+                                <span>{stock.currentPrice > 0 ? `@ ${sym}${stock.currentPrice.toFixed(2)}` : '-'}</span>
+                              </>
                             )}
                           </div>
                         </td>
