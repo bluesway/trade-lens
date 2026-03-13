@@ -1093,9 +1093,9 @@ export default function App() {
                     {isDemo ? "目前顯示為部分預設範例資料。請上傳完整 CSV 以查看全貌。" : `已成功載入並分析 ${rawData.length} 筆交易紀錄`}
                   </p>
                   {lastUpdate && (
-                    <span className="text-xs bg-slate-100 dark:bg-slate-800 dark:bg-slate-800 text-slate-500 dark:text-slate-400 dark:text-slate-400 px-2 py-1 rounded-md flex items-center gap-1 w-fit">
-                      <Clock size={12} />
-                      快取: {lastUpdate.toLocaleTimeString()}
+                    <span className="text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2.5 py-1 rounded-full flex items-center gap-1.5 w-fit font-medium border border-blue-100 dark:border-blue-800">
+                      <Clock size={14} />
+                      資料最後更新: {lastUpdate.toLocaleString()}
                     </span>
                   )}
                 </div>
@@ -1792,21 +1792,17 @@ export default function App() {
                             )}
                           </div>
                           {editingStockSymbol !== stock.symbol && (
-                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1 group/name">
+                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1 group/name relative cursor-help">
                               {stock.name}
                               {stock.isManualName && (
-                                <span className="px-1 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-500 rounded text-[10px] cursor-help relative">
+                                <span className="px-1 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-500 rounded text-[10px]">
                                   手動
-                                  <div className="absolute left-0 bottom-full mb-1 hidden group-hover/name:block bg-slate-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap z-50 shadow-lg">
-                                    最後更新: {stock.lastUpdateTimestamp ? new Date(stock.lastUpdateTimestamp).toLocaleString() : '未知'}
-                                  </div>
                                 </span>
                               )}
-                              {!stock.isManualName && stock.lastUpdateTimestamp && (
-                                <span className="hidden group-hover/name:block text-[10px] text-slate-400 bg-slate-100 dark:bg-slate-800 px-1 rounded absolute mt-5 z-50 shadow-sm border border-slate-200 dark:border-slate-700">
-                                  API 更新: {new Date(stock.lastUpdateTimestamp).toLocaleString()}
-                                </span>
-                              )}
+                              <div className="absolute left-0 bottom-full mb-1 hidden group-hover/name:block bg-slate-800 dark:bg-slate-700 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap z-50 shadow-lg border border-white/10">
+                                {stock.isManualName ? '手動修改於: ' : 'API 最後更新: '}
+                                {stock.lastUpdateTimestamp ? new Date(stock.lastUpdateTimestamp).toLocaleString() : '尚未更新'}
+                              </div>
                             </div>
                           )}
                         </td>
@@ -1815,7 +1811,7 @@ export default function App() {
                           <div className="font-medium text-slate-800 dark:text-slate-200">
                             {stock.currentValueOriginal > 0 ? formatOriginalCurrency(stock.currentValueOriginal, sym) : '-'}
                           </div>
-                          <div className="text-xs text-slate-400 mt-1 flex items-center justify-end gap-1 group/price" onClick={e=>e.stopPropagation()}>
+                          <div className="text-xs text-slate-400 mt-1 flex items-center justify-end gap-1 group/price relative cursor-help" onClick={e=>e.stopPropagation()}>
                             {editingStockSymbol === stock.symbol ? (
                               <input 
                                 type="number" 
@@ -1827,19 +1823,15 @@ export default function App() {
                             ) : (
                               <>
                                 {stock.isManualPrice && (
-                                  <span className="px-1 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-500 rounded text-[10px] cursor-help relative mr-1">
+                                  <span className="px-1 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-500 rounded text-[10px] mr-1">
                                     手動
-                                    <div className="absolute right-0 bottom-full mb-1 hidden group-hover/price:block bg-slate-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap z-50 shadow-lg">
-                                      最後更新: {stock.lastUpdateTimestamp ? new Date(stock.lastUpdateTimestamp).toLocaleString() : '未知'}
-                                    </div>
-                                  </span>
-                                )}
-                                {!stock.isManualPrice && stock.lastUpdateTimestamp && (
-                                  <span className="hidden group-hover/price:block text-[10px] text-slate-400 bg-slate-100 dark:bg-slate-800 px-1 rounded absolute mt-5 mr-16 z-50 shadow-sm border border-slate-200 dark:border-slate-700">
-                                    API 更新: {new Date(stock.lastUpdateTimestamp).toLocaleString()}
                                   </span>
                                 )}
                                 <span>{stock.currentPrice > 0 ? `@ ${sym}${stock.currentPrice.toFixed(2)}` : '-'}</span>
+                                <div className="absolute right-0 bottom-full mb-1 hidden group-hover/price:block bg-slate-800 dark:bg-slate-700 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap z-50 shadow-lg border border-white/10">
+                                  {stock.isManualPrice ? '手動修改於: ' : 'API 最後更新: '}
+                                  {stock.lastUpdateTimestamp ? new Date(stock.lastUpdateTimestamp).toLocaleString() : '尚未更新'}
+                                </div>
                               </>
                             )}
                           </div>
