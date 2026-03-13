@@ -1543,22 +1543,22 @@ export default function App() {
                 <AreaChart data={trendData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorCost" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#818cf8" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#818cf8" stopOpacity={0}/>
                     </linearGradient>
                     <linearGradient id="colorPnl" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#34d399" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#34d399" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={darkMode ? "#334155" : "#E2E8F0"} />
-                  <XAxis dataKey="displayDate" tick={{fontSize: 12, fill: darkMode ? '#94a3b8' : '#64748b'}} tickMargin={10} minTickGap={30} />
-                  <YAxis yAxisId="left" tickFormatter={(val) => `${val>1000? (val/1000).toFixed(0)+'k' : val}`} tick={{fontSize: 12, fill: darkMode ? '#94a3b8' : '#64748b'}} orientation="left" stroke="#3b82f6" />
-                  <YAxis yAxisId="right" tickFormatter={(val) => `${val>1000? (val/1000).toFixed(0)+'k' : val}`} tick={{fontSize: 12, fill: darkMode ? '#94a3b8' : '#64748b'}} orientation="right" stroke="#10b981" />
+                  <XAxis dataKey="displayDate" tick={{fontSize: 12, fill: darkMode ? '#94a3b8' : '#64748b'}} tickMargin={10} minTickGap={30} axisLine={false} tickLine={false} />
+                  <YAxis yAxisId="left" tickFormatter={(val) => `${val>1000? (val/1000).toFixed(0)+'k' : val}`} tick={{fontSize: 11, fill: '#818cf8'}} orientation="left" stroke="#818cf8" axisLine={false} tickLine={false} />
+                  <YAxis yAxisId="right" tickFormatter={(val) => `${val>1000? (val/1000).toFixed(0)+'k' : val}`} tick={{fontSize: 11, fill: '#34d399'}} orientation="right" stroke="#34d399" axisLine={false} tickLine={false} />
                   <Tooltip content={<CustomTooltip />} cursor={{fill: darkMode ? '#1e293b' : '#f1f5f9'}} />
-                  <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: '10px' }} />
-                  <Area yAxisId="left" type="monotone" dataKey="costBase" name="累積投入本金" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorCost)" />
-                  <Area yAxisId="right" type="monotone" dataKey="realizedPnlBase" name="累積已實現損益" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorPnl)" />
+                  <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: '20px' }} />
+                  <Area yAxisId="left" type="monotone" dataKey="costBase" name="累積投入本金" stroke="#818cf8" strokeWidth={3} fillOpacity={1} fill="url(#colorCost)" />
+                  <Area yAxisId="right" type="monotone" dataKey="realizedPnlBase" name="累積已實現損益" stroke="#34d399" strokeWidth={3} fillOpacity={1} fill="url(#colorPnl)" />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
