@@ -1573,7 +1573,7 @@ export default function App() {
           <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800" ref={barChartRef}>
             <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 dark:text-white mb-6 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                各股已實現損益
+                各股已實現損益 (賣飛/避險榜)
                 <button onClick={() => exportChartAsImage(barChartRef, 'realized_pnl_chart')} className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-md transition-all" title="將圖表存為圖片">
                   <Camera size={16} />
                 </button>
