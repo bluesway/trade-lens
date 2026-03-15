@@ -5,6 +5,8 @@
 [![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
+![Trade Lens Dashboard Preview](screenshots/dashboard-preview.png)
+
 **Trade Lens** is a professional-grade, privacy-first trading dashboard designed for the modern investor. It transforms your raw brokerage CSV exports into beautiful, actionable visualizations—all while keeping your sensitive financial data exactly where it belongs: **on your own device.**
 
 ---
