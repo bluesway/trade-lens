@@ -1,0 +1,73 @@
+import React from 'react';
+import { TrendingUp, TrendingDown, Activity, DollarSign, Layers } from 'lucide-react';
+
+export default function SummaryCards({ summary, formatBaseCurrency, formatPercent, processedDataCount }) {
+  const overallRealizedPercent = summary.totalRealizedCost > 0 
+    ? (summary.totalRealizedPnl / summary.totalRealizedCost) * 100 : 0;
+  const overallUnrealizedPercent = summary.totalHoldingCost > 0 
+    ? (summary.totalUnrealizedPnl / summary.totalHoldingCost) * 100 : 0;
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center gap-2 relative overflow-hidden">
+        <div className="absolute -right-4 -top-4 text-slate-50 opacity-50"><TrendingUp size={100} /></div>
+        <div className="flex items-center gap-3 relative z-10">
+          <div className={`p-3 rounded-full ${summary.totalRealizedPnl >= 0 ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
+            {summary.totalRealizedPnl >= 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
+          </div>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">總已實現損益 (換算)</p>
+        </div>
+        <div className="flex items-baseline gap-2 mt-2 relative z-10">
+          <h3 className={`text-2xl font-bold ${summary.totalRealizedPnl >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+            {summary.totalRealizedPnl > 0 ? '+' : ''}{formatBaseCurrency(summary.totalRealizedPnl)}
+          </h3>
+          <span className={`text-sm font-semibold px-2 py-0.5 rounded-md ${summary.totalRealizedPnl >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+            {formatPercent(overallRealizedPercent)}
+          </span>
+        </div>
+      </div>
+
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center gap-2 relative overflow-hidden">
+        <div className="absolute -right-4 -top-4 text-slate-50 opacity-50"><Activity size={100} /></div>
+        <div className="flex items-center gap-3 relative z-10">
+          <div className={`p-3 rounded-full ${summary.totalUnrealizedPnl >= 0 ? 'bg-blue-100 text-blue-600' : 'bg-rose-100 text-rose-600'}`}>
+            {summary.totalUnrealizedPnl >= 0 ? <Activity size={20} /> : <TrendingDown size={20} />}
+          </div>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">總未實現損益 (換算)</p>
+        </div>
+        <div className="flex items-baseline gap-2 mt-2 relative z-10">
+          <h3 className={`text-2xl font-bold ${summary.totalUnrealizedPnl >= 0 ? 'text-blue-600' : 'text-rose-600'}`}>
+            {summary.totalUnrealizedPnl > 0 ? '+' : ''}{formatBaseCurrency(summary.totalUnrealizedPnl)}
+          </h3>
+          <span className={`text-sm font-semibold px-2 py-0.5 rounded-md ${summary.totalUnrealizedPnl >= 0 ? 'bg-blue-50 text-blue-600' : 'bg-rose-50 text-rose-600'}`}>
+            {formatPercent(overallUnrealizedPercent)}
+          </span>
+        </div>
+      </div>
+
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center gap-2">
+        <div className="flex items-center gap-3">
+          <div className="p-3 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+            <DollarSign size={20} />
+          </div>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">目前持股總市值 (換算)</p>
+        </div>
+        <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-2">
+          {formatBaseCurrency(summary.totalValue)}
+        </h3>
+      </div>
+
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center gap-2">
+        <div className="flex items-center gap-3">
+          <div className="p-3 rounded-full bg-purple-100 text-purple-600">
+            <Layers size={20} />
+          </div>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">持倉檔數</p>
+        </div>
+        <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-2">
+          {processedDataCount} <span className="text-base font-normal text-slate-500 dark:text-slate-400">檔股票</span>
+        </h3>
+      </div>
+    </div>
+  );
+}
