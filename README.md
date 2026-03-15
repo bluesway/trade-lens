@@ -33,7 +33,7 @@
 ### Installation
 1.  Clone the repository:
     ```bash
-    git clone http://git.bluesway.org:30000/bluesway/trade-lens.git
+    git clone https://git.bluesway.org/bluesway/trade-lens.git
     cd trade-lens
     ```
 2.  Install dependencies:

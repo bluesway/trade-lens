@@ -1131,7 +1131,7 @@ export default function App() {
                         <span>API 金鑰：僅用於向 yfapi.net 抓取股價，且金鑰同樣僅儲存於本地。</span>
                       </div>
                       <a 
-                        href="http://git.bluesway.org:30000/bluesway/trade-lens" 
+                        href="https://git.bluesway.org/bluesway/trade-lens" 
                         target="_blank" 
                         rel="noreferrer"
                         className="flex items-center gap-2 text-xs bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg border border-white/20 transition-colors cursor-pointer"
