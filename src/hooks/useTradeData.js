@@ -57,12 +57,9 @@ export function useTradeData(showToast) {
     setIsLoadingPrices(true);
     try {
       const now = Date.now();
-      const ONE_DAY = 24*60*60*1000;
-      const toFetch = symbols.filter(s => isForce || !liveData[s] || (now - liveData[s].timestamp > ONE_DAY));
-      if (toFetch.length === 0) { setLastUpdate(new Date()); setIsLoadingPrices(false); return; }
       const newData = { ...liveData };
-      for (let i = 0; i < toFetch.length; i += 10) {
-        const res = await fetch(`https://yfapi.net/v6/finance/quote?symbols=${toFetch.slice(i, i+10).join(',')}`, { headers: { 'x-api-key': apiKey } });
+      for (let i = 0; i < symbols.length; i += 10) {
+        const res = await fetch(`https://yfapi.net/v6/finance/quote?symbols=${symbols.slice(i, i+10).join(',')}`, { headers: { 'x-api-key': apiKey } });
         const json = await res.json();
         json?.quoteResponse?.result?.forEach(item => {
           newData[item.symbol] = { price: item.regularMarketPrice, name: item.longName || STOCK_MAPPING[item.symbol]?.name, currency: item.currency || 'USD', timestamp: now };
@@ -102,10 +99,8 @@ export function useTradeData(showToast) {
       const valOrig = s.holdingQty * price;
       const pnlUnreal = valOrig > 0 ? valOrig - s.totalCost : 0;
       const realizedCost = s.totalSellRevenue - s.realizedPnl;
-      
       return { 
-        ...s, 
-        name: manual?.name || apiData?.name || STOCK_MAPPING[s.symbol]?.name || `未知代號 (${s.symbol})`,
+        ...s, name: manual?.name || apiData?.name || STOCK_MAPPING[s.symbol]?.name || `未知代號 (${s.symbol})`,
         currentPrice: price, currency, currencySymbol,
         currentValueBase: valOrig * rate, unrealizedPnlBase: pnlUnreal * rate, realizedPnlBase: s.realizedPnl * rate, realizedCostBase: realizedCost * rate, totalCostBase: s.totalCost * rate, ifSoldTodayPnlBase: (s.totalSoldQty * price - realizedCost) * rate,
         unrealizedPnlOriginal: pnlUnreal, realizedPnlOriginal: s.realizedPnl, ifSoldTodayPnlOriginal: (s.totalSoldQty * price - realizedCost), currentValueOriginal: valOrig,
@@ -128,10 +123,10 @@ export function useTradeData(showToast) {
     const sorted = [...rawData].sort((a, b) => new Date(a['日期']) - new Date(b['日期']));
     let curCost = 0, curPnl = 0;
     const stats = {};
-    return sorted.map(r => {
+    const timeline = sorted.map(r => {
       const sym = formatSymbol(r['代號'], r['市場'] || guessMarket(r['代號']));
       const amt = parseFloat(String(r['總金額']).replace(/[^0-9.-]+/g, "")) || 0;
-      const cur = r['市場']==='美股'?'USD':r['市場']==='台股'?'TWD':'USD';
+      const cur = r['市場']==='美股'?'USD':r['市場']==='台股'?'TWD':r['市場']==='港股'?'HKD':'USD';
       const rate = getExchangeRate(cur, baseCurrency);
       if(!stats[sym]) stats[sym] = { qty: 0, cost: 0 };
       if(r['類型']==='買入'){ stats[sym].qty += parseFloat(r['數量']); stats[sym].cost += amt; curCost += amt * rate; }
@@ -140,9 +135,16 @@ export function useTradeData(showToast) {
         if(stats[sym].qty > 0) curCost -= (stats[sym].cost / stats[sym].qty) * parseFloat(r['數量']) * rate;
         stats[sym].qty -= parseFloat(r['數量']);
       }
-      return { date: r['日期'], displayDate: r['日期'].substring(5), costBase: curCost, realizedPnlBase: curPnl };
+      return { date: r['日期'], timestamp: new Date(r['日期']).getTime(), displayDate: r['日期'].substring(5), costBase: curCost, realizedPnlBase: curPnl };
     });
-  }, [rawData, baseCurrency, exchangeRates]);
+
+    // 處理時間範圍過濾
+    if (trendTimeRange === '全部') return timeline;
+    const now = new Date().getTime();
+    const rangeMs = { '1週': 7*24*60*60*1000, '1月': 30*24*60*60*1000, '3月': 90*24*60*60*1000, '半年': 180*24*60*60*1000, 'YTD': now - new Date(new Date().getFullYear(), 0, 1).getTime(), '1年': 365*24*60*60*1000, '5年': 5*365*24*60*60*1000 };
+    const limit = now - (rangeMs[trendTimeRange] || 0);
+    return timeline.filter(t => t.timestamp >= limit);
+  }, [rawData, baseCurrency, exchangeRates, trendTimeRange]);
 
   return {
     isAppLoaded, rawData, isDemo, apiKey, baseCurrency, lastUpdate, isLoadingPrices, processedData, summary, trendData,

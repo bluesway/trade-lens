@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { toPng } from 'html-to-image';
 import { CURRENCY_SYMBOLS } from './utils/constants';
-import { parseCSV, asyncStorage } from './utils/helpers';
+import { parseCSV } from './utils/helpers';
 import { useTradeData } from './hooks/useTradeData';
 
 // Components
@@ -16,10 +16,8 @@ export default function App() {
   const [toastMsg, setToastMsg] = useState('');
   const [darkMode, setDarkMode] = useState(false);
   const [showManager, setShowManager] = useState(false);
-  const [showCsvHelp, setShowCsvHelp] = useState(false);
   const [marketFilter, setMarketFilter] = useState('全部');
   const [hideZeroHolding, setHideZeroHolding] = useState(false);
-  const [trendTimeRange, setTrendTimeRange] = useState('全部');
   const [showUserNotice, setShowUserNotice] = useState(false);
 
   const trendChartRef = useRef(null);
@@ -32,7 +30,8 @@ export default function App() {
   };
 
   const {
-    isAppLoaded, rawData, isDemo, apiKey, baseCurrency, lastUpdate, isLoadingPrices, processedData, summary,
+    isAppLoaded, rawData, isDemo, apiKey, baseCurrency, lastUpdate, isLoadingPrices, 
+    processedData, summary, trendData, trendTimeRange, setTrendTimeRange,
     fetchLivePrices, setApiKey, setRawData, setBaseCurrency, setManualStockData
   } = useTradeData(showToast);
 
@@ -105,18 +104,10 @@ export default function App() {
     }
   };
 
-  const trendData = useMemo(() => {
-    if (rawData.length === 0) return [];
-    // 這裡為了簡化，我們先將趨勢邏輯放在 memo 內，或將來也可以移入 hook
-    // ... (維持原本的 Trend 計算邏輯，但為了篇幅精簡，此處呼叫 hook 的回傳值或在 hook 內計算更好)
-    // 考慮到邏輯一致性，我將趨勢計算補回 hook 或在 App 內保留精簡版
-    return []; // 這裡暫時回傳空，實務上我剛才應該把這段也搬進 hook，等下我會去補完 hook
-  }, [rawData, baseCurrency]);
-
   if (!isAppLoaded) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-900/50 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-slate-500">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3 text-slate-500 dark:text-slate-400">
           <div className="w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
           <p className="font-medium">載入本機 IndexedDB 資料中...</p>
         </div>
@@ -125,7 +116,7 @@ export default function App() {
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-slate-950' : 'bg-slate-50'}`}>
+    <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'}`}>
       <div className="max-w-7xl mx-auto px-4 py-8 md:px-6 lg:px-8 space-y-6">
         
         <UserNotice show={showUserNotice} onDismiss={dismissNotice} />
@@ -136,7 +127,6 @@ export default function App() {
           showManager={showManager} setShowManager={setShowManager}
           fetchLivePrices={fetchLivePrices} isLoadingPrices={isLoadingPrices} apiKey={apiKey}
           handleFileUpload={handleFileUpload} handleExportCSV={handleExportCSV}
-          showCsvHelp={showCsvHelp} setShowCsvHelp={setShowCsvHelp}
         />
 
         {showManager && (
@@ -150,7 +140,7 @@ export default function App() {
 
         <SummaryCards 
           summary={summary} processedDataCount={processedData.length}
-          formatBaseCurrency={(v) => `${CURRENCY_SYMBOLS[baseCurrency] || baseCurrency} ${v.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`}
+          formatBaseCurrency={(v) => `${CURRENCY_SYMBOLS[baseCurrency] || baseCurrency} ${(v || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`}
           formatPercent={(v) => `${v > 0 ? '+' : ''}${v.toFixed(2)}%`}
         />
 
@@ -160,12 +150,12 @@ export default function App() {
           darkMode={darkMode} baseCurrency={baseCurrency}
           exportChartAsImage={exportChartAsImage}
           trendChartRef={trendChartRef} barChartRef={barChartRef} pieChartRef={pieChartRef}
-          formatBaseCurrency={(v) => `${CURRENCY_SYMBOLS[baseCurrency] || baseCurrency} ${v.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`}
+          formatBaseCurrency={(v) => `${CURRENCY_SYMBOLS[baseCurrency] || baseCurrency} ${(v || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`}
         />
 
         <DataTable 
           processedData={processedData} marketFilter={marketFilter} setMarketFilter={setMarketFilter}
-          hideZeroHolding={hideZeroHolding}
+          hideZeroHolding={hideZeroHolding} setHideZeroHolding={setHideZeroHolding}
           handleSaveManualStock={setManualStockData}
           formatPercent={(v) => `${v > 0 ? '+' : ''}${v.toFixed(2)}%`}
           formatOriginalCurrency={(v, sym) => `${sym} ${(v || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`}
@@ -174,7 +164,7 @@ export default function App() {
       </div>
 
       {toastMsg && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] bg-slate-800 text-white px-6 py-3 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300 flex items-center gap-3">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] bg-slate-800 dark:bg-slate-700 text-white px-6 py-3 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300 flex items-center gap-3">
           <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
           <span className="text-sm font-medium">{toastMsg}</span>
         </div>
