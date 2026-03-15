@@ -1,12 +1,14 @@
 import React from 'react';
-import { TrendingUp, TrendingDown, Activity, DollarSign, Layers } from 'lucide-react';
+import { Activity, DollarSign, Layers, TrendingDown, TrendingUp } from 'lucide-react';
 
-export default function SummaryCards({ summary, formatBaseCurrency, formatPercent, processedDataCount }) {
-  const overallRealizedPercent = summary.totalRealizedCost > 0 
-    ? (summary.totalRealizedPnl / summary.totalRealizedCost) * 100 : 0;
-  const overallUnrealizedPercent = summary.totalHoldingCost > 0 
-    ? (summary.totalUnrealizedPnl / summary.totalHoldingCost) * 100 : 0;
-
+export default function SummaryCards({
+  formatBaseCurrency,
+  formatPercent,
+  holdingCount,
+  overallRealizedPercent,
+  overallUnrealizedPercent,
+  summary
+}) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center gap-2 relative overflow-hidden">
@@ -19,7 +21,8 @@ export default function SummaryCards({ summary, formatBaseCurrency, formatPercen
         </div>
         <div className="flex items-baseline gap-2 mt-2 relative z-10">
           <h3 className={`text-2xl font-bold ${summary.totalRealizedPnl >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-            {summary.totalRealizedPnl > 0 ? '+' : ''}{formatBaseCurrency(summary.totalRealizedPnl)}
+            {summary.totalRealizedPnl > 0 ? '+' : ''}
+            {formatBaseCurrency(summary.totalRealizedPnl)}
           </h3>
           <span className={`text-sm font-semibold px-2 py-0.5 rounded-md ${summary.totalRealizedPnl >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
             {formatPercent(overallRealizedPercent)}
@@ -37,7 +40,8 @@ export default function SummaryCards({ summary, formatBaseCurrency, formatPercen
         </div>
         <div className="flex items-baseline gap-2 mt-2 relative z-10">
           <h3 className={`text-2xl font-bold ${summary.totalUnrealizedPnl >= 0 ? 'text-blue-600' : 'text-rose-600'}`}>
-            {summary.totalUnrealizedPnl > 0 ? '+' : ''}{formatBaseCurrency(summary.totalUnrealizedPnl)}
+            {summary.totalUnrealizedPnl > 0 ? '+' : ''}
+            {formatBaseCurrency(summary.totalUnrealizedPnl)}
           </h3>
           <span className={`text-sm font-semibold px-2 py-0.5 rounded-md ${summary.totalUnrealizedPnl >= 0 ? 'bg-blue-50 text-blue-600' : 'bg-rose-50 text-rose-600'}`}>
             {formatPercent(overallUnrealizedPercent)}
@@ -59,13 +63,13 @@ export default function SummaryCards({ summary, formatBaseCurrency, formatPercen
 
       <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center gap-2">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-full bg-purple-100 text-purple-600">
+          <div className="p-3 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
             <Layers size={20} />
           </div>
           <p className="text-sm font-medium text-slate-500 dark:text-slate-400">持倉檔數</p>
         </div>
         <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-2">
-          {processedDataCount} <span className="text-base font-normal text-slate-500 dark:text-slate-400">檔股票</span>
+          {holdingCount} <span className="text-base font-normal text-slate-500 dark:text-slate-400">檔股票</span>
         </h3>
       </div>
     </div>
