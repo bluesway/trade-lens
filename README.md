@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="screenshots/logo.svg" width="128" height="128" alt="Trade Lens Logo">
+</p>
+
 # 📊 Trade Lens: Global Portfolio Insights
 
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
