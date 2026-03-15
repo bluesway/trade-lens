@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { asyncStorage, parseCSV, guessMarket, formatSymbol } from '../utils/helpers';
-import { DEFAULT_CSV, STOCK_MAPPING } from '../utils/constants';
+import { DEFAULT_CSV, STOCK_MAPPING, CURRENCY_SYMBOLS } from '../utils/constants';
 
 export function useTradeData(showToast) {
   const [isAppLoaded, setIsAppLoaded] = useState(false);
@@ -15,7 +15,6 @@ export function useTradeData(showToast) {
   const [isLoadingPrices, setIsLoadingPrices] = useState(false);
   const [trendTimeRange, setTrendTimeRange] = useState('全部');
 
-  // 初始化與資料載入邏輯 (維持不變)
   useEffect(() => {
     const loadInitialData = async () => {
       try {
@@ -51,7 +50,6 @@ export function useTradeData(showToast) {
     return exchangeRates[`${from}${to}=X`]?.rate || 1;
   };
 
-  // 即時股價抓取 (維持不變)
   const fetchLivePrices = async (isForce = false, targetBase = baseCurrency) => {
     if (!apiKey) { showToast('請先設定 API Key'); return; }
     const symbols = Array.from(new Set(rawData.map(r => formatSymbol(r['代號'], r['市場'] || guessMarket(r['代號']))).filter(s => s && s !== '未知')));
@@ -63,7 +61,6 @@ export function useTradeData(showToast) {
       const toFetch = symbols.filter(s => isForce || !liveData[s] || (now - liveData[s].timestamp > ONE_DAY));
       if (toFetch.length === 0) { setLastUpdate(new Date()); setIsLoadingPrices(false); return; }
       const newData = { ...liveData };
-      const newRates = { ...exchangeRates };
       for (let i = 0; i < toFetch.length; i += 10) {
         const res = await fetch(`https://yfapi.net/v6/finance/quote?symbols=${toFetch.slice(i, i+10).join(',')}`, { headers: { 'x-api-key': apiKey } });
         const json = await res.json();
@@ -79,12 +76,11 @@ export function useTradeData(showToast) {
     finally { setIsLoadingPrices(false); }
   };
 
-  // 聚合計算
   const processedData = useMemo(() => {
     const agg = {};
     [...rawData].sort((a,b) => new Date(a['日期']) - new Date(b['日期'])).forEach(r => {
       const sym = formatSymbol(r['代號'], r['市場'] || guessMarket(r['代號']));
-      if(!agg[sym]) agg[sym] = { symbol: sym, holdingQty: 0, totalCost: 0, realizedPnl: 0, totalSellRevenue: 0, totalSoldQty: 0, history: [] };
+      if(!agg[sym]) agg[sym] = { symbol: sym, market: r['市場'] || guessMarket(r['代號']), holdingQty: 0, totalCost: 0, realizedPnl: 0, totalSellRevenue: 0, totalSoldQty: 0, history: [] };
       agg[sym].history.push(r);
       const qty = parseFloat(r['數量']) || 0;
       const amt = parseFloat(String(r['總金額']).replace(/[^0-9.-]+/g, "")) || 0;
@@ -97,14 +93,26 @@ export function useTradeData(showToast) {
       }
     });
     return Object.values(agg).map(s => {
-      const live = liveData[s.symbol];
+      const apiData = liveData[s.symbol];
       const manual = manualStockData[s.symbol];
-      const price = manual?.price !== undefined ? manual.price : (live?.price || STOCK_MAPPING[s.symbol]?.price || 0);
-      const rate = getExchangeRate(live?.currency || 'USD', baseCurrency);
+      const price = manual?.price !== undefined ? manual.price : (apiData?.price || STOCK_MAPPING[s.symbol]?.price || 0);
+      const currency = apiData?.currency || (s.market === '美股' ? 'USD' : s.market === '台股' ? 'TWD' : s.market === '港股' ? 'HKD' : s.market === '日股' ? 'JPY' : 'CNY');
+      const currencySymbol = CURRENCY_SYMBOLS[currency] || currency;
+      const rate = getExchangeRate(currency, baseCurrency);
       const valOrig = s.holdingQty * price;
       const pnlUnreal = valOrig > 0 ? valOrig - s.totalCost : 0;
-      return { ...s, currentPrice: price, currentValueBase: valOrig * rate, unrealizedPnlBase: pnlUnreal * rate, realizedPnlBase: s.realizedPnl * rate, realizedCostBase: (s.totalSellRevenue - s.realizedPnl) * rate, totalCostBase: s.totalCost * rate, ifSoldTodayPnlBase: (s.totalSoldQty * price - (s.totalSellRevenue - s.realizedPnl)) * rate };
-    });
+      const realizedCost = s.totalSellRevenue - s.realizedPnl;
+      
+      return { 
+        ...s, 
+        name: manual?.name || apiData?.name || STOCK_MAPPING[s.symbol]?.name || `未知代號 (${s.symbol})`,
+        currentPrice: price, currency, currencySymbol,
+        currentValueBase: valOrig * rate, unrealizedPnlBase: pnlUnreal * rate, realizedPnlBase: s.realizedPnl * rate, realizedCostBase: realizedCost * rate, totalCostBase: s.totalCost * rate, ifSoldTodayPnlBase: (s.totalSoldQty * price - realizedCost) * rate,
+        unrealizedPnlOriginal: pnlUnreal, realizedPnlOriginal: s.realizedPnl, ifSoldTodayPnlOriginal: (s.totalSoldQty * price - realizedCost), currentValueOriginal: valOrig,
+        unrealizedPnlPercent: s.totalCost > 0 ? (pnlUnreal / s.totalCost) * 100 : 0,
+        realizedPnlPercent: realizedCost > 0 ? (s.realizedPnl / realizedCost) * 100 : 0
+      };
+    }).sort((a,b) => b.realizedPnlBase - a.realizedPnlBase);
   }, [rawData, liveData, manualStockData, baseCurrency]);
 
   const summary = useMemo(() => processedData.reduce((a, c) => ({
@@ -115,28 +123,25 @@ export function useTradeData(showToast) {
     totalValue: a.totalValue + c.currentValueBase
   }), { totalRealizedPnl: 0, totalRealizedCost: 0, totalUnrealizedPnl: 0, totalHoldingCost: 0, totalValue: 0 }), [processedData]);
 
-  // 趨勢計算 (補回靈魂)
   const trendData = useMemo(() => {
     if (rawData.length === 0) return [];
     const sorted = [...rawData].sort((a, b) => new Date(a['日期']) - new Date(b['日期']));
-    let currentCost = 0, currentPnl = 0;
-    const stockStats = {};
-    const timeline = [];
-    sorted.forEach(r => {
+    let curCost = 0, curPnl = 0;
+    const stats = {};
+    return sorted.map(r => {
       const sym = formatSymbol(r['代號'], r['市場'] || guessMarket(r['代號']));
       const amt = parseFloat(String(r['總金額']).replace(/[^0-9.-]+/g, "")) || 0;
-      const rate = getExchangeRate(r['市場']==='美股'?'USD':r['市場']==='台股'?'TWD':'USD', baseCurrency);
-      if(!stockStats[sym]) stockStats[sym] = { qty: 0, cost: 0 };
-      if(r['類型']==='買入'){ stockStats[sym].qty += parseFloat(r['數量']); stockStats[sym].cost += amt; currentCost += amt * rate; }
+      const cur = r['市場']==='美股'?'USD':r['市場']==='台股'?'TWD':'USD';
+      const rate = getExchangeRate(cur, baseCurrency);
+      if(!stats[sym]) stats[sym] = { qty: 0, cost: 0 };
+      if(r['類型']==='買入'){ stats[sym].qty += parseFloat(r['數量']); stats[sym].cost += amt; curCost += amt * rate; }
       else {
-        const pnl = parseFloat(String(r['損益']).replace(/[^0-9.-]+/g, "")) || 0;
-        currentPnl += pnl * rate;
-        if(stockStats[sym].qty > 0) currentCost -= (stockStats[sym].cost / stockStats[sym].qty) * parseFloat(r['數量']) * rate;
-        stockStats[sym].qty -= parseFloat(r['數量']);
+        curPnl += (parseFloat(String(r['損益']).replace(/[^0-9.-]+/g, "")) || 0) * rate;
+        if(stats[sym].qty > 0) curCost -= (stats[sym].cost / stats[sym].qty) * parseFloat(r['數量']) * rate;
+        stats[sym].qty -= parseFloat(r['數量']);
       }
-      timeline.push({ date: r['日期'], displayDate: r['日期'].substring(5), costBase: currentCost, realizedPnlBase: currentPnl });
+      return { date: r['日期'], displayDate: r['日期'].substring(5), costBase: curCost, realizedPnlBase: curPnl };
     });
-    return timeline;
   }, [rawData, baseCurrency, exchangeRates]);
 
   return {

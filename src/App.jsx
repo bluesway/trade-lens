@@ -168,7 +168,7 @@ export default function App() {
           hideZeroHolding={hideZeroHolding}
           handleSaveManualStock={setManualStockData}
           formatPercent={(v) => `${v > 0 ? '+' : ''}${v.toFixed(2)}%`}
-          formatOriginalCurrency={(v, sym) => `${sym} ${v.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`}
+          formatOriginalCurrency={(v, sym) => `${sym} ${(v || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`}
         />
 
       </div>
