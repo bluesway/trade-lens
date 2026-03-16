@@ -2,16 +2,24 @@ export const DEFAULT_LOCALE = 'zh-TW';
 
 export const SUPPORTED_LOCALES = [
   { code: 'zh-TW', nativeLabel: '繁體中文 (台灣)', dir: 'ltr' },
-  { code: 'zh-HK', nativeLabel: '繁體中文 (香港)', dir: 'ltr' },
+  { code: 'yue-Hant-HK', nativeLabel: '廣東話 (香港)', dir: 'ltr' },
   { code: 'zh-CN', nativeLabel: '简体中文 (中国)', dir: 'ltr' },
   { code: 'zh-SG', nativeLabel: '简体中文 (新加坡)', dir: 'ltr' },
   { code: 'en-US', nativeLabel: 'English (US)', dir: 'ltr' },
   { code: 'en-GB', nativeLabel: 'English (UK)', dir: 'ltr' },
+  { code: 'en-SG', nativeLabel: 'English (Singapore)', dir: 'ltr' },
   { code: 'ja-JP', nativeLabel: '日本語', dir: 'ltr' },
   { code: 'ko-KR', nativeLabel: '한국어', dir: 'ltr' },
   { code: 'id-ID', nativeLabel: 'Bahasa Indonesia', dir: 'ltr' },
   { code: 'fr-FR', nativeLabel: 'Français', dir: 'ltr' },
+  { code: 'de-DE', nativeLabel: 'Deutsch', dir: 'ltr' },
+  { code: 'it-IT', nativeLabel: 'Italiano', dir: 'ltr' },
   { code: 'ms-MY', nativeLabel: 'Bahasa Melayu', dir: 'ltr' },
+  { code: 'nl-NL', nativeLabel: 'Nederlands', dir: 'ltr' },
+  { code: 'es-419', nativeLabel: 'Español (Latinoamérica)', dir: 'ltr' },
+  { code: 'es-ES', nativeLabel: 'Español (España)', dir: 'ltr' },
+  { code: 'pt-BR', nativeLabel: 'Português (Brasil)', dir: 'ltr' },
+  { code: 'pt-PT', nativeLabel: 'Português (Portugal)', dir: 'ltr' },
   { code: 'vi-VN', nativeLabel: 'Tiếng Việt', dir: 'ltr' },
   { code: 'th-TH', nativeLabel: 'ไทย', dir: 'ltr' },
   { code: 'ar-SA', nativeLabel: 'العربية', dir: 'rtl' }
@@ -51,32 +59,59 @@ const LOCALE_ALIASES = {
   'ar-sa': 'ar-SA',
   en: 'en-US',
   'en-gb': 'en-GB',
+  'en-sg': 'en-SG',
   'en-uk': 'en-GB',
   'en-us': 'en-US',
+  es: 'es-419',
+  'es-419': 'es-419',
+  'es-ar': 'es-419',
+  'es-cl': 'es-419',
+  'es-co': 'es-419',
+  'es-es': 'es-ES',
+  'es-mx': 'es-419',
+  'es-pe': 'es-419',
+  'es-us': 'es-419',
   fr: 'fr-FR',
   'fr-fr': 'fr-FR',
+  de: 'de-DE',
+  'de-de': 'de-DE',
   id: 'id-ID',
   'id-id': 'id-ID',
+  it: 'it-IT',
+  'it-it': 'it-IT',
   ja: 'ja-JP',
   'ja-jp': 'ja-JP',
   ko: 'ko-KR',
   'ko-kr': 'ko-KR',
   ms: 'ms-MY',
   'ms-my': 'ms-MY',
+  nl: 'nl-NL',
+  'nl-nl': 'nl-NL',
+  pt: 'pt-BR',
+  'pt-br': 'pt-BR',
+  'pt-pt': 'pt-PT',
   th: 'th-TH',
   'th-th': 'th-TH',
   vi: 'vi-VN',
   'vi-vn': 'vi-VN',
+  yue: 'yue-Hant-HK',
+  'yue-hant': 'yue-Hant-HK',
+  'yue-hant-hk': 'yue-Hant-HK',
+  'yue-hk': 'yue-Hant-HK',
   zh: 'zh-TW',
   'zh-cn': 'zh-CN',
   'zh-hans': 'zh-CN',
   'zh-hans-cn': 'zh-CN',
   'zh-hans-sg': 'zh-SG',
   'zh-hant': 'zh-TW',
-  'zh-hant-hk': 'zh-HK',
-  'zh-hk': 'zh-HK',
+  'zh-hant-hk': 'yue-Hant-HK',
+  'zh-hk': 'yue-Hant-HK',
   'zh-sg': 'zh-SG',
   'zh-tw': 'zh-TW'
+};
+
+const FORMATTING_LOCALE_OVERRIDES = {
+  'yue-Hant-HK': 'zh-HK'
 };
 
 const SUPPORTED_LOCALE_CODES = SUPPORTED_LOCALES.map((locale) => locale.code);
@@ -108,7 +143,8 @@ export const getLocaleDirection = (value) => getLocaleMeta(value).dir;
 export const isRtlLocale = (value) => getLocaleDirection(value) === 'rtl';
 
 export const getFormattingLocale = (value) => {
-  return normalizeLocale(value);
+  const localeCode = normalizeLocale(value);
+  return FORMATTING_LOCALE_OVERRIDES[localeCode] || localeCode;
 };
 
 export const usesDualCalendarDateDisplay = (value) => normalizeLocale(value) === 'th-TH';
