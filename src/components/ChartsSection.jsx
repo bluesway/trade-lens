@@ -80,14 +80,19 @@ export default function ChartsSection({
     <ul className="flex justify-center gap-6 pt-4">
       {payload.map((entry, index) => {
         const isIfSoldToday = entry.dataKey === 'ifSoldTodayPnlBase';
+        const markerStyle = isIfSoldToday
+          ? undefined
+          : { backgroundColor: entry.color || entry.fill || '#64748b' };
 
         return (
           <li key={`item-${index}`} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 font-medium">
             <div
               className={`w-4 h-4 rounded-[2px] ${
-                isIfSoldToday ? 'border-2 border-dashed border-slate-400 bg-slate-200/50 dark:bg-slate-700/50' : ''
+                isIfSoldToday
+                  ? 'border-2 border-dashed border-slate-400 bg-slate-200/50 dark:bg-slate-700/50'
+                  : 'bg-slate-500 dark:bg-slate-300'
               }`}
-              style={{ backgroundColor: isIfSoldToday ? undefined : entry.color || entry.fill }}
+              style={markerStyle}
             />
             <span>{t('charts.legendConverted', { label: entry.value })}</span>
           </li>

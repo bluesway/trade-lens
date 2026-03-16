@@ -49,8 +49,10 @@ export const BASE_CURRENCY_OPTIONS = [
   'JPY',
   'EUR',
   'GBP',
+  'CHF',
   'CAD',
   'AUD',
+  'NOK',
   'SGD',
   'KRW',
   'IRR',
@@ -67,9 +69,11 @@ export const BASE_CURRENCY_OPTIONS = [
   'MYR',
   'MXN',
   'BRL',
+  'ARS',
   'RUB',
   'VND',
   'THB',
+  'ZAR',
   'SAR'
 ];
 

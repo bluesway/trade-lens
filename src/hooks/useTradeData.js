@@ -12,6 +12,7 @@ import {
   formatSymbol,
   getCurrencyBySymbolOrMarket,
   guessMarket,
+  normalizeQuoteCurrencyData,
   normalizeMarket,
   parseCSV
 } from '../utils/helpers';
@@ -276,7 +277,7 @@ export function useTradeData(showToast) {
       uniqueSymbols.forEach((symbol) => {
         const cached = liveData[symbol];
         const fallbackCurrency = getCurrencyBySymbolOrMarket(symbol, marketBySymbol.get(symbol));
-        const currency = cached?.currency || fallbackCurrency;
+        const currency = normalizeQuoteCurrencyData(cached?.currency).currency || fallbackCurrency;
 
         if (currency && currency !== targetBaseCurrency) {
           getFxRateSymbols(currency, targetBaseCurrency).forEach((rateKey) => {
@@ -332,16 +333,17 @@ export function useTradeData(showToast) {
         const json = await response.json();
         if (json?.quoteResponse?.result) {
           json.quoteResponse.result.forEach((item) => {
+            const normalizedQuote = normalizeQuoteCurrencyData(item.currency, item.regularMarketPrice);
             updatedLiveData[item.symbol] = {
-              price: item.regularMarketPrice,
+              price: normalizedQuote.price,
               name: item.longName || item.shortName || STOCK_MAPPING[item.symbol]?.name,
-              currency: item.currency || getCurrencyBySymbolOrMarket(item.symbol, marketBySymbol.get(item.symbol)),
+              currency: normalizedQuote.currency || getCurrencyBySymbolOrMarket(item.symbol, marketBySymbol.get(item.symbol)),
               timestamp: now
             };
             fetchedSymbols.add(item.symbol);
             fetchedCount += 1;
 
-            const itemCurrency = item.currency || getCurrencyBySymbolOrMarket(item.symbol, marketBySymbol.get(item.symbol));
+            const itemCurrency = normalizedQuote.currency || getCurrencyBySymbolOrMarket(item.symbol, marketBySymbol.get(item.symbol));
             if (itemCurrency && itemCurrency !== targetBaseCurrency) {
               getFxRateSymbols(itemCurrency, targetBaseCurrency).forEach((rateKey) => {
                 currenciesToFetch.add(rateKey);
@@ -630,10 +632,11 @@ export function useTradeData(showToast) {
 
         const isManualPrice = manualData?.price !== undefined;
         const isManualName = manualData?.name !== undefined && manualData?.name !== '';
-        const currentPrice = isManualPrice ? manualData.price : apiData?.price || stock.currentPrice;
+        const normalizedApiQuote = normalizeQuoteCurrencyData(apiData?.currency, apiData?.price);
+        const currentPrice = isManualPrice ? manualData.price : normalizedApiQuote.price || stock.currentPrice;
         const currentName = isManualName ? manualData.name : apiData?.name || stock.name;
         const lastUpdateTimestamp = isManualPrice ? manualData.timestamp : apiData?.timestamp || null;
-        const currency = apiData?.currency || getCurrencyBySymbolOrMarket(stock.symbol, stock.market);
+        const currency = normalizedApiQuote.currency || getCurrencyBySymbolOrMarket(stock.symbol, stock.market);
         const exchangeRate = getExchangeRate(currency, baseCurrency);
 
         const currentValueOriginal = stock.holdingQty * currentPrice;

@@ -5,6 +5,10 @@ const CRYPTO_DEFAULT_QUOTE_CURRENCY = 'USD';
 const CRYPTO_PAIR_REGEX = /^[A-Z0-9]{2,15}-[A-Z]{3,5}$/;
 const REGION_DISPLAY_NAME_CACHE = new Map();
 const MARKET_DISPLAY_CURRENCIES = new Set([...BASE_CURRENCY_OPTIONS, 'BRL']);
+const QUOTE_CURRENCY_NORMALIZERS = {
+  GBp: { currency: 'GBP', priceFactor: 0.01 },
+  ZAc: { currency: 'ZAR', priceFactor: 0.01 }
+};
 
 const MARKET_DEFINITIONS = {
   全部: {
@@ -246,6 +250,62 @@ const MARKET_DEFINITIONS = {
     regionCode: 'SA',
     suffixes: ['.SR']
   },
+  瑞士股: {
+    aliases: ['瑞士股', '瑞士', 'switzerland', 'ch', 'six', 'swiss'],
+    currency: 'CHF',
+    defaultSuffix: '.SW',
+    regionCode: 'CH',
+    suffixes: ['.SW']
+  },
+  奧地利股: {
+    aliases: ['奧地利股', '奥地利股', '奧地利', '奥地利', 'austria', 'at', 'vienna', 'wienerborse'],
+    currency: 'EUR',
+    defaultSuffix: '.VI',
+    regionCode: 'AT',
+    suffixes: ['.VI']
+  },
+  挪威股: {
+    aliases: ['挪威股', '挪威', 'norway', 'no', 'oslo', 'oslobors'],
+    currency: 'NOK',
+    defaultSuffix: '.OL',
+    regionCode: 'NO',
+    suffixes: ['.OL']
+  },
+  芬蘭股: {
+    aliases: ['芬蘭股', '芬兰股', '芬蘭', '芬兰', 'finland', 'fi', 'helsinki', 'nasdaqhelsinki'],
+    currency: 'EUR',
+    defaultSuffix: '.HE',
+    regionCode: 'FI',
+    suffixes: ['.HE']
+  },
+  比利時股: {
+    aliases: ['比利時股', '比利时股', '比利時', '比利时', 'belgium', 'be', 'brussels', 'euronextbrussels'],
+    currency: 'EUR',
+    defaultSuffix: '.BR',
+    regionCode: 'BE',
+    suffixes: ['.BR']
+  },
+  愛爾蘭股: {
+    aliases: ['愛爾蘭股', '爱尔兰股', '愛爾蘭', '爱尔兰', 'ireland', 'ie', 'dublin', 'ise'],
+    currency: 'EUR',
+    defaultSuffix: '.IR',
+    regionCode: 'IE',
+    suffixes: ['.IR']
+  },
+  南非股: {
+    aliases: ['南非股', '南非', 'southafrica', 'za', 'jse', 'johannesburg'],
+    currency: 'ZAR',
+    defaultSuffix: '.JO',
+    regionCode: 'ZA',
+    suffixes: ['.JO']
+  },
+  阿根廷股: {
+    aliases: ['阿根廷股', '阿根廷', 'argentina', 'ar', 'buenosaires', 'bcba'],
+    currency: 'ARS',
+    defaultSuffix: '.BA',
+    regionCode: 'AR',
+    suffixes: ['.BA']
+  },
   虛擬幣: {
     aliases: ['虛擬幣', '虚拟币', '加密貨幣', '加密货币', 'crypto', 'cryptocurrency', 'digitalasset', 'digitalassets'],
     currency: CRYPTO_DEFAULT_QUOTE_CURRENCY,
@@ -341,6 +401,14 @@ export const MANUAL_MARKET_OPTIONS = [
   '匈牙利股',
   '丹麥股',
   '希臘股',
+  '瑞士股',
+  '奧地利股',
+  '挪威股',
+  '芬蘭股',
+  '比利時股',
+  '愛爾蘭股',
+  '南非股',
+  '阿根廷股',
   '越股',
   '泰股',
   '沙股',
@@ -380,6 +448,14 @@ const MARKET_EXAMPLE_SYMBOLS = {
   匈牙利股: 'OTP', // OTP Bank
   丹麥股: 'NOVO-B', // Novo Nordisk
   希臘股: 'OTE', // Hellenic Telecommunications
+  瑞士股: 'NESN', // Nestle
+  奧地利股: 'OMV', // OMV
+  挪威股: 'EQNR', // Equinor
+  芬蘭股: 'KNEBV', // KONE
+  比利時股: 'ABI', // AB InBev
+  愛爾蘭股: 'RYA', // Ryanair
+  南非股: 'NPN', // Naspers
+  阿根廷股: 'GGAL', // Grupo Financiero Galicia
   越股: 'FPT', // FPT Corporation
   泰股: 'PTT', // PTT
   沙股: '2222', // Saudi Aramco
@@ -772,6 +848,19 @@ export const getMarketLabel = (market, locale, t) => {
 export const getMarketSymbolPlaceholder = (market) => {
   const normalizedMarket = normalizeMarket(market);
   return normalizedMarket ? MARKET_EXAMPLE_SYMBOLS[normalizedMarket] || '' : '';
+};
+
+export const normalizeQuoteCurrencyData = (currency, price) => {
+  const rule = QUOTE_CURRENCY_NORMALIZERS[String(currency || '').trim()];
+  const normalizedCurrency = rule?.currency || currency || '';
+  const normalizedPrice = price === undefined || price === null
+    ? price
+    : Number(price) * (rule?.priceFactor || 1);
+
+  return {
+    currency: normalizedCurrency,
+    price: Number.isFinite(normalizedPrice) ? normalizedPrice : price
+  };
 };
 
 export const formatDate = (dateStr, locale = 'zh-TW', options = {}) => {
