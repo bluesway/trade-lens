@@ -1566,6 +1566,398 @@ const koKR = {
   }
 };
 
+const msMY = {
+  common: {
+    language: 'Bahasa',
+    close: 'Tutup',
+    cancel: 'Batal',
+    save: 'Simpan',
+    edit: 'Edit',
+    delete: 'Padam',
+    importCsv: 'Import CSV',
+    exportCsv: 'Eksport CSV'
+  },
+  currencies: {
+    TWD: 'Dolar Taiwan Baru (TWD)',
+    CNY: 'Yuan China (CNY)',
+    HKD: 'Dolar Hong Kong (HKD)',
+    USD: 'Dolar AS (USD)',
+    JPY: 'Yen Jepun (JPY)'
+  },
+  markets: {
+    all: 'Semua',
+    chinaA: 'Saham A China',
+    hongKong: 'Saham Hong Kong',
+    taiwan: 'Saham Taiwan',
+    japan: 'Saham Jepun',
+    us: 'Saham AS',
+    other: 'Lain-lain',
+    unknown: 'Tidak diketahui'
+  },
+  tradeTypes: {
+    buy: 'Beli',
+    sell: 'Jual'
+  },
+  timeRanges: {
+    oneWeek: '1 minggu',
+    oneMonth: '1 bulan',
+    threeMonths: '3 bulan',
+    halfYear: '6 bulan',
+    ytd: 'YTD',
+    oneYear: '1 tahun',
+    fiveYears: '5 tahun',
+    all: 'Semua'
+  },
+  app: {
+    loadingLocalData: 'Sedang memuatkan data IndexedDB tempatan...',
+    generatingImage: 'Sedang jana imej...',
+    imageExportSuccess: 'Eksport imej berjaya.',
+    imageExportFail: 'Eksport imej gagal.',
+    noDataToExport: 'Tiada data untuk dieksport buat masa ini.',
+    exportFilenamePrefix: 'trade_records'
+  },
+  header: {
+    title: 'Papan pemuka portfolio saham global',
+    demoDescription: 'Sekarang cuma dipaparkan sebahagian data contoh. Import CSV penuh untuk nampak keseluruhan portfolio.',
+    recordsLoaded: 'Berjaya memuatkan dan menganalisis {{count}} rekod dagangan',
+    lastUpdated: 'Kemas kini terakhir: {{value}}',
+    switchToLight: 'Tukar ke mod cerah',
+    switchToDark: 'Tukar ke mod gelap',
+    settingsRecords: 'Tetapan & dagangan',
+    updatePrices: 'Kemas kini harga',
+    apiKeyRequired: 'Perlu tetapkan API Key dulu',
+    updateWithCache: 'Kemas kini harga masa nyata (guna cache)',
+    setApiKeyFirst: 'Sila tetapkan API Key dahulu',
+    forceRefresh: 'Muat semula paksa',
+    forceRefreshTitle: 'Abaikan cache dan guna kuota API sebenar',
+    languageLabel: 'Tukar bahasa',
+    csvTitle: 'Panduan lajur CSV',
+    csvIntro: 'Pastikan CSV anda sekurang-kurangnya mengandungi tajuk lajur berikut. Susunan tidak penting:',
+    csvRows: {
+      date: 'Tarikh (contoh: 2025/01/01)',
+      type: 'Jenis (Beli / Jual)',
+      symbol: 'Simbol (contoh: 0700.HK, AAPL)',
+      market: 'Pasaran (pilihan, berguna bila tambah rekod secara manual)',
+      quantity: 'Kuantiti',
+      price: 'Harga seunit (mata wang asal)',
+      amount: 'Jumlah nilai (mata wang asal)',
+      pnl: 'Untung/Rugi (wajib untuk jual, mata wang asal)'
+    },
+    csvNote1: '* Nota 1: Kod 6 digit yang bermula dengan 6 atau 0 akan dikenal pasti secara automatik sebagai saham A China (.SS / .SZ).',
+    csvNote2: '* Nota 2: Untuk pasaran lain, tambahkan suffix terus pada simbol seperti .TW atau .HK.',
+    forceRefreshConfirm: 'Betul mahu buat muat semula paksa? Cache 24 jam akan diabaikan dan kuota API sebenar akan digunakan.'
+  },
+  summary: {
+    totalRealized: 'Jumlah untung/rugi direalisasi (ditukar)',
+    totalUnrealized: 'Jumlah untung/rugi belum direalisasi (ditukar)',
+    totalValue: 'Nilai pasaran semasa (ditukar)',
+    holdingCount: 'Bilangan pegangan',
+    holdingUnit: 'kaunter'
+  },
+  charts: {
+    trendTitle: 'Trend kos terkumpul',
+    saveImage: 'Simpan carta sebagai imej',
+    noTrend: 'Rekod dagangan masih belum cukup untuk melukis trend.',
+    realizedTitle: 'Untung/rugi direalisasi ikut saham (jual awal / keluar cantik)',
+    distributionTitle: 'Agihan nilai portfolio (10 teratas)',
+    convertedNote: 'Dipaparkan selepas ditukar ke {{currency}}',
+    noPnlData: 'Belum ada data untung/rugi buat masa ini.',
+    noHoldings: 'Tiada pegangan semasa.',
+    legendConverted: '{{label}} (selepas tukaran)',
+    costSeries: 'Kos terkumpul',
+    realizedSeries: 'Untung/rugi direalisasi terkumpul',
+    ifSoldSeries: 'Kalau jual hari ini',
+    actualSeries: 'Untung/rugi sebenar',
+    others: 'Lain-lain'
+  },
+  table: {
+    title: 'Rekod dagangan mengikut saham',
+    subtitle: 'Klik pada baris untuk lihat butiran beli dan jual. Semua amaun kekal dipaparkan dalam mata wang asal pasaran tersebut.',
+    columns: {
+      symbol: 'Simbol / nama saham (pasaran · mata wang)',
+      holdingQty: 'Kuantiti semasa',
+      currentValue: 'Harga semasa / nilai pasaran',
+      unrealized: 'Untung/rugi belum direalisasi',
+      realized: 'Untung/rugi direalisasi',
+      ifSoldToday: 'Kalau jual hari ini',
+      date: 'Tarikh',
+      type: 'Jenis',
+      quantity: 'Kuantiti',
+      price: 'Harga',
+      amount: 'Jumlah',
+      pnl: 'Untung/Rugi',
+      actions: 'Tindakan'
+    },
+    manualBadge: 'Manual',
+    manualUpdatedAt: 'Dikemas kini manual: {{value}}',
+    apiUpdatedAt: 'Kemas kini API terakhir: {{value}}',
+    notUpdatedYet: 'Belum dikemas kini',
+    manualNamePlaceholder: 'Nama saham manual',
+    currentPricePlaceholder: 'Harga semasa',
+    hedgeSuccess: 'Keluar awal rupa-rupanya lebih berbaloi ({{value}})',
+    soldTooEarly: 'Jual terlalu awal, terlepas {{value}}',
+    tradeDetails: 'Butiran dagangan',
+    atPrice: '@ {{price}}',
+    quantityAtPrice: '{{quantity}} unit @ {{price}}',
+    mobileHoldingQty: 'Pegangan',
+    mobileUnrealized: 'Belum realisasi',
+    mobileRealized: 'Direalisasi'
+  },
+  manager: {
+    title: 'Tetapan & rekod dagangan',
+    clearAndLoadDemo: 'Kosongkan dan muatkan data contoh',
+    apiKeyTitle: 'Tetapan API Key yfapi.net',
+    getFreeApiKey: 'Daftar percuma untuk dapatkan key',
+    apiKeyPlaceholder: 'Tampal x-api-key anda di sini (contoh: A2sD8...)',
+    saveApiKey: 'Simpan key',
+    baseCurrencyTitle: 'Mata wang asas kad ringkasan',
+    baseCurrencyHelp: '* Semua aset mata wang asing akan ditukar ke mata wang ini menggunakan kadar tukaran terkini supaya boleh dijumlahkan dalam kad ringkasan di atas.',
+    hideZeroHolding: 'Sembunyikan rekod yang sudah tiada pegangan',
+    manualRecordTitle: 'Tambah rekod secara manual',
+    fields: {
+      date: 'Tarikh',
+      type: 'Jenis',
+      market: 'Pasaran',
+      symbol: 'Simbol',
+      quantity: 'Kuantiti',
+      price: 'Harga seunit',
+      amount: 'Jumlah nilai',
+      pnl: 'Untung/Rugi (untuk jual sahaja)'
+    },
+    placeholders: {
+      symbol: 'Contoh: 0700.HK',
+      quantity: 'Bilangan unit',
+      price: 'Harga seunit',
+      amount: 'Ikut mata wang pasaran itu',
+      pnl: 'Pilihan'
+    },
+    saveChanges: 'Simpan perubahan',
+    addRecord: 'Tambah',
+    noRecords: 'Belum ada sebarang rekod.'
+  },
+  notice: {
+    title: 'Selamat datang ke Trade Lens',
+    body: 'Ini ialah alat sumber terbuka untuk pelabur yang menukar CSV broker menjadi carta kos, agihan untung/rugi, dan gambaran portfolio yang lebih mudah dibaca.',
+    privacy: 'Privasi diutamakan: semua data hanya disimpan dalam pelayar anda (IndexedDB) dan tidak dihantar ke pelayan.',
+    apiKey: 'API Key hanya digunakan untuk ambil harga daripada yfapi.net dan turut disimpan secara setempat.',
+    sourceCode: 'Sumber terbuka: lihat kod dan sama-sama menyumbang',
+    dismiss: 'Jangan tunjuk lagi'
+  },
+  messages: {
+    apiKeySaved: 'API Key berjaya disimpan.',
+    manualStockSaved: 'Maklumat {{symbol}} telah dikemas kini secara manual.',
+    needApiKey: 'Masukkan API Key yfapi.net dalam panel tetapan dahulu sebelum kemas kini harga.',
+    cacheFresh: 'Harga saham dan kadar tukaran sudah dikemas kini dalam 24 jam terakhir, jadi cache tempatan digunakan untuk jimatkan kuota.',
+    updateSuccess: 'Berjaya mengemas kini harga saham dan kadar tukaran untuk {{count}} item.',
+    fetchFailed: 'Gagal mendapatkan data: {{message}}',
+    baseCurrencyChanged: 'Mata wang asas telah ditukar kepada {{currency}}. Sedang kemas kini kadar tukaran...',
+    recordUpdated: 'Rekod dagangan berjaya dikemas kini.',
+    dataCleared: 'Data telah dikosongkan dan rekod contoh dimuatkan semula.',
+    clearConfirm: 'Betul mahu padam semua data dan muatkan semula data contoh? Tindakan ini tidak boleh dipulihkan.',
+    backupConfirm: 'Sebelum padam, mahu eksport data semasa sebagai sandaran CSV dahulu?'
+  },
+  data: {
+    unknownSymbol: 'Simbol tidak dikenali ({{symbol}})',
+    unknown: 'Tidak diketahui'
+  }
+};
+
+const viVN = {
+  common: {
+    language: 'Ngôn ngữ',
+    close: 'Đóng',
+    cancel: 'Hủy',
+    save: 'Lưu',
+    edit: 'Sửa',
+    delete: 'Xóa',
+    importCsv: 'Nhập CSV',
+    exportCsv: 'Xuất CSV'
+  },
+  currencies: {
+    TWD: 'Đài tệ (TWD)',
+    CNY: 'Nhân dân tệ (CNY)',
+    HKD: 'Đô la Hồng Kông (HKD)',
+    USD: 'Đô la Mỹ (USD)',
+    JPY: 'Yên Nhật (JPY)'
+  },
+  markets: {
+    all: 'Tất cả',
+    chinaA: 'Cổ phiếu A Trung Quốc',
+    hongKong: 'Cổ phiếu Hồng Kông',
+    taiwan: 'Cổ phiếu Đài Loan',
+    japan: 'Cổ phiếu Nhật',
+    us: 'Cổ phiếu Mỹ',
+    other: 'Khác',
+    unknown: 'Không rõ'
+  },
+  tradeTypes: {
+    buy: 'Mua',
+    sell: 'Bán'
+  },
+  timeRanges: {
+    oneWeek: '1 tuần',
+    oneMonth: '1 tháng',
+    threeMonths: '3 tháng',
+    halfYear: '6 tháng',
+    ytd: 'YTD',
+    oneYear: '1 năm',
+    fiveYears: '5 năm',
+    all: 'Tất cả'
+  },
+  app: {
+    loadingLocalData: 'Đang tải dữ liệu IndexedDB cục bộ...',
+    generatingImage: 'Đang tạo hình ảnh...',
+    imageExportSuccess: 'Xuất hình ảnh thành công.',
+    imageExportFail: 'Xuất hình ảnh thất bại.',
+    noDataToExport: 'Hiện chưa có dữ liệu để xuất.',
+    exportFilenamePrefix: 'trade_records'
+  },
+  header: {
+    title: 'Bảng điều khiển danh mục đầu tư toàn cầu',
+    demoDescription: 'Hiện chỉ hiển thị một phần dữ liệu mẫu. Nhập CSV đầy đủ để thấy toàn bộ bức tranh danh mục.',
+    recordsLoaded: 'Đã tải và phân tích {{count}} giao dịch',
+    lastUpdated: 'Cập nhật gần nhất: {{value}}',
+    switchToLight: 'Chuyển sang giao diện sáng',
+    switchToDark: 'Chuyển sang giao diện tối',
+    settingsRecords: 'Cài đặt & giao dịch',
+    updatePrices: 'Cập nhật giá',
+    apiKeyRequired: 'Cần đặt API Key trước',
+    updateWithCache: 'Cập nhật giá thời gian thực (dùng cache)',
+    setApiKeyFirst: 'Vui lòng đặt API Key trước',
+    forceRefresh: 'Làm mới cưỡng bức',
+    forceRefreshTitle: 'Bỏ qua cache và dùng quota API thật',
+    languageLabel: 'Đổi ngôn ngữ',
+    csvTitle: 'Hướng dẫn cột CSV',
+    csvIntro: 'CSV của bạn nên có tối thiểu các tiêu đề cột sau, không cần đúng thứ tự:',
+    csvRows: {
+      date: 'Ngày (ví dụ: 2025/01/01)',
+      type: 'Loại (Mua / Bán)',
+      symbol: 'Mã chứng khoán (ví dụ: AAPL, NVDA)',
+      market: 'Thị trường (không bắt buộc, hữu ích khi thêm tay)',
+      quantity: 'Khối lượng',
+      price: 'Giá đơn vị (theo nguyên tệ)',
+      amount: 'Tổng giá trị (theo nguyên tệ)',
+      pnl: 'Lãi/Lỗ (bắt buộc khi bán, theo nguyên tệ)'
+    },
+    csvNote1: '* Lưu ý 1: Mã 6 chữ số bắt đầu bằng 6 hoặc 0 sẽ được nhận diện tự động là cổ phiếu A Trung Quốc (.SS / .SZ).',
+    csvNote2: '* Lưu ý 2: Với thị trường khác, hãy thêm suffix trực tiếp vào mã như .TW hoặc .HK.',
+    forceRefreshConfirm: 'Bạn chắc muốn làm mới cưỡng bức? Cache 24 giờ sẽ bị bỏ qua và quota API thật sẽ bị tiêu hao.'
+  },
+  summary: {
+    totalRealized: 'Tổng lãi/lỗ đã chốt (quy đổi)',
+    totalUnrealized: 'Tổng lãi/lỗ tạm tính (quy đổi)',
+    totalValue: 'Giá trị thị trường hiện tại (quy đổi)',
+    holdingCount: 'Số mã đang nắm giữ',
+    holdingUnit: 'mã'
+  },
+  charts: {
+    trendTitle: 'Xu hướng vốn tích lũy',
+    saveImage: 'Lưu biểu đồ thành ảnh',
+    noTrend: 'Dữ liệu giao dịch hiện chưa đủ để vẽ xu hướng.',
+    realizedTitle: 'Lãi/lỗ đã chốt theo mã (bán non / thoát đẹp)',
+    distributionTitle: 'Phân bổ giá trị danh mục (top 10)',
+    convertedNote: 'Hiển thị sau khi quy đổi sang {{currency}}',
+    noPnlData: 'Hiện chưa có dữ liệu lãi/lỗ.',
+    noHoldings: 'Hiện chưa có vị thế nắm giữ.',
+    legendConverted: '{{label}} (sau quy đổi)',
+    costSeries: 'Vốn tích lũy',
+    realizedSeries: 'Lãi/lỗ đã chốt tích lũy',
+    ifSoldSeries: 'Nếu bán hôm nay',
+    actualSeries: 'Lãi/lỗ thực tế',
+    others: 'Khác'
+  },
+  table: {
+    title: 'Lịch sử giao dịch theo mã',
+    subtitle: 'Bấm vào từng dòng để xem chi tiết mua và bán; mọi giá trị vẫn hiển thị theo nguyên tệ của thị trường đó.',
+    columns: {
+      symbol: 'Mã / tên cổ phiếu (thị trường · tiền tệ)',
+      holdingQty: 'Khối lượng đang giữ',
+      currentValue: 'Giá hiện tại / giá trị thị trường',
+      unrealized: 'Lãi/lỗ tạm tính',
+      realized: 'Lãi/lỗ đã chốt',
+      ifSoldToday: 'Nếu bán hôm nay',
+      date: 'Ngày',
+      type: 'Loại',
+      quantity: 'Khối lượng',
+      price: 'Giá',
+      amount: 'Giá trị',
+      pnl: 'Lãi/Lỗ',
+      actions: 'Thao tác'
+    },
+    manualBadge: 'Nhập tay',
+    manualUpdatedAt: 'Cập nhật tay lúc: {{value}}',
+    apiUpdatedAt: 'API cập nhật gần nhất: {{value}}',
+    notUpdatedYet: 'Chưa cập nhật',
+    manualNamePlaceholder: 'Tên mã nhập tay',
+    currentPricePlaceholder: 'Giá hiện tại',
+    hedgeSuccess: 'Thoát sớm lại ngon hơn ({{value}})',
+    soldTooEarly: 'Bán non mất {{value}}',
+    tradeDetails: 'Chi tiết giao dịch',
+    atPrice: '@ {{price}}',
+    quantityAtPrice: '{{quantity}} cổ phiếu @ {{price}}',
+    mobileHoldingQty: 'Đang giữ',
+    mobileUnrealized: 'Tạm tính',
+    mobileRealized: 'Đã chốt'
+  },
+  manager: {
+    title: 'Cài đặt & lịch sử giao dịch',
+    clearAndLoadDemo: 'Xóa và nạp dữ liệu mẫu',
+    apiKeyTitle: 'Thiết lập API Key của yfapi.net',
+    getFreeApiKey: 'Đăng ký miễn phí để lấy key',
+    apiKeyPlaceholder: 'Dán x-api-key của bạn vào đây (ví dụ: A2sD8...)',
+    saveApiKey: 'Lưu key',
+    baseCurrencyTitle: 'Đồng tiền gốc của thẻ tổng quan',
+    baseCurrencyHelp: '* Tất cả tài sản ngoại tệ sẽ được quy đổi sang đồng tiền này bằng tỷ giá mới nhất để cộng dồn trong các thẻ tổng quan phía trên.',
+    hideZeroHolding: 'Ẩn các mã đã bán hết',
+    manualRecordTitle: 'Thêm giao dịch thủ công',
+    fields: {
+      date: 'Ngày',
+      type: 'Loại',
+      market: 'Thị trường',
+      symbol: 'Mã',
+      quantity: 'Khối lượng',
+      price: 'Giá đơn vị',
+      amount: 'Tổng giá trị',
+      pnl: 'Lãi/Lỗ (chỉ khi bán)'
+    },
+    placeholders: {
+      symbol: 'Ví dụ: AAPL',
+      quantity: 'Số lượng cổ phiếu',
+      price: 'Giá mỗi cổ phiếu',
+      amount: 'Theo tiền tệ của thị trường đó',
+      pnl: 'Tùy chọn'
+    },
+    saveChanges: 'Lưu thay đổi',
+    addRecord: 'Thêm',
+    noRecords: 'Hiện chưa có giao dịch nào.'
+  },
+  notice: {
+    title: 'Chào mừng đến với Trade Lens',
+    body: 'Đây là công cụ mã nguồn mở dành cho nhà đầu tư, biến CSV từ broker thành biểu đồ vốn, phân bổ lãi/lỗ và bức tranh danh mục dễ đọc hơn.',
+    privacy: 'Ưu tiên quyền riêng tư: mọi dữ liệu chỉ nằm trong trình duyệt của bạn (IndexedDB) và không được gửi lên máy chủ.',
+    apiKey: 'API Key chỉ dùng để lấy giá từ yfapi.net và cũng chỉ được lưu cục bộ.',
+    sourceCode: 'Mã nguồn mở: xem code và tham gia đóng góp',
+    dismiss: 'Đừng hiện lại'
+  },
+  messages: {
+    apiKeySaved: 'Đã lưu API Key.',
+    manualStockSaved: 'Đã cập nhật thủ công thông tin của {{symbol}}.',
+    needApiKey: 'Hãy nhập API Key của yfapi.net trong bảng cài đặt trước khi cập nhật giá.',
+    cacheFresh: 'Giá cổ phiếu và tỷ giá đã được cập nhật trong vòng 24 giờ qua, nên hệ thống dùng cache cục bộ để tiết kiệm quota.',
+    updateSuccess: 'Đã cập nhật giá cổ phiếu và tỷ giá cho {{count}} mục.',
+    fetchFailed: 'Lấy dữ liệu thất bại: {{message}}',
+    baseCurrencyChanged: 'Đã đổi đồng tiền gốc sang {{currency}}. Đang cập nhật tỷ giá...',
+    recordUpdated: 'Đã cập nhật lịch sử giao dịch.',
+    dataCleared: 'Đã xóa dữ liệu và nạp lại dữ liệu mẫu.',
+    clearConfirm: 'Bạn chắc muốn xóa toàn bộ dữ liệu và nạp lại dữ liệu mẫu? Thao tác này không thể hoàn tác.',
+    backupConfirm: 'Trước khi xóa, bạn có muốn xuất dữ liệu hiện tại thành CSV để sao lưu không?'
+  },
+  data: {
+    unknownSymbol: 'Mã không xác định ({{symbol}})',
+    unknown: 'Không rõ'
+  }
+};
+
 const thTH = {
   common: {
     language: 'ภาษา',
@@ -1967,6 +2359,8 @@ export const resources = {
   'en-GB': { translation: enGB },
   'ja-JP': { translation: jaJP },
   'ko-KR': { translation: koKR },
+  'ms-MY': { translation: msMY },
+  'vi-VN': { translation: viVN },
   'th-TH': { translation: thTH },
   'ar-SA': { translation: arSA }
 };
