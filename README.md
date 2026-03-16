@@ -81,7 +81,7 @@
 - 日本語：[`README.ja-JP.md`](https://git.bluesway.org/bluesway/trade-lens/src/branch/master/README.ja-JP.md)
 - English (US)：[`README.en-US.md`](https://git.bluesway.org/bluesway/trade-lens/src/branch/master/README.en-US.md)
 
-## Tech Stack
+## 技術組成
 
 - React 18
 - Vite
@@ -90,6 +90,6 @@
 - i18next / react-i18next
 - IndexedDB
 
-## License
+## 授權條款
 
-Distributed under the **MIT License**. See [`LICENSE`](https://git.bluesway.org/bluesway/trade-lens/src/branch/master/LICENSE) for details.
+本專案採 **MIT License** 授權，詳見 [`LICENSE`](https://git.bluesway.org/bluesway/trade-lens/src/branch/master/LICENSE)。

@@ -75,7 +75,7 @@
    ```
 4. 在管理面板填入 `yfapi.net` API Key，然后导入你的 CSV。
 
-## Tech Stack
+## 技术栈
 
 - React 18
 - Vite
@@ -84,6 +84,6 @@
 - i18next / react-i18next
 - IndexedDB
 
-## License
+## 许可协议
 
-Distributed under the **MIT License**. See [`LICENSE`](https://git.bluesway.org/bluesway/trade-lens/src/branch/master/LICENSE) for details.
+本项目基于 **MIT License** 发布，详见 [`LICENSE`](https://git.bluesway.org/bluesway/trade-lens/src/branch/master/LICENSE)。
