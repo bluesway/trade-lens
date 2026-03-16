@@ -66,6 +66,7 @@ export const BASE_CURRENCY_OPTIONS = [
   'IDR',
   'MYR',
   'MXN',
+  'BRL',
   'RUB',
   'VND',
   'THB',

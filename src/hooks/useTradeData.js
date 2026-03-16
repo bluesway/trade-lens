@@ -12,6 +12,7 @@ import {
   formatSymbol,
   getCurrencyBySymbolOrMarket,
   guessMarket,
+  normalizeMarket,
   parseCSV
 } from '../utils/helpers';
 import { DEFAULT_CSV, STOCK_MAPPING } from '../utils/constants';
@@ -77,7 +78,8 @@ const getResetRecord = (currentRecord, clearPrice = true) => ({
 });
 
 const resolveMarket = (code, market) => {
-  if (market && market !== '未知') return market;
+  const normalizedMarket = normalizeMarket(market);
+  if (normalizedMarket && normalizedMarket !== '未知') return normalizedMarket;
   return guessMarket(code);
 };
 

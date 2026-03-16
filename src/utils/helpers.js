@@ -1,12 +1,389 @@
-import { getFormattingLocale } from '../locales/config';
+import { BASE_CURRENCY_OPTIONS, getFormattingLocale } from '../locales/config';
 import { DB_NAME, DB_VERSION, STORE_NAME } from './constants';
 
-const MARKET_CURRENCY_MAP = {
-  美股: 'USD',
-  台股: 'TWD',
-  港股: 'HKD',
-  陸股: 'CNY',
-  日股: 'JPY'
+const CRYPTO_DEFAULT_QUOTE_CURRENCY = 'USD';
+const CRYPTO_PAIR_REGEX = /^[A-Z0-9]{2,15}-[A-Z]{3,5}$/;
+const REGION_DISPLAY_NAME_CACHE = new Map();
+const MARKET_DISPLAY_CURRENCIES = new Set([...BASE_CURRENCY_OPTIONS, 'BRL']);
+
+const MARKET_DEFINITIONS = {
+  全部: {
+    aliases: ['全部', 'all'],
+    currency: 'USD',
+    translationKey: 'markets.all'
+  },
+  陸股: {
+    aliases: ['陸股', '中国', '中國', '中国a股', '中國a股', 'china', 'chinaa', 'ashare', 'sse', 'szse', 'shanghai', 'shenzhen'],
+    currency: 'CNY',
+    suffixes: ['.SS', '.SZ'],
+    translationKey: 'markets.chinaA'
+  },
+  港股: {
+    aliases: ['港股', '香港', 'hongkong', 'hk', 'hkex'],
+    currency: 'HKD',
+    suffixes: ['.HK'],
+    translationKey: 'markets.hongKong'
+  },
+  台股: {
+    aliases: ['台股', '臺股', '台灣', '臺灣', 'taiwan', 'tw', 'twse', 'tpex'],
+    currency: 'TWD',
+    defaultSuffix: '.TW',
+    suffixes: ['.TW'],
+    translationKey: 'markets.taiwan'
+  },
+  日股: {
+    aliases: ['日股', '日本', 'japan', 'jp', 'tse', 'tokyo'],
+    currency: 'JPY',
+    defaultSuffix: '.T',
+    suffixes: ['.T'],
+    translationKey: 'markets.japan'
+  },
+  美股: {
+    aliases: ['美股', '美國', '美国', 'usa', 'us', 'unitedstates', 'nyse', 'nasdaq', 'amex'],
+    currency: 'USD',
+    translationKey: 'markets.us'
+  },
+  加拿大股: {
+    aliases: ['加拿大股', '加拿大', 'canada', 'ca', 'tsx', 'tsxv', 'cse', 'neo', 'neoexchange'],
+    currency: 'CAD',
+    defaultSuffix: '.TO',
+    regionCode: 'CA',
+    suffixes: ['.TO', '.V', '.CN', '.NE']
+  },
+  澳股: {
+    aliases: ['澳股', '澳洲', '澳大利亞', '澳大利亚', 'australia', 'au', 'asx'],
+    currency: 'AUD',
+    defaultSuffix: '.AX',
+    regionCode: 'AU',
+    suffixes: ['.AX']
+  },
+  英股: {
+    aliases: ['英股', '英國', '英国', 'uk', 'gb', 'greatbritain', 'unitedkingdom', 'lse', 'london'],
+    currency: 'GBP',
+    defaultSuffix: '.L',
+    regionCode: 'GB',
+    suffixes: ['.L']
+  },
+  新加坡股: {
+    aliases: ['新加坡股', '新加坡', 'singapore', 'sg', 'sgx'],
+    currency: 'SGD',
+    defaultSuffix: '.SI',
+    regionCode: 'SG',
+    suffixes: ['.SI']
+  },
+  韓股: {
+    aliases: ['韓股', '韩股', '韓國', '韩国', 'korea', 'southkorea', 'kr', 'krx', 'kospi', 'kosdaq'],
+    currency: 'KRW',
+    defaultSuffix: '.KS',
+    regionCode: 'KR',
+    suffixes: ['.KS', '.KQ']
+  },
+  印尼股: {
+    aliases: ['印尼股', '印尼', '印度尼西亞', '印度尼西亚', 'indonesia', 'id', 'idx', 'jakarta'],
+    currency: 'IDR',
+    defaultSuffix: '.JK',
+    regionCode: 'ID',
+    suffixes: ['.JK']
+  },
+  法股: {
+    aliases: ['法股', '法國', '法国', 'france', 'fr', 'paris', 'euronextparis'],
+    currency: 'EUR',
+    defaultSuffix: '.PA',
+    regionCode: 'FR',
+    suffixes: ['.PA']
+  },
+  德股: {
+    aliases: ['德股', '德國', '德国', 'germany', 'de', 'xetra', 'frankfurt', 'berlin', 'bremen', 'dusseldorf', 'hamburg', 'hanover', 'munich', 'stuttgart'],
+    currency: 'EUR',
+    defaultSuffix: '.DE',
+    regionCode: 'DE',
+    suffixes: ['.DE', '.BE', '.BM', '.DU', '.F', '.HM', '.HA', '.MU', '.SG']
+  },
+  義股: {
+    aliases: ['義股', '意股', '義大利', '意大利', 'italy', 'it', 'borsaitaliana', 'milan'],
+    currency: 'EUR',
+    defaultSuffix: '.MI',
+    regionCode: 'IT',
+    suffixes: ['.MI', '.TI']
+  },
+  馬股: {
+    aliases: ['馬股', '马股', '馬來西亞', '马来西亚', 'malaysia', 'my', 'bursamalaysia', 'kualalumpur'],
+    currency: 'MYR',
+    defaultSuffix: '.KL',
+    regionCode: 'MY',
+    suffixes: ['.KL']
+  },
+  荷股: {
+    aliases: ['荷股', '荷蘭', '荷兰', 'netherlands', 'nl', 'amsterdam', 'euronextamsterdam'],
+    currency: 'EUR',
+    defaultSuffix: '.AS',
+    regionCode: 'NL',
+    suffixes: ['.AS']
+  },
+  以色列股: {
+    aliases: ['以色列股', '以色列', 'israel', 'il', 'tase', 'telaviv'],
+    currency: 'ILS',
+    defaultSuffix: '.TA',
+    regionCode: 'IL',
+    suffixes: ['.TA']
+  },
+  墨股: {
+    aliases: ['墨股', '墨西哥', 'mexico', 'mx', 'bmv'],
+    currency: 'MXN',
+    defaultSuffix: '.MX',
+    regionCode: 'MX',
+    suffixes: ['.MX']
+  },
+  西班牙股: {
+    aliases: ['西班牙股', '西股', '西班牙', 'spain', 'es', 'bme', 'madrid'],
+    currency: 'EUR',
+    defaultSuffix: '.MC',
+    regionCode: 'ES',
+    suffixes: ['.MC']
+  },
+  巴西股: {
+    aliases: ['巴西股', '巴股', '巴西', 'brazil', 'br', 'b3', 'bovespa', 'saopaulo'],
+    currency: 'BRL',
+    defaultSuffix: '.SA',
+    regionCode: 'BR',
+    suffixes: ['.SA']
+  },
+  葡股: {
+    aliases: ['葡股', '葡萄牙', 'portugal', 'pt', 'lisbon', 'euronextlisbon'],
+    currency: 'EUR',
+    defaultSuffix: '.LS',
+    regionCode: 'PT',
+    suffixes: ['.LS']
+  },
+  波股: {
+    aliases: ['波股', '波蘭', '波兰', 'poland', 'pl', 'gpw', 'warsaw'],
+    currency: 'PLN',
+    defaultSuffix: '.WA',
+    regionCode: 'PL',
+    suffixes: ['.WA']
+  },
+  土股: {
+    aliases: ['土股', '土耳其', 'turkey', 'tr', 'bist', 'borsaistanbul', 'istanbul'],
+    currency: 'TRY',
+    defaultSuffix: '.IS',
+    regionCode: 'TR',
+    suffixes: ['.IS']
+  },
+  印股: {
+    aliases: ['印股', '印度', 'india', 'in', 'nse', 'bse', 'bombay'],
+    currency: 'INR',
+    defaultSuffix: '.NS',
+    regionCode: 'IN',
+    suffixes: ['.NS', '.BO']
+  },
+  俄股: {
+    aliases: ['俄股', '俄羅斯', '俄罗斯', 'russia', 'ru', 'moex', 'moscow'],
+    currency: 'RUB',
+    defaultSuffix: '.ME',
+    regionCode: 'RU',
+    suffixes: ['.ME']
+  },
+  瑞典股: {
+    aliases: ['瑞典股', '瑞典', 'sweden', 'se', 'stockholm', 'nasdaqstockholm'],
+    currency: 'SEK',
+    defaultSuffix: '.ST',
+    regionCode: 'SE',
+    suffixes: ['.ST']
+  },
+  捷克股: {
+    aliases: ['捷克股', '捷克', 'czech', 'czechrepublic', 'cz', 'prague', 'pse'],
+    currency: 'CZK',
+    defaultSuffix: '.PR',
+    regionCode: 'CZ',
+    suffixes: ['.PR']
+  },
+  羅馬尼亞股: {
+    aliases: ['羅馬尼亞股', '罗马尼亚股', '羅馬尼亞', '罗马尼亚', 'romania', 'ro', 'bucharest', 'bvb'],
+    currency: 'RON',
+    defaultSuffix: '.RO',
+    regionCode: 'RO',
+    suffixes: ['.RO']
+  },
+  匈牙利股: {
+    aliases: ['匈牙利股', '匈牙利', 'hungary', 'hu', 'budapest', 'bsebudapest', 'budapeststockexchange'],
+    currency: 'HUF',
+    defaultSuffix: '.BD',
+    regionCode: 'HU',
+    suffixes: ['.BD']
+  },
+  丹麥股: {
+    aliases: ['丹麥股', '丹麦股', '丹麥', '丹麦', 'denmark', 'dk', 'copenhagen', 'nasdaqcopenhagen'],
+    currency: 'DKK',
+    defaultSuffix: '.CO',
+    regionCode: 'DK',
+    suffixes: ['.CO']
+  },
+  希臘股: {
+    aliases: ['希臘股', '希腊股', '希臘', '希腊', 'greece', 'gr', 'athens', 'athex'],
+    currency: 'EUR',
+    defaultSuffix: '.AT',
+    regionCode: 'GR',
+    suffixes: ['.AT']
+  },
+  越股: {
+    aliases: ['越股', '越南股', '越南', 'vietnam', 'vn', 'hose', 'hnx', 'upcom'],
+    currency: 'VND',
+    defaultSuffix: '.VN',
+    regionCode: 'VN',
+    suffixes: ['.VN']
+  },
+  泰股: {
+    aliases: ['泰股', '泰國股', '泰国股', '泰國', '泰国', 'thailand', 'th', 'set', 'bangkok'],
+    currency: 'THB',
+    defaultSuffix: '.BK',
+    regionCode: 'TH',
+    suffixes: ['.BK']
+  },
+  沙股: {
+    aliases: ['沙股', '沙烏地股', '沙特股', '沙烏地', '沙特', '沙烏地阿拉伯', '沙特阿拉伯', 'saudi', 'saudiarabia', 'tadawul', 'sa'],
+    currency: 'SAR',
+    defaultSuffix: '.SR',
+    regionCode: 'SA',
+    suffixes: ['.SR']
+  },
+  虛擬幣: {
+    aliases: ['虛擬幣', '虚拟币', '加密貨幣', '加密货币', 'crypto', 'cryptocurrency', 'digitalasset', 'digitalassets'],
+    currency: CRYPTO_DEFAULT_QUOTE_CURRENCY,
+    defaultQuoteCurrency: CRYPTO_DEFAULT_QUOTE_CURRENCY
+  },
+  其他: {
+    aliases: ['其他', 'other', 'others'],
+    currency: 'USD',
+    translationKey: 'markets.other'
+  },
+  未知: {
+    aliases: ['未知', 'unknown'],
+    currency: 'USD',
+    translationKey: 'markets.unknown'
+  }
+};
+
+const CRYPTO_LABEL_BY_LOCALE_PREFIX = {
+  ar: 'العملات الرقمية',
+  cs: 'Krypto',
+  da: 'Krypto',
+  de: 'Krypto',
+  el: 'Crypto',
+  en: 'Crypto',
+  es: 'Cripto',
+  fa: 'کریپتو',
+  fr: 'Crypto',
+  he: 'קריפטו',
+  hi: 'क्रिप्टो',
+  hu: 'Kripto',
+  id: 'Kripto',
+  it: 'Cripto',
+  ja: '暗号資産',
+  ko: '가상자산',
+  ms: 'Kripto',
+  nl: 'Crypto',
+  pl: 'Krypto',
+  pt: 'Cripto',
+  ro: 'Crypto',
+  ru: 'Крипто',
+  sv: 'Krypto',
+  th: 'คริปโต',
+  tr: 'Kripto',
+  vi: 'Crypto',
+  yue: '加密幣',
+  zh: '加密貨幣',
+  'zh-cn': '加密货币',
+  'zh-sg': '加密货币',
+  'zh-tw': '虛擬幣'
+};
+
+const normalizeMarketToken = (value) => String(value || '')
+  .trim()
+  .toLowerCase()
+  .replace(/[\s_()[\]{}:：/\\.-]+/g, '');
+
+const MARKET_ALIAS_MAP = Object.entries(MARKET_DEFINITIONS).reduce((map, [market, definition]) => {
+  definition.aliases.forEach((alias) => {
+    map.set(normalizeMarketToken(alias), market);
+  });
+  return map;
+}, new Map());
+
+export const MANUAL_MARKET_OPTIONS = [
+  '陸股',
+  '港股',
+  '台股',
+  '日股',
+  '美股',
+  '加拿大股',
+  '澳股',
+  '英股',
+  '新加坡股',
+  '韓股',
+  '印尼股',
+  '法股',
+  '德股',
+  '義股',
+  '馬股',
+  '荷股',
+  '以色列股',
+  '墨股',
+  '西班牙股',
+  '巴西股',
+  '葡股',
+  '波股',
+  '土股',
+  '印股',
+  '俄股',
+  '瑞典股',
+  '捷克股',
+  '羅馬尼亞股',
+  '匈牙利股',
+  '丹麥股',
+  '希臘股',
+  '越股',
+  '泰股',
+  '沙股',
+  '虛擬幣',
+  '其他'
+];
+
+const MARKET_EXAMPLE_SYMBOLS = {
+  陸股: '600519', // Kweichow Moutai
+  港股: '0700', // Tencent
+  台股: '2330', // TSMC
+  日股: '7203', // Toyota
+  美股: 'AAPL', // Apple
+  加拿大股: 'RY', // Royal Bank of Canada
+  澳股: 'CBA', // Commonwealth Bank
+  英股: 'SHEL', // Shell
+  新加坡股: 'D05', // DBS
+  韓股: '005930', // Samsung Electronics
+  印尼股: 'BBCA', // Bank Central Asia
+  法股: 'MC', // LVMH
+  德股: 'SAP', // SAP
+  義股: 'ENEL', // Enel
+  馬股: '1295', // Public Bank
+  荷股: 'ASML', // ASML
+  以色列股: 'TEVA', // Teva
+  墨股: 'WALMEX', // Walmart de Mexico
+  西班牙股: 'SAN', // Santander
+  巴西股: 'PETR4', // Petrobras
+  葡股: 'EDP', // EDP
+  波股: 'CDR', // CD Projekt
+  土股: 'THYAO', // Turkish Airlines
+  印股: 'RELIANCE', // Reliance Industries
+  俄股: 'SBER', // Sberbank
+  瑞典股: 'VOLV-B', // Volvo
+  捷克股: 'CEZ', // CEZ Group
+  羅馬尼亞股: 'SNP', // OMV Petrom
+  匈牙利股: 'OTP', // OTP Bank
+  丹麥股: 'NOVO-B', // Novo Nordisk
+  希臘股: 'OTE', // Hellenic Telecommunications
+  越股: 'FPT', // FPT Corporation
+  泰股: 'PTT', // PTT
+  沙股: '2222', // Saudi Aramco
+  虛擬幣: 'BTC' // Bitcoin
 };
 
 const BUY_TYPE_TERMS = [
@@ -244,42 +621,157 @@ export const parseCSV = (text) => {
   return result;
 };
 
-export const guessMarket = (code) => {
-  if (!code) return '未知';
-  const c = code.trim().toUpperCase();
-  if (c.length === 6 && (c.startsWith('6') || c.startsWith('0'))) return '陸股';
-  if (c.includes('.TW')) return '台股';
-  if (c.includes('.HK')) return '港股';
-  if (c.includes('.T')) return '日股';
-  if (c.includes('.') && (c.includes('.SS') || c.includes('.SZ'))) return '陸股';
-  if (/^[A-Z]+$/.test(c)) return '美股';
+const getMarketDefinition = (market) => MARKET_DEFINITIONS[market];
+
+const getMarketBySymbol = (symbol) => {
+  const normalizedSymbol = String(symbol || '').trim().toUpperCase();
+  if (!normalizedSymbol) return '未知';
+
+  if (CRYPTO_PAIR_REGEX.test(normalizedSymbol)) {
+    return '虛擬幣';
+  }
+
+  if (/^\d{6}$/.test(normalizedSymbol) && (normalizedSymbol.startsWith('6') || normalizedSymbol.startsWith('0'))) {
+    return '陸股';
+  }
+
+  const matchedMarket = Object.entries(MARKET_DEFINITIONS).find(([, definition]) => (
+    definition.suffixes?.some((suffix) => normalizedSymbol.endsWith(suffix))
+  ));
+
+  if (matchedMarket) {
+    return matchedMarket[0];
+  }
+
+  if (/^[A-Z][A-Z0-9-]*$/.test(normalizedSymbol)) {
+    return '美股';
+  }
+
   return '未知';
 };
 
+const getLocalizedRegionName = (regionCode, locale) => {
+  if (!regionCode) return '';
+
+  const formattingLocale = getFormattingLocale(locale);
+  const cacheKey = `${formattingLocale}:${regionCode}`;
+  if (REGION_DISPLAY_NAME_CACHE.has(cacheKey)) {
+    return REGION_DISPLAY_NAME_CACHE.get(cacheKey);
+  }
+
+  let localizedName = regionCode;
+  try {
+    const displayNames = new Intl.DisplayNames([formattingLocale], { type: 'region' });
+    localizedName = displayNames.of(regionCode) || regionCode;
+  } catch (error) {
+    localizedName = regionCode;
+  }
+
+  REGION_DISPLAY_NAME_CACHE.set(cacheKey, localizedName);
+  return localizedName;
+};
+
+const getCryptoLabel = (locale) => {
+  const formattingLocale = getFormattingLocale(locale).toLowerCase();
+
+  if (CRYPTO_LABEL_BY_LOCALE_PREFIX[formattingLocale]) {
+    return CRYPTO_LABEL_BY_LOCALE_PREFIX[formattingLocale];
+  }
+
+  const matchedPrefix = Object.entries(CRYPTO_LABEL_BY_LOCALE_PREFIX)
+    .find(([prefix]) => formattingLocale.startsWith(prefix));
+
+  return matchedPrefix?.[1] || 'Crypto';
+};
+
+export const normalizeMarket = (market) => {
+  if (!market) return '';
+
+  const rawMarket = String(market).trim();
+  if (MARKET_DEFINITIONS[rawMarket]) {
+    return rawMarket;
+  }
+
+  const normalizedToken = normalizeMarketToken(market);
+  return MARKET_ALIAS_MAP.get(normalizedToken) || '';
+};
+
+export const guessMarket = (code) => {
+  return getMarketBySymbol(code);
+};
+
 export const formatSymbol = (code, market) => {
-  code = code.trim().toUpperCase();
-  if (code.includes('.')) return code;
-  if (code.length === 6 && (code.startsWith('6') || code.startsWith('0'))) {
-    return code.startsWith('6') ? `${code}.SS` : `${code}.SZ`;
+  const normalizedCode = String(code || '').trim().toUpperCase();
+  if (!normalizedCode) return '';
+
+  if (normalizedCode.includes('.') || normalizedCode.includes('=X')) {
+    return normalizedCode;
   }
-  switch(market) {
-    case '港股': return `${code}.HK`;
-    case '台股': return `${code}.TW`;
-    case '日股': return `${code}.T`;
-    case '美股': return code; 
-    default: return code;
+
+  if (CRYPTO_PAIR_REGEX.test(normalizedCode)) {
+    return normalizedCode;
   }
+
+  if (/^\d{6}$/.test(normalizedCode) && (normalizedCode.startsWith('6') || normalizedCode.startsWith('0'))) {
+    return normalizedCode.startsWith('6') ? `${normalizedCode}.SS` : `${normalizedCode}.SZ`;
+  }
+
+  const normalizedMarket = normalizeMarket(market) || guessMarket(normalizedCode);
+  const marketDefinition = getMarketDefinition(normalizedMarket);
+
+  if (normalizedMarket === '虛擬幣') {
+    return `${normalizedCode}-${marketDefinition?.defaultQuoteCurrency || CRYPTO_DEFAULT_QUOTE_CURRENCY}`;
+  }
+
+  if (marketDefinition?.defaultSuffix) {
+    return `${normalizedCode}${marketDefinition.defaultSuffix}`;
+  }
+
+  return normalizedCode;
 };
 
 export const getCurrencyBySymbolOrMarket = (symbol, market) => {
   const normalizedSymbol = String(symbol || '').trim().toUpperCase();
+  const normalizedMarket = normalizeMarket(market) || getMarketBySymbol(normalizedSymbol);
 
-  if (normalizedSymbol.endsWith('.TW')) return 'TWD';
-  if (normalizedSymbol.endsWith('.HK')) return 'HKD';
-  if (normalizedSymbol.endsWith('.SZ') || normalizedSymbol.endsWith('.SS')) return 'CNY';
-  if (normalizedSymbol.endsWith('.T')) return 'JPY';
+  if (CRYPTO_PAIR_REGEX.test(normalizedSymbol)) {
+    const [, quoteCurrency = ''] = normalizedSymbol.split('-');
+    if (MARKET_DISPLAY_CURRENCIES.has(quoteCurrency)) {
+      return quoteCurrency;
+    }
+  }
 
-  return MARKET_CURRENCY_MAP[market] || 'CNY';
+  const matchedMarket = getMarketBySymbol(normalizedSymbol);
+  if (matchedMarket && matchedMarket !== '未知') {
+    return getMarketDefinition(matchedMarket)?.currency || CRYPTO_DEFAULT_QUOTE_CURRENCY;
+  }
+
+  return getMarketDefinition(normalizedMarket)?.currency || 'USD';
+};
+
+export const getMarketLabel = (market, locale, t) => {
+  const rawMarket = String(market || '').trim();
+  const normalizedMarket = normalizeMarket(market) || '未知';
+  const marketDefinition = getMarketDefinition(normalizedMarket);
+
+  if (marketDefinition?.translationKey && typeof t === 'function') {
+    return t(marketDefinition.translationKey);
+  }
+
+  if (normalizedMarket === '虛擬幣') {
+    return getCryptoLabel(locale);
+  }
+
+  if (marketDefinition?.regionCode) {
+    return getLocalizedRegionName(marketDefinition.regionCode, locale);
+  }
+
+  return rawMarket || normalizedMarket;
+};
+
+export const getMarketSymbolPlaceholder = (market) => {
+  const normalizedMarket = normalizeMarket(market);
+  return normalizedMarket ? MARKET_EXAMPLE_SYMBOLS[normalizedMarket] || '' : '';
 };
 
 export const formatDate = (dateStr, locale = 'zh-TW', options = {}) => {

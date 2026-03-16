@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { Database, DollarSign, Edit2, Info, Key, Plus, Trash2, X } from 'lucide-react';
 import {
   BASE_CURRENCY_OPTIONS,
-  MARKET_TRANSLATION_KEYS,
   TRADE_TYPE_TRANSLATION_KEYS,
   normalizeLocale
 } from '../locales/config';
@@ -17,8 +16,12 @@ import {
 import {
   formatDate,
   formatSymbol,
+  getMarketLabel,
+  getMarketSymbolPlaceholder,
   getCurrencyBySymbolOrMarket,
-  guessMarket
+  guessMarket,
+  MANUAL_MARKET_OPTIONS,
+  normalizeMarket
 } from '../utils/helpers';
 import { STOCK_MAPPING } from '../utils/constants';
 
@@ -50,7 +53,8 @@ export default function ManagerPanel({
   const activeLocale = normalizeLocale(i18n.resolvedLanguage || i18n.language);
   const showGregorianReference = shouldShowGregorianReference(activeLocale);
   const tradeTypeOptions = ['買入', '賣出'];
-  const marketOptions = ['陸股', '港股', '台股', '日股', '美股', '其他'];
+  const marketOptions = MANUAL_MARKET_OPTIONS;
+  const symbolPlaceholder = getMarketSymbolPlaceholder(newRec.market) || t('manager.placeholders.symbol');
 
   const getCurrencyOptionLabel = (currency) => {
     const translationKey = `currencies.${currency}`;
@@ -215,7 +219,7 @@ export default function ManagerPanel({
             >
               {marketOptions.map((market) => (
                 <option key={market} value={market}>
-                  {t(MARKET_TRANSLATION_KEYS[market])}
+                  {getMarketLabel(market, activeLocale, t)}
                 </option>
               ))}
             </select>
@@ -224,7 +228,7 @@ export default function ManagerPanel({
             <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">{t('manager.fields.symbol')}</label>
             <input
               type="text"
-              placeholder={t('manager.placeholders.symbol')}
+              placeholder={symbolPlaceholder}
               value={newRec.code}
               onChange={(event) => updateNewRecField('code', event.target.value)}
               className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -309,7 +313,7 @@ export default function ManagerPanel({
               .map((row, originalIndex) => ({ ...row, originalIndex }))
               .sort((a, b) => new Date(b['日期'] || 0) - new Date(a['日期'] || 0))
               .map((row) => {
-                let market = row['市場'] || '未知';
+                let market = normalizeMarket(row['市場']);
                 if (market === '未知' || !market) {
                   market = guessMarket(row['代號']);
                 }
@@ -340,7 +344,7 @@ export default function ManagerPanel({
                       <div className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                         {symbol}
                         <span className="text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded">
-                          {t(MARKET_TRANSLATION_KEYS[market] || 'markets.unknown')}
+                          {getMarketLabel(market, activeLocale, t)}
                         </span>
                       </div>
                       <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{resolvedName}</div>

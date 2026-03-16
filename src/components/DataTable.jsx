@@ -11,7 +11,6 @@ import {
   X
 } from 'lucide-react';
 import {
-  MARKET_TRANSLATION_KEYS,
   TRADE_TYPE_TRANSLATION_KEYS,
   normalizeLocale
 } from '../locales/config';
@@ -22,7 +21,7 @@ import {
   formatLocalizedNumber,
   shouldShowGregorianReference
 } from '../utils/localization';
-import { formatDate } from '../utils/helpers';
+import { formatDate, getMarketLabel } from '../utils/helpers';
 
 export default function DataTable({
   availableMarkets,
@@ -83,7 +82,7 @@ export default function DataTable({
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
-              {t(MARKET_TRANSLATION_KEYS[market] || 'markets.unknown')}
+              {getMarketLabel(market, activeLocale, t)}
             </button>
           ))}
         </div>
@@ -200,7 +199,7 @@ export default function DataTable({
                           <>
                             {stock.symbol}
                             <span className="text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded">
-                              {t(MARKET_TRANSLATION_KEYS[stock.market] || 'markets.unknown')} &middot; {stock.currency}
+                              {getMarketLabel(stock.market, activeLocale, t)} &middot; {stock.currency}
                             </span>
                             <button onClick={(event) => {
                               event.stopPropagation();
@@ -435,7 +434,7 @@ export default function DataTable({
                     <div className="font-bold text-slate-800 dark:text-slate-200 text-lg flex items-center gap-2">
                       {stock.symbol}
                       <span className="text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded">
-                        {t(MARKET_TRANSLATION_KEYS[stock.market] || 'markets.unknown')} &middot; {stock.currency}
+                        {getMarketLabel(stock.market, activeLocale, t)} &middot; {stock.currency}
                       </span>
                     </div>
                     <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">{stock.name}</div>
