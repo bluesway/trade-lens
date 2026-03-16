@@ -50,7 +50,7 @@ const zhTW = {
   },
   header: {
     title: '全球投資組合儀表板',
-    demoDescription: '目前顯示的是部分範例資料，匯入完整 CSV 才能看到完整樣貌。',
+    demoDescription: '目前顯示的是精簡版範例資料，匯入完整 CSV 才能看到完整全貌。',
     recordsLoaded: '已成功載入並分析 {{count}} 筆交易紀錄',
     lastUpdated: '資料最後更新：{{value}}',
     switchToLight: '切換到淺色模式',
@@ -90,7 +90,7 @@ const zhTW = {
     trendTitle: '累積投入走勢',
     saveImage: '將圖表存為圖片',
     noTrend: '目前交易紀錄還不夠，暫時畫不出走勢。',
-    realizedTitle: '各股已實現損益（賣飛 / 避險榜）',
+    realizedTitle: '各股已實現損益（賣飛 / 漂亮出場榜）',
     distributionTitle: '持股市值分布（前 10 檔）',
     convertedNote: '統一換算為 {{currency}}',
     noPnlData: '目前無損益資料',
@@ -126,7 +126,7 @@ const zhTW = {
     notUpdatedYet: '尚未更新',
     manualNamePlaceholder: '手動股名',
     currentPricePlaceholder: '現價',
-    hedgeSuccess: '提早賣出較划算（{{value}}）',
+    hedgeSuccess: '這筆提早賣反而比較划算（{{value}}）',
     soldTooEarly: '賣早了，少賺 {{value}}',
     tradeDetails: '交易明細',
     atPrice: '@ {{price}}',
@@ -246,7 +246,7 @@ const yueHantHK = {
   },
   header: {
     title: '全球投資組合儀表板',
-    demoDescription: '而家顯示緊部分示範資料，匯入完整 CSV 先睇到全貌。',
+    demoDescription: '而家顯示緊精簡版示範資料，匯入完整 CSV 先睇到全貌。',
     recordsLoaded: '已成功載入並分析 {{count}} 筆交易紀錄',
     lastUpdated: '資料最後更新：{{value}}',
     switchToLight: '切換到淺色模式',
@@ -286,7 +286,7 @@ const yueHantHK = {
     trendTitle: '累積投入走勢',
     saveImage: '將圖表存成圖片',
     noTrend: '而家交易紀錄唔夠，未畫到走勢。',
-    realizedTitle: '各股已實現損益（賣飛 / 對沖榜）',
+    realizedTitle: '各股已實現損益（賣飛 / 靚位離場榜）',
     distributionTitle: '持股市值分佈（Top 10）',
     convertedNote: '統一換算成 {{currency}} 顯示',
     noPnlData: '而家冇損益資料',
@@ -322,7 +322,7 @@ const yueHantHK = {
     notUpdatedYet: '未更新',
     manualNamePlaceholder: '手動股名',
     currentPricePlaceholder: '現價',
-    hedgeSuccess: '早啲沽反而着數（{{value}}）',
+    hedgeSuccess: '呢筆早啲沽反而着數（{{value}}）',
     soldTooEarly: '沽早咗，少賺 {{value}}',
     tradeDetails: '交易明細',
     atPrice: '@ {{price}}',
@@ -834,7 +834,7 @@ const enUS = {
   },
   header: {
     title: 'Global Portfolio Dashboard',
-    demoDescription: 'A trimmed demo dataset is showing right now. Import a full CSV to see the entire picture.',
+    demoDescription: 'You are looking at a trimmed demo set right now. Import the full CSV to see the complete picture.',
     recordsLoaded: 'Loaded and analyzed {{count}} trade records.',
     lastUpdated: 'Last updated: {{value}}',
     switchToLight: 'Switch to light mode',
@@ -874,7 +874,7 @@ const enUS = {
     trendTitle: 'Cumulative Cost Trend',
     saveImage: 'Save chart as image',
     noTrend: 'There is not enough trade history yet to draw the trend.',
-    realizedTitle: 'Realized P&L by Symbol (Missed Upside / Timely Exit)',
+    realizedTitle: 'Realized P&L by Symbol (Left Money on the Table / Clean Exit)',
     distributionTitle: 'Holding Value Mix (Top 10)',
     convertedNote: 'Shown in {{currency}} after conversion',
     noPnlData: 'No P&L data yet.',
@@ -910,8 +910,8 @@ const enUS = {
     notUpdatedYet: 'Not refreshed yet',
     manualNamePlaceholder: 'Manual name',
     currentPricePlaceholder: 'Price',
-    hedgeSuccess: 'Earlier exit worked out better ({{value}})',
-    soldTooEarly: 'Sold too soon ({{value}})',
+    hedgeSuccess: 'Getting out earlier turned out to be the better move ({{value}})',
+    soldTooEarly: 'Sold too early and left {{value}} on the table',
     tradeDetails: 'Execution Details',
     atPrice: '@ {{price}}',
     quantityAtPrice: '{{quantity}} shares @ {{price}}',
@@ -1030,7 +1030,7 @@ const enGB = {
   },
   header: {
     title: 'Global Portfolio Dashboard',
-    demoDescription: 'A trimmed demo dataset is showing right now. Import a full CSV to see the whole picture.',
+    demoDescription: 'You are looking at a trimmed demo set right now. Import the full CSV to see the whole picture.',
     recordsLoaded: 'Loaded and analysed {{count}} trade records.',
     lastUpdated: 'Last updated: {{value}}',
     switchToLight: 'Switch to light mode',
@@ -1070,7 +1070,7 @@ const enGB = {
     trendTitle: 'Cumulative Cost Trend',
     saveImage: 'Save chart as image',
     noTrend: 'There is not enough trade history yet to draw the trend.',
-    realizedTitle: 'Realised P&L by Symbol (Missed Upside / Timely Exit)',
+    realizedTitle: 'Realised P&L by Symbol (Left Money on the Table / Clean Exit)',
     distributionTitle: 'Holding Value Mix (Top 10)',
     convertedNote: 'Shown in {{currency}} after conversion',
     noPnlData: 'No P&L data yet.',
@@ -1106,8 +1106,8 @@ const enGB = {
     notUpdatedYet: 'Not refreshed yet',
     manualNamePlaceholder: 'Manual name',
     currentPricePlaceholder: 'Price',
-    hedgeSuccess: 'Selling earlier worked out better ({{value}})',
-    soldTooEarly: 'Sold too soon ({{value}})',
+    hedgeSuccess: 'Selling earlier turned out to be the better call ({{value}})',
+    soldTooEarly: 'Sold too early and left {{value}} behind',
     tradeDetails: 'Execution Details',
     atPrice: '@ {{price}}',
     quantityAtPrice: '{{quantity}} shares @ {{price}}',
@@ -1857,7 +1857,7 @@ const frFR = {
   },
   header: {
     title: 'Tableau de bord du portefeuille actions mondial',
-    demoDescription: 'Seule une partie des données de démonstration est affichée pour l’instant. Importez votre CSV complet pour voir l’ensemble du portefeuille.',
+    demoDescription: 'Pour l’instant, vous voyez une version allégée des données de démonstration. Importez le CSV complet pour retrouver toute la vue portefeuille.',
     recordsLoaded: '{{count}} transactions chargées et analysées',
     lastUpdated: 'Dernière mise à jour : {{value}}',
     switchToLight: 'Passer en mode clair',
@@ -1897,7 +1897,7 @@ const frFR = {
     trendTitle: 'Évolution du capital investi',
     saveImage: 'Enregistrer le graphique en image',
     noTrend: 'Il n’y a pas encore assez de transactions pour tracer une tendance.',
-    realizedTitle: 'Plus/moins-values réalisées par titre (vente trop tôt / sortie bien timée)',
+    realizedTitle: 'Plus/moins-values réalisées par titre (vente trop tôt / sortie propre)',
     distributionTitle: 'Répartition de la valeur du portefeuille (top 10)',
     convertedNote: 'Affiché après conversion en {{currency}}',
     noPnlData: 'Aucune donnée de plus/moins-value pour le moment.',
@@ -1933,8 +1933,8 @@ const frFR = {
     notUpdatedYet: 'Pas encore mis à jour',
     manualNamePlaceholder: 'Nom saisi manuellement',
     currentPricePlaceholder: 'Cours actuel',
-    hedgeSuccess: 'Sortir plus tôt était finalement le bon move ({{value}})',
-    soldTooEarly: 'Vendu trop tôt, manque {{value}}',
+    hedgeSuccess: 'Sortir plus tôt s’est finalement révélé plus payant ({{value}})',
+    soldTooEarly: 'Vendu trop tôt, vous avez laissé {{value}} sur la table',
     tradeDetails: 'Détail des transactions',
     atPrice: '@ {{price}}',
     quantityAtPrice: '{{quantity}} actions @ {{price}}',
@@ -1976,7 +1976,7 @@ const frFR = {
   },
   notice: {
     title: 'Bienvenue sur Trade Lens',
-    body: 'Cet outil open source pour investisseurs transforme les CSV de courtier en courbes de capital investi, répartitions de P/L et vues portefeuille plus lisibles.',
+    body: 'Cet outil open source pour investisseurs transforme les CSV de courtier en courbes de coût, vues P/L et répartitions de portefeuille nettement plus lisibles.',
     privacy: 'Priorité à la confidentialité : toutes les données restent uniquement dans votre navigateur (IndexedDB) et ne sont pas envoyées au serveur.',
     apiKey: 'L’API Key sert uniquement à récupérer les cours via yfapi.net et reste elle aussi stockée localement.',
     sourceCode: 'Open source : consultez le code et contribuez',
@@ -2249,7 +2249,7 @@ const es419 = {
   },
   header: {
     title: 'Panel global del portafolio',
-    demoDescription: 'Ahora mismo solo se muestra una parte de los datos demo. Importa el CSV completo para ver la película completa.',
+    demoDescription: 'Ahorita estás viendo una versión recortada del demo. Importa el CSV completo para ver toda la película.',
     recordsLoaded: '{{count}} operaciones cargadas y analizadas',
     lastUpdated: 'Última actualización: {{value}}',
     switchToLight: 'Cambiar a modo claro',
@@ -2289,7 +2289,7 @@ const es419 = {
     trendTitle: 'Tendencia del costo acumulado',
     saveImage: 'Guardar gráfico como imagen',
     noTrend: 'Todavía no hay suficiente historial para dibujar la tendencia.',
-    realizedTitle: 'Ganancia/pérdida realizada por ticker (venta temprana / buena salida)',
+    realizedTitle: 'Ganancia/pérdida realizada por ticker (venta apresurada / salida limpia)',
     distributionTitle: 'Distribución del valor en cartera (top 10)',
     convertedNote: 'Mostrado en {{currency}} después de la conversión',
     noPnlData: 'Todavía no hay datos de P/L.',
@@ -2325,8 +2325,8 @@ const es419 = {
     notUpdatedYet: 'Aún sin actualizar',
     manualNamePlaceholder: 'Nombre manual',
     currentPricePlaceholder: 'Precio',
-    hedgeSuccess: 'Salir antes terminó siendo mejor ({{value}})',
-    soldTooEarly: 'Vendiste demasiado pronto y dejaste {{value}} en la mesa',
+    hedgeSuccess: 'Salir antes terminó siendo la mejor jugada ({{value}})',
+    soldTooEarly: 'Vendiste antes de tiempo y dejaste {{value}} sobre la mesa',
     tradeDetails: 'Detalle de ejecuciones',
     atPrice: '@ {{price}}',
     quantityAtPrice: '{{quantity}} acciones @ {{price}}',
@@ -2368,7 +2368,7 @@ const es419 = {
   },
   notice: {
     title: 'Bienvenido a Trade Lens',
-    body: 'Trade Lens es una herramienta de código abierto para convertir los CSV de tu bróker en tendencias de costo, vistas de P/L y gráficos de asignación.',
+    body: 'Trade Lens es una herramienta de código abierto que convierte los CSV de tu bróker en tendencias de costo, vistas de P/L y una foto mucho más clara de tu portafolio.',
     privacy: 'Privacidad primero: todo se queda solo en tu navegador (IndexedDB). No se envía nada a nuestro servidor.',
     apiKey: 'La clave API solo se usa para consultar precios en yfapi.net y también se guarda de forma local.',
     sourceCode: 'Código abierto: revisa el código y contribuye',
@@ -3708,7 +3708,7 @@ const arSA = {
   },
   header: {
     title: 'لوحة متابعة المحفظة الاستثمارية العالمية',
-    demoDescription: 'المعروض الآن عينة مختصرة من البيانات. ارفع ملف CSV كاملاً لرؤية الصورة الكاملة.',
+    demoDescription: 'المعروض الآن نسخة مختصرة من بيانات التجربة. ارفع ملف CSV كاملاً حتى تظهر لك الصورة كاملة.',
     recordsLoaded: 'تم تحميل وتحليل {{count}} عملية تداول.',
     lastUpdated: 'آخر تحديث: {{value}}',
     switchToLight: 'التبديل إلى الوضع الفاتح',
@@ -3748,7 +3748,7 @@ const arSA = {
     trendTitle: 'اتجاه التكلفة التراكمية',
     saveImage: 'حفظ الرسم كصورة',
     noTrend: 'لا يوجد سجل تداول كافٍ حتى الآن لرسم الاتجاه.',
-    realizedTitle: 'الربح/الخسارة المحققة حسب السهم (بيع مبكر / خروج موفق)',
+    realizedTitle: 'الربح/الخسارة المحققة حسب السهم (بيع مبكر زيادة / خروج مرتب)',
     distributionTitle: 'توزيع قيمة المراكز (أعلى 10)',
     convertedNote: 'يُعرض بعد التحويل إلى {{currency}}',
     noPnlData: 'لا توجد بيانات أرباح أو خسائر حالياً.',
@@ -3784,8 +3784,8 @@ const arSA = {
     notUpdatedYet: 'لم يتم التحديث بعد',
     manualNamePlaceholder: 'اسم مُدخل يدوياً',
     currentPricePlaceholder: 'السعر الحالي',
-    hedgeSuccess: 'كان البيع المبكر أفضل ({{value}})',
-    soldTooEarly: 'تم البيع مبكراً أكثر من اللازم ({{value}})',
+    hedgeSuccess: 'طلع البيع بدري هو القرار الأفضل هالمرة ({{value}})',
+    soldTooEarly: 'بعت بدري أكثر من اللازم وخليت {{value}} على الطاولة',
     tradeDetails: 'تفاصيل الصفقات',
     atPrice: '@ {{price}}',
     quantityAtPrice: '{{quantity}} سهم @ {{price}}',
@@ -6391,6 +6391,2043 @@ const elGR = {
   }
 };
 
+const isPlainObject = (value) => value && typeof value === 'object' && !Array.isArray(value);
+
+const mergeLocale = (base, overrides) => {
+  const merged = { ...base };
+
+  Object.entries(overrides).forEach(([key, value]) => {
+    if (isPlainObject(value) && isPlainObject(base?.[key])) {
+      merged[key] = mergeLocale(base[key], value);
+    } else {
+      merged[key] = value;
+    }
+  });
+
+  return merged;
+};
+
+const enIE = mergeLocale(enGB, {
+  currencies: {
+    EUR: 'Euro (EUR)'
+  },
+  header: {
+    demoDescription: 'You are looking at a trimmed demo set for now. Import your full CSV to see the whole picture.',
+    recordsLoaded: 'Loaded and analysed {{count}} trades.',
+    settingsRecords: 'Settings & trades',
+    updateWithCache: 'Refresh live prices using cache',
+    forceRefreshTitle: 'Skip the cache and use real API allowance',
+    csvRows: {
+      symbol: 'Symbol (for example: RYA.IR, AAPL)'
+    }
+  },
+  charts: {
+    realizedTitle: 'Realised P&L by holding (bailed early / clean exit)'
+  },
+  table: {
+    title: 'Trade history by holding',
+    hedgeSuccess: 'Getting out earlier actually paid off ({{value}})',
+    soldTooEarly: 'Sold a shade early and left {{value}} behind'
+  },
+  manager: {
+    placeholders: {
+      symbol: 'For example: RYA.IR'
+    }
+  },
+  messages: {
+    cacheFresh: 'Prices and FX were refreshed within the last 24 hours, so the app reused the local cache to save your allowance.'
+  }
+});
+
+const enNZ = mergeLocale(enAU, {
+  currencies: {
+    NZD: 'New Zealand Dollar (NZD)'
+  },
+  header: {
+    demoDescription: 'You are looking at a trimmed demo set right now. Import your full CSV to see the full picture.',
+    csvRows: {
+      symbol: 'Symbol (for example: FPH.NZ, AAPL)'
+    }
+  },
+  charts: {
+    realizedTitle: 'Realised P&L by holding (jumped too soon / tidy exit)'
+  },
+  table: {
+    title: 'Trade history by holding',
+    hedgeSuccess: 'Getting out earlier ended up being the better call ({{value}})',
+    soldTooEarly: 'Sold a bit early and left {{value}} behind'
+  },
+  manager: {
+    placeholders: {
+      symbol: 'For example: FPH.NZ'
+    }
+  }
+});
+
+const enZA = mergeLocale(enGB, {
+  currencies: {
+    ZAR: 'South African Rand (ZAR)'
+  },
+  header: {
+    demoDescription: 'Right now you are seeing a trimmed demo set. Import your full CSV to get the full picture.',
+    csvRows: {
+      symbol: 'Symbol (for example: NPN.JO, AAPL)'
+    }
+  },
+  charts: {
+    realizedTitle: 'Realised P&L by counter (sold too early / tidy exit)'
+  },
+  table: {
+    title: 'Trade history by counter',
+    hedgeSuccess: 'Selling earlier worked out better this time ({{value}})',
+    soldTooEarly: 'Sold a touch too soon and left {{value}} behind'
+  },
+  manager: {
+    placeholders: {
+      symbol: 'For example: NPN.JO'
+    }
+  }
+});
+
+const frBE = mergeLocale(frFR, {
+  header: {
+    demoDescription: 'Pour l’instant, tu vois un set démo allégé. Importe ton CSV complet pour avoir toute la vue.',
+    csvRows: {
+      symbol: 'Symbole (par ex. : ABI.BR, AAPL)'
+    }
+  },
+  charts: {
+    realizedTitle: 'P/L réalisé par ligne (sortie trop tôt / sortie propre)'
+  },
+  table: {
+    title: 'Historique par ligne',
+    hedgeSuccess: 'Sortir plus tôt s’est finalement révélé plus rentable ({{value}})',
+    soldTooEarly: 'Vendu trop tôt, tu as laissé {{value}} sur la table'
+  },
+  manager: {
+    placeholders: {
+      symbol: 'Ex. : ABI.BR'
+    }
+  }
+});
+
+const frCH = mergeLocale(frFR, {
+  currencies: {
+    CHF: 'Franc suisse (CHF)'
+  },
+  header: {
+    demoDescription: 'Pour l’instant, tu vois un jeu démo allégé. Importe ton CSV complet pour retrouver toute la photo.',
+    csvRows: {
+      symbol: 'Symbole (par ex. : NESN.SW, AAPL)'
+    }
+  },
+  charts: {
+    realizedTitle: 'P/L réalisé par ligne (sortie trop vite / sortie propre)'
+  },
+  table: {
+    title: 'Historique par ligne',
+    hedgeSuccess: 'Sortir plus tôt a finalement mieux payé ({{value}})',
+    soldTooEarly: 'Vendu un peu trop tôt, il manque {{value}}'
+  },
+  manager: {
+    placeholders: {
+      symbol: 'Ex. : NESN.SW'
+    }
+  }
+});
+
+const deAT = mergeLocale(deDE, {
+  header: {
+    demoDescription: 'Gerade siehst du ein abgespecktes Demo-Set. Importiere dein komplettes CSV, dann bekommst du das ganze Bild.',
+    csvRows: {
+      symbol: 'Symbol (z. B. OMV.VI oder AAPL)'
+    }
+  },
+  charts: {
+    realizedTitle: 'Realisierte P&L je Position (zu früh raus / sauberer Exit)'
+  },
+  table: {
+    title: 'Trade-Historie nach Position',
+    hedgeSuccess: 'Früher auszusteigen war diesmal der bessere Griff ({{value}})',
+    soldTooEarly: 'Etwas zu früh verkauft und {{value}} liegen gelassen'
+  },
+  manager: {
+    placeholders: {
+      symbol: 'Z. B. OMV.VI'
+    }
+  }
+});
+
+const deCH = mergeLocale(deDE, {
+  currencies: {
+    CHF: 'Schweizer Franken (CHF)'
+  },
+  header: {
+    demoDescription: 'Im Moment siehst du ein abgespecktes Demo-Set. Importiere dein vollständiges CSV, dann hast du das ganze Bild.',
+    csvRows: {
+      symbol: 'Symbol (z. B. NESN.SW oder AAPL)'
+    }
+  },
+  charts: {
+    realizedTitle: 'Realisierte P&L pro Titel (zu früh raus / sauberer Exit)'
+  },
+  table: {
+    title: 'Trade-Historie pro Titel',
+    hedgeSuccess: 'Früher auszusteigen war diesmal die bessere Entscheidung ({{value}})',
+    soldTooEarly: 'Etwas zu früh verkauft und {{value}} liegen gelassen'
+  },
+  manager: {
+    placeholders: {
+      symbol: 'Z. B. NESN.SW'
+    }
+  }
+});
+
+const itCH = mergeLocale(itIT, {
+  currencies: {
+    CHF: 'Franco svizzero (CHF)'
+  },
+  header: {
+    demoDescription: 'In questo momento stai vedendo un set demo ridotto. Importa il CSV completo per avere il quadro intero.',
+    csvRows: {
+      symbol: 'Simbolo (ad es.: NESN.SW, AAPL)'
+    }
+  },
+  charts: {
+    realizedTitle: 'P&L realizzato per titolo (uscita troppo presto / uscita pulita)'
+  },
+  table: {
+    title: 'Storico per titolo',
+    hedgeSuccess: 'Uscire prima alla fine si è rivelata la mossa giusta ({{value}})',
+    soldTooEarly: 'Hai venduto un filo troppo presto e hai lasciato {{value}} sul tavolo'
+  },
+  manager: {
+    placeholders: {
+      symbol: 'Es.: NESN.SW'
+    }
+  }
+});
+
+const nlBE = mergeLocale(nlNL, {
+  header: {
+    demoDescription: 'Je ziet nu een afgeslankte demoset. Importeer je volledige CSV om het hele plaatje te zien.',
+    csvRows: {
+      symbol: 'Symbool (bijv.: ABI.BR, AAPL)'
+    }
+  },
+  charts: {
+    realizedTitle: 'Gerealiseerde P&L per positie (te vroeg buiten / nette exit)'
+  },
+  table: {
+    title: 'Handelshistoriek per positie',
+    hedgeSuccess: 'Eerder uitstappen bleek deze keer de betere zet ({{value}})',
+    soldTooEarly: 'Net wat te vroeg verkocht en {{value}} laten liggen'
+  },
+  manager: {
+    placeholders: {
+      symbol: 'Bijv.: ABI.BR'
+    }
+  }
+});
+
+const esAR = mergeLocale(es419, {
+  currencies: {
+    ARS: 'Peso argentino (ARS)'
+  },
+  header: {
+    demoDescription: 'Por ahora estás viendo un demo recortado. Importá tu CSV completo para ver toda la foto.',
+    settingsRecords: 'Configuración y operaciones',
+    updateWithCache: 'Actualizar cotizaciones con caché',
+    forceRefreshTitle: 'Ignorar caché y gastar cuota real de la API',
+    csvRows: {
+      symbol: 'Símbolo (por ejemplo: GGAL.BA, AAPL)'
+    }
+  },
+  charts: {
+    realizedTitle: 'P&L realizado por papel (saliste antes / salida prolija)'
+  },
+  table: {
+    title: 'Historial por papel',
+    hedgeSuccess: 'Salir antes terminó siendo la mejor jugada ({{value}})',
+    soldTooEarly: 'Vendiste un poco antes y dejaste {{value}} arriba de la mesa'
+  },
+  manager: {
+    placeholders: {
+      symbol: 'Por ejemplo: GGAL.BA'
+    }
+  }
+});
+
+const esCL = mergeLocale(es419, {
+  currencies: {
+    CLP: 'Peso chileno (CLP)'
+  },
+  header: {
+    demoDescription: 'Ahora mismo se muestra un demo recortado. Importa tu CSV completo para ver toda la película.',
+    csvRows: {
+      symbol: 'Símbolo (por ejemplo: BSANTANDER.SN, AAPL)'
+    }
+  },
+  charts: {
+    realizedTitle: 'P&L realizado por papel (salida apurada / buena salida)'
+  },
+  table: {
+    title: 'Historial por papel',
+    hedgeSuccess: 'Salir antes terminó siendo mejor negocio ({{value}})',
+    soldTooEarly: 'Vendiste medio antes y dejaste {{value}} sobre la mesa'
+  },
+  manager: {
+    placeholders: {
+      symbol: 'Por ejemplo: BSANTANDER.SN'
+    }
+  }
+});
+
+const esCO = mergeLocale(es419, {
+  currencies: {
+    COP: 'Peso colombiano (COP)'
+  },
+  header: {
+    demoDescription: 'Por ahora estás viendo un demo recortado. Importa tu CSV completo para ver la película completa.',
+    csvRows: {
+      symbol: 'Símbolo (por ejemplo: ECOPETROL.CL, AAPL)'
+    }
+  },
+  charts: {
+    realizedTitle: 'P&L realizado por especie (salida temprana / buena salida)'
+  },
+  table: {
+    title: 'Historial por especie',
+    hedgeSuccess: 'Salir antes terminó siendo la mejor jugada ({{value}})',
+    soldTooEarly: 'Vendiste un poquito antes y dejaste {{value}} sobre la mesa'
+  },
+  manager: {
+    placeholders: {
+      symbol: 'Por ejemplo: ECOPETROL.CL'
+    }
+  }
+});
+
+const esVE = mergeLocale(es419, {
+  header: {
+    demoDescription: 'Ahorita estás viendo un demo recortado. Importa tu CSV completo para ver toda la foto.',
+    csvRows: {
+      symbol: 'Símbolo (por ejemplo: BVCC.CR, AAPL)'
+    }
+  },
+  charts: {
+    realizedTitle: 'P&L realizado por emisor (saliste temprano / salida limpia)'
+  },
+  table: {
+    title: 'Historial por emisor',
+    hedgeSuccess: 'Salir antes terminó siendo la jugada buena ({{value}})',
+    soldTooEarly: 'Vendiste antes de tiempo y dejaste {{value}} sobre la mesa'
+  },
+  manager: {
+    placeholders: {
+      symbol: 'Por ejemplo: BVCC.CR'
+    }
+  }
+});
+
+const esPE = mergeLocale(es419, {
+  header: {
+    demoDescription: 'Ahorita estás viendo una versión recortada del demo. Importa el CSV completo para ver la foto completa.',
+    csvRows: {
+      symbol: 'Símbolo (por ejemplo: MINSURI1.LM, AAPL)'
+    }
+  },
+  charts: {
+    realizedTitle: 'P&L realizado por valor (saliste temprano / salida limpia)'
+  },
+  table: {
+    title: 'Historial por valor',
+    hedgeSuccess: 'Salir antes terminó siendo la mejor jugada ({{value}})',
+    soldTooEarly: 'Vendiste antes de tiempo y dejaste {{value}} sobre la mesa'
+  },
+  manager: {
+    placeholders: {
+      symbol: 'Por ejemplo: MINSURI1.LM'
+    }
+  }
+});
+
+const arAE = mergeLocale(arSA, {
+  currencies: {
+    AED: 'الدرهم الإماراتي (AED)'
+  },
+  header: {
+    demoDescription: 'أنت الآن ترى نسخة ديمو مختصرة. حمّل ملف CSV الكامل حتى تشوف الصورة كاملة.',
+    csvRows: {
+      symbol: 'الرمز (مثال: EMAAR.AE أو AAPL)'
+    }
+  },
+  charts: {
+    realizedTitle: 'الربح والخسارة المحققة حسب السهم (خروج بدري / خروج مرتب)'
+  },
+  table: {
+    title: 'سجل التداول حسب السهم',
+    hedgeSuccess: 'الخروج بدري طلع هو القرار الصح هالمرة ({{value}})',
+    soldTooEarly: 'بعت بدري شوي وتركت {{value}} على الطاولة'
+  },
+  manager: {
+    placeholders: {
+      symbol: 'مثال: EMAAR.AE'
+    }
+  }
+});
+
+const arKW = mergeLocale(arSA, {
+  currencies: {
+    KWF: 'فلس كويتي (KWF)'
+  },
+  header: {
+    demoDescription: 'أنت حالياً تشوف نسخة تجريبية مختصرة. حمّل ملف CSV الكامل علشان تشوف الصورة كاملة.',
+    csvRows: {
+      symbol: 'الرمز (مثال: KFH.KW أو AAPL)'
+    }
+  },
+  charts: {
+    realizedTitle: 'الربح والخسارة المحققة حسب السهم (بيع بدري / خروج مرتب)'
+  },
+  table: {
+    title: 'سجل التداول حسب السهم',
+    hedgeSuccess: 'الطلعة المبكرة كانت أوفر هالمرة ({{value}})',
+    soldTooEarly: 'بعت أبكر من اللازم وخليت {{value}} على الطاولة'
+  },
+  manager: {
+    placeholders: {
+      symbol: 'مثال: KFH.KW'
+    }
+  }
+});
+
+const arQA = mergeLocale(arSA, {
+  currencies: {
+    QAR: 'الريال القطري (QAR)'
+  },
+  header: {
+    demoDescription: 'أنت الآن ترى نسخة ديمو مختصرة. حمّل CSV الكامل حتى تظهر لك الصورة كاملة.',
+    csvRows: {
+      symbol: 'الرمز (مثال: QNBK.QA أو AAPL)'
+    }
+  },
+  charts: {
+    realizedTitle: 'الربح والخسارة المحققة حسب السهم (خروج مبكر / خروج مرتب)'
+  },
+  table: {
+    title: 'سجل التداول حسب السهم',
+    hedgeSuccess: 'الخروج بدري كان القرار الأفضل هالمرة ({{value}})',
+    soldTooEarly: 'بعت بدري شوي وخليت {{value}} على الطاولة'
+  },
+  manager: {
+    placeholders: {
+      symbol: 'مثال: QNBK.QA'
+    }
+  }
+});
+
+const arEG = mergeLocale(arSA, {
+  currencies: {
+    EGP: 'الجنيه المصري (EGP)'
+  },
+  header: {
+    demoDescription: 'المعروض الآن نسخة مختصرة من بيانات التجربة. ارفع ملف CSV الكامل عشان تشوف الصورة كلها.',
+    csvRows: {
+      symbol: 'الرمز (مثال: COMI.CA أو AAPL)'
+    }
+  },
+  charts: {
+    realizedTitle: 'الربح/الخسارة المحققة حسب السهم (بعت بدري / خروج مرتب)'
+  },
+  table: {
+    title: 'سجل التداول حسب السهم',
+    hedgeSuccess: 'طلع البيع بدري كان أحسن قرار المرة دي ({{value}})',
+    soldTooEarly: 'بعت بدري شوية وسيبت {{value}} على الترابيزة'
+  },
+  manager: {
+    placeholders: {
+      symbol: 'مثال: COMI.CA'
+    }
+  }
+});
+
+const nbNO = mergeLocale(daDK, {
+  common: {
+    language: 'Språk',
+    close: 'Lukk',
+    cancel: 'Avbryt',
+    save: 'Lagre',
+    edit: 'Rediger',
+    delete: 'Slett',
+    importCsv: 'Importer CSV',
+    exportCsv: 'Eksporter CSV'
+  },
+  currencies: {
+    TWD: 'Ny taiwandollar (TWD)',
+    CNY: 'Kinesisk yuan (CNY)',
+    HKD: 'Hongkong-dollar (HKD)',
+    USD: 'Amerikansk dollar (USD)',
+    JPY: 'Japansk yen (JPY)',
+    NOK: 'Norsk krone (NOK)'
+  },
+  markets: {
+    all: 'Alle',
+    chinaA: 'Kina A-aksjer',
+    hongKong: 'Hongkong',
+    taiwan: 'Taiwan',
+    japan: 'Japan',
+    us: 'USA',
+    other: 'Andre',
+    unknown: 'Ukjent'
+  },
+  tradeTypes: {
+    buy: 'Kjøp',
+    sell: 'Salg'
+  },
+  timeRanges: {
+    oneWeek: '1 uke',
+    oneMonth: '1 mnd.',
+    threeMonths: '3 mnd.',
+    halfYear: '6 mnd.',
+    ytd: 'Hittil i år',
+    oneYear: '1 år',
+    fiveYears: '5 år',
+    all: 'Alle'
+  },
+  app: {
+    loadingLocalData: 'Laster inn lokale IndexedDB-data...',
+    generatingImage: 'Lager bilde...',
+    imageExportSuccess: 'Bildet ble eksportert.',
+    imageExportFail: 'Eksport av bilde mislyktes.',
+    noDataToExport: 'Det finnes ingen data å eksportere akkurat nå.',
+    exportFilenamePrefix: 'trade_records'
+  },
+  header: {
+    title: 'Global porteføljeoversikt',
+    demoDescription: 'Du ser et nedskalert demosett akkurat nå. Importer hele CSV-filen for å få hele bildet.',
+    recordsLoaded: '{{count}} handler er lastet inn og analysert.',
+    lastUpdated: 'Sist oppdatert: {{value}}',
+    switchToLight: 'Bytt til lyst tema',
+    switchToDark: 'Bytt til mørkt tema',
+    settingsRecords: 'Innstillinger og handler',
+    updatePrices: 'Oppdater kurser',
+    apiKeyRequired: 'API-nøkkel kreves',
+    updateWithCache: 'Oppdater kurser med cache',
+    setApiKeyFirst: 'Legg inn API-nøkkelen først',
+    forceRefresh: 'Tving oppdatering',
+    forceRefreshTitle: 'Hopp over cache og bruk ekte API-kvote',
+    languageLabel: 'Bytt språk',
+    csvTitle: 'Guide til CSV-felter',
+    csvIntro: 'Sørg for at CSV-filen minst har disse kolonnene. Rekkefølgen spiller ingen rolle:',
+    csvRows: {
+      date: 'Dato (f.eks. 2025/01/01)',
+      type: 'Type (Kjøp / Salg)',
+      symbol: 'Ticker (f.eks. EQNR.OL eller AAPL)',
+      market: 'Marked (valgfritt, nyttig ved manuelle føringer)',
+      quantity: 'Antall',
+      price: 'Pris per enhet (opprinnelig valuta)',
+      amount: 'Totalbeløp (opprinnelig valuta)',
+      pnl: 'P&L (obligatorisk ved salg, opprinnelig valuta)'
+    },
+    csvNote1: '* Merk 1: Seks-sifrede tickere som starter med 6 eller 0 blir automatisk tolket som kinesiske A-aksjer (.SS / .SZ).',
+    csvNote2: '* Merk 2: For andre markeder legger du suffix rett på tickeren, for eksempel .TW eller .HK.',
+    forceRefreshConfirm: 'Vil du tvinge en oppdatering? Dette hopper over 24-timers cachen og bruker ekte API-kvote.'
+  },
+  summary: {
+    totalRealized: 'Samlet realisert P&L (omregnet)',
+    totalUnrealized: 'Samlet urealisert P&L (omregnet)',
+    totalValue: 'Nåværende porteføljeverdi (omregnet)',
+    holdingCount: 'Åpne posisjoner',
+    holdingUnit: 'posisjoner'
+  },
+  charts: {
+    trendTitle: 'Kumulativ kostnadstrend',
+    saveImage: 'Lagre diagram som bilde',
+    noTrend: 'Det er ikke nok historikk ennå til å tegne en trend.',
+    realizedTitle: 'Realisert P&L per ticker (solgt for tidlig / ryddig exit)',
+    distributionTitle: 'Fordeling av porteføljeverdi (topp 10)',
+    convertedNote: 'Vises etter omregning til {{currency}}',
+    noPnlData: 'Ingen P&L-data ennå.',
+    noHoldings: 'Ingen åpne posisjoner akkurat nå.',
+    legendConverted: '{{label}} (omregnet)',
+    costSeries: 'Kumulativ kostpris',
+    realizedSeries: 'Kumulativ realisert P&L',
+    ifSoldSeries: 'Om du solgte i dag',
+    actualSeries: 'Faktisk realisert',
+    others: 'Andre'
+  },
+  table: {
+    title: 'Handelshistorikk per ticker',
+    subtitle: 'Åpne en rad for å se detaljer om kjøp og salg. Beløpene vises fortsatt i markedets opprinnelige valuta.',
+    columns: {
+      symbol: 'Ticker / navn (marked · valuta)',
+      holdingQty: 'Nåværende antall',
+      currentValue: 'Siste kurs / markedsverdi',
+      unrealized: 'Urealisert P&L',
+      realized: 'Realisert P&L',
+      ifSoldToday: 'Om solgt i dag',
+      date: 'Dato',
+      type: 'Type',
+      quantity: 'Antall',
+      price: 'Pris',
+      amount: 'Beløp',
+      pnl: 'P&L',
+      actions: 'Handlinger'
+    },
+    manualBadge: 'Manuell',
+    manualUpdatedAt: 'Manuell justering: {{value}}',
+    apiUpdatedAt: 'Sist oppdatert via API: {{value}}',
+    notUpdatedYet: 'Ikke oppdatert ennå',
+    manualNamePlaceholder: 'Manuelt navn',
+    currentPricePlaceholder: 'Pris',
+    hedgeSuccess: 'Det viste seg å være smartest å gå ut tidligere ({{value}})',
+    soldTooEarly: 'Du solgte litt for tidlig og lot {{value}} bli liggende igjen',
+    tradeDetails: 'Detaljer for handelen',
+    atPrice: '@ {{price}}',
+    quantityAtPrice: '{{quantity}} aksjer @ {{price}}',
+    mobileHoldingQty: 'Posisjon',
+    mobileUnrealized: 'Urealisert',
+    mobileRealized: 'Realisert'
+  },
+  manager: {
+    title: 'Innstillinger og handelslogg',
+    clearAndLoadDemo: 'Tøm og last demo',
+    apiKeyTitle: 'yfapi.net API-nøkkel',
+    getFreeApiKey: 'Få en gratis',
+    apiKeyPlaceholder: 'Lim inn x-api-key her (f.eks. A2sD8...)',
+    saveApiKey: 'Lagre API-nøkkel',
+    baseCurrencyTitle: 'Basisvaluta for oppsummeringskort',
+    baseCurrencyHelp: '* Alle eiendeler i utenlandsk valuta blir regnet om til denne basisvalutaen med live FX, slik at kortene øverst summerer riktig.',
+    hideZeroHolding: 'Skjul posisjoner som er helt lukket',
+    manualRecordTitle: 'Legg til handel manuelt',
+    fields: {
+      date: 'Dato',
+      type: 'Type',
+      market: 'Marked',
+      symbol: 'Ticker',
+      quantity: 'Antall',
+      price: 'Pris per enhet',
+      amount: 'Totalbeløp',
+      pnl: 'Realisert P&L (kun ved salg)'
+    },
+    placeholders: {
+      symbol: 'F.eks. EQNR.OL',
+      quantity: 'Antall aksjer',
+      price: 'Pris per aksje',
+      amount: 'I markedets valuta',
+      pnl: 'Valgfritt'
+    },
+    saveChanges: 'Lagre endringer',
+    addRecord: 'Legg til',
+    noRecords: 'Det finnes ingen handler ennå.'
+  },
+  notice: {
+    title: 'Velkommen til Trade Lens',
+    body: 'Trade Lens er et open source-verktøy for investorer som gjør om megler-CSV-er til kostnadstrender, P&L-visninger og en mer lesbar porteføljeoversikt.',
+    privacy: 'Personvern først: alt lagres bare i nettleseren din (IndexedDB). Ingenting sendes til serveren.',
+    apiKey: 'API-nøkkelen brukes kun til å hente priser fra yfapi.net og lagres også lokalt.',
+    sourceCode: 'Open source: se koden og bidra',
+    dismiss: 'Ikke vis igjen'
+  },
+  messages: {
+    apiKeySaved: 'API-nøkkelen er lagret.',
+    manualStockSaved: '{{symbol}} ble oppdatert manuelt.',
+    needApiKey: 'Legg inn API-nøkkelen fra yfapi.net i innstillingspanelet før du oppdaterer kurser.',
+    cacheFresh: 'Kurser og valutakurser ble oppdatert i løpet av de siste 24 timene, så appen brukte lokal cache for å spare kvote.',
+    updateSuccess: '{{count}} kurser og valutakurser ble oppdatert.',
+    fetchFailed: 'Henting mislyktes: {{message}}',
+    baseCurrencyChanged: 'Basisvalutaen er byttet til {{currency}}. Oppdaterer valutakurser nå...',
+    recordUpdated: 'Handelsoppføringen ble oppdatert.',
+    dataCleared: 'Data ble tømt og demosettet ble lastet inn på nytt.',
+    clearConfirm: 'Vil du slette alle data og laste inn demoen på nytt? Dette kan ikke angres.',
+    backupConfirm: 'Vil du eksportere dagens data som CSV-backup før sletting?'
+  },
+  data: {
+    unknownSymbol: 'Ukjent ticker ({{symbol}})',
+    unknown: 'Ukjent'
+  }
+});
+
+const fiFI = mergeLocale(enUS, {
+  common: {
+    language: 'Kieli',
+    close: 'Sulje',
+    cancel: 'Peruuta',
+    save: 'Tallenna',
+    edit: 'Muokkaa',
+    delete: 'Poista',
+    importCsv: 'Tuo CSV',
+    exportCsv: 'Vie CSV'
+  },
+  currencies: {
+    TWD: 'Uusi Taiwanin dollari (TWD)',
+    CNY: 'Kiinan juan (CNY)',
+    HKD: 'Hongkongin dollari (HKD)',
+    USD: 'Yhdysvaltain dollari (USD)',
+    JPY: 'Japanin jeni (JPY)',
+    EUR: 'Euro (EUR)'
+  },
+  markets: {
+    all: 'Kaikki',
+    chinaA: 'Kiinan A-osakkeet',
+    hongKong: 'Hongkong',
+    taiwan: 'Taiwan',
+    japan: 'Japani',
+    us: 'Yhdysvallat',
+    other: 'Muut',
+    unknown: 'Tuntematon'
+  },
+  tradeTypes: {
+    buy: 'Osto',
+    sell: 'Myynti'
+  },
+  timeRanges: {
+    oneWeek: '1 vko',
+    oneMonth: '1 kk',
+    threeMonths: '3 kk',
+    halfYear: '6 kk',
+    ytd: 'YTD',
+    oneYear: '1 vuosi',
+    fiveYears: '5 vuotta',
+    all: 'Kaikki'
+  },
+  app: {
+    loadingLocalData: 'Ladataan paikallisia IndexedDB-tietoja...',
+    generatingImage: 'Luodaan kuvaa...',
+    imageExportSuccess: 'Kuvan vienti onnistui.',
+    imageExportFail: 'Kuvan vienti epäonnistui.',
+    noDataToExport: 'Vietävää dataa ei ole juuri nyt.',
+    exportFilenamePrefix: 'trade_records'
+  },
+  header: {
+    title: 'Globaali salkkunäkymä',
+    demoDescription: 'Näet nyt supistetun demoaineiston. Tuo koko CSV, niin näet koko kuvan.',
+    recordsLoaded: '{{count}} tapahtumaa ladattu ja analysoitu.',
+    lastUpdated: 'Viimeksi päivitetty: {{value}}',
+    switchToLight: 'Vaihda vaaleaan teemaan',
+    switchToDark: 'Vaihda tummaan teemaan',
+    settingsRecords: 'Asetukset ja tapahtumat',
+    updatePrices: 'Päivitä hinnat',
+    apiKeyRequired: 'API-avain vaaditaan',
+    updateWithCache: 'Päivitä hinnat välimuistilla',
+    setApiKeyFirst: 'Aseta API-avain ensin',
+    forceRefresh: 'Pakota päivitys',
+    forceRefreshTitle: 'Ohita välimuisti ja kuluta oikeaa API-kiintiötä',
+    languageLabel: 'Vaihda kieli',
+    csvTitle: 'CSV-kenttien ohje',
+    csvIntro: 'Varmista, että CSV:ssä on vähintään nämä sarakkeet. Järjestyksellä ei ole väliä:',
+    csvRows: {
+      date: 'Päiväys (esim. 2025/01/01)',
+      type: 'Tyyppi (Osto / Myynti)',
+      symbol: 'Tunnus (esim. KNEBV.HE tai AAPL)',
+      market: 'Markkina (valinnainen, hyödyllinen manuaalisissa kirjauksissa)',
+      quantity: 'Määrä',
+      price: 'Yksikköhinta (alkuperäinen valuutta)',
+      amount: 'Kokonaissumma (alkuperäinen valuutta)',
+      pnl: 'P&L (pakollinen myynneissä, alkuperäinen valuutta)'
+    },
+    csvNote1: '* Huomio 1: Kuusinumeroiset tunnukset, jotka alkavat numerolla 6 tai 0, tulkitaan automaattisesti Kiinan A-osakkeiksi (.SS / .SZ).',
+    csvNote2: '* Huomio 2: Muilla markkinoilla lisää pääte suoraan tunnukseen, esimerkiksi .TW tai .HK.',
+    forceRefreshConfirm: 'Pakotetaanko päivitys? Tämä ohittaa 24 tunnin välimuistin ja kuluttaa oikeaa API-kiintiötä.'
+  },
+  summary: {
+    totalRealized: 'Realisoitu P&L yhteensä (muunnettuna)',
+    totalUnrealized: 'Realisoitumaton P&L yhteensä (muunnettuna)',
+    totalValue: 'Nykyinen salkun arvo (muunnettuna)',
+    holdingCount: 'Avoimet positiot',
+    holdingUnit: 'positiota'
+  },
+  charts: {
+    trendTitle: 'Kumulatiivinen kulukehitys',
+    saveImage: 'Tallenna kaavio kuvana',
+    noTrend: 'Tapahtumahistoriaa ei ole vielä tarpeeksi trendin piirtämiseen.',
+    realizedTitle: 'Realisoitu P&L yhtiöittäin (myyty liian aikaisin / siisti exit)',
+    distributionTitle: 'Salkun arvon jakauma (top 10)',
+    convertedNote: 'Näytetään muunnettuna valuuttaan {{currency}}',
+    noPnlData: 'P&L-dataa ei ole vielä.',
+    noHoldings: 'Avoimia positioita ei ole juuri nyt.',
+    legendConverted: '{{label}} (muunnettuna)',
+    costSeries: 'Kumulatiivinen hankintameno',
+    realizedSeries: 'Kumulatiivinen realisoitu P&L',
+    ifSoldSeries: 'Jos myisit tänään',
+    actualSeries: 'Oikeasti realisoitu',
+    others: 'Muut'
+  },
+  table: {
+    title: 'Tapahtumahistoria tunnuksittain',
+    subtitle: 'Avaa rivi nähdäksesi ostot ja myynnit tarkemmin. Summat näytetään edelleen markkinan alkuperäisessä valuutassa.',
+    columns: {
+      symbol: 'Tunnus / nimi (markkina · valuutta)',
+      holdingQty: 'Nykyinen määrä',
+      currentValue: 'Viimeisin hinta / markkina-arvo',
+      unrealized: 'Realisoitumaton P&L',
+      realized: 'Realisoitu P&L',
+      ifSoldToday: 'Jos myisit tänään',
+      date: 'Päiväys',
+      type: 'Tyyppi',
+      quantity: 'Määrä',
+      price: 'Hinta',
+      amount: 'Summa',
+      pnl: 'P&L',
+      actions: 'Toiminnot'
+    },
+    manualBadge: 'Manuaalinen',
+    manualUpdatedAt: 'Manuaalinen muutos: {{value}}',
+    apiUpdatedAt: 'API päivitetty: {{value}}',
+    notUpdatedYet: 'Ei päivitetty vielä',
+    manualNamePlaceholder: 'Manuaalinen nimi',
+    currentPricePlaceholder: 'Hinta',
+    hedgeSuccess: 'Aiempi poistuminen olikin tällä kertaa parempi ratkaisu ({{value}})',
+    soldTooEarly: 'Myit hieman liian aikaisin ja jätit {{value}} pöydälle',
+    tradeDetails: 'Toteutuksen tiedot',
+    atPrice: '@ {{price}}',
+    quantityAtPrice: '{{quantity}} osaketta @ {{price}}',
+    mobileHoldingQty: 'Positio',
+    mobileUnrealized: 'Realisoitumaton',
+    mobileRealized: 'Realisoitu'
+  },
+  manager: {
+    title: 'Asetukset ja tapahtumaloki',
+    clearAndLoadDemo: 'Tyhjennä ja lataa demo',
+    apiKeyTitle: 'yfapi.net API-avain',
+    getFreeApiKey: 'Hanki ilmaiseksi',
+    apiKeyPlaceholder: 'Liitä x-api-key tähän (esim. A2sD8...)',
+    saveApiKey: 'Tallenna API-avain',
+    baseCurrencyTitle: 'Yhteenvetokorttien perusvaluutta',
+    baseCurrencyHelp: '* Kaikki ulkomaan valuutassa olevat varat muunnetaan tähän perusvaluuttaan live-FX:llä, jotta yläosan kortit osaavat laskea kaiken yhteen järkevästi.',
+    hideZeroHolding: 'Piilota kokonaan suljetut positiot',
+    manualRecordTitle: 'Lisää tapahtuma käsin',
+    fields: {
+      date: 'Päiväys',
+      type: 'Tyyppi',
+      market: 'Markkina',
+      symbol: 'Tunnus',
+      quantity: 'Määrä',
+      price: 'Yksikköhinta',
+      amount: 'Kokonaissumma',
+      pnl: 'Realisoitu P&L (vain myynnit)'
+    },
+    placeholders: {
+      symbol: 'Esim. KNEBV.HE',
+      quantity: 'Osakemäärä',
+      price: 'Hinta per osake',
+      amount: 'Markkinan valuutassa',
+      pnl: 'Valinnainen'
+    },
+    saveChanges: 'Tallenna muutokset',
+    addRecord: 'Lisää',
+    noRecords: 'Tapahtumia ei ole vielä.'
+  },
+  notice: {
+    title: 'Tervetuloa Trade Lensiin',
+    body: 'Trade Lens on avoimen lähdekoodin työkalu sijoittajille. Se muuttaa välittäjän CSV:t kustannustrendeiksi, P&L-näkymiksi ja luettavammaksi salkkunäkymäksi.',
+    privacy: 'Yksityisyys ensin: kaikki pysyy vain selaimessasi (IndexedDB). Mitään ei lähetetä palvelimelle.',
+    apiKey: 'API-avainta käytetään vain hintojen hakemiseen yfapi.netistä, ja sekin säilyy paikallisesti.',
+    sourceCode: 'Avoin lähdekoodi: katso koodi ja osallistu',
+    dismiss: 'Älä näytä uudelleen'
+  },
+  messages: {
+    apiKeySaved: 'API-avain tallennettu.',
+    manualStockSaved: '{{symbol}} päivitettiin käsin.',
+    needApiKey: 'Syötä yfapi.netin API-avain asetuspaneeliin ennen hintojen päivittämistä.',
+    cacheFresh: 'Hinnat ja valuuttakurssit on päivitetty viimeisen 24 tunnin aikana, joten sovellus käytti paikallista välimuistia kiintiön säästämiseksi.',
+    updateSuccess: '{{count}} hintaa ja valuuttakurssia päivitettiin.',
+    fetchFailed: 'Haku epäonnistui: {{message}}',
+    baseCurrencyChanged: 'Perusvaluutta vaihdettiin valuuttaan {{currency}}. Päivitetään valuuttakursseja...',
+    recordUpdated: 'Tapahtuma päivitettiin.',
+    dataCleared: 'Data tyhjennettiin ja demosetti ladattiin uudelleen.',
+    clearConfirm: 'Poistetaanko kaikki tiedot ja ladataanko demo uudelleen? Tätä ei voi perua.',
+    backupConfirm: 'Haluatko viedä nykyiset tiedot CSV-varmuuskopioksi ennen tyhjennystä?'
+  },
+  data: {
+    unknownSymbol: 'Tuntematon tunnus ({{symbol}})',
+    unknown: 'Tuntematon'
+  }
+});
+
+const etEE = mergeLocale(enUS, {
+  common: {
+    language: 'Keel',
+    close: 'Sulge',
+    cancel: 'Tühista',
+    save: 'Salvesta',
+    edit: 'Muuda',
+    delete: 'Kustuta',
+    importCsv: 'Impordi CSV',
+    exportCsv: 'Ekspordi CSV'
+  },
+  currencies: {
+    TWD: 'Uus Taiwani dollar (TWD)',
+    CNY: 'Hiina jüaan (CNY)',
+    HKD: 'Hongkongi dollar (HKD)',
+    USD: 'USA dollar (USD)',
+    JPY: 'Jaapani jeen (JPY)',
+    EUR: 'Euro (EUR)'
+  },
+  markets: {
+    all: 'Kõik',
+    chinaA: 'Hiina A-aktsiad',
+    hongKong: 'Hongkong',
+    taiwan: 'Taiwan',
+    japan: 'Jaapan',
+    us: 'USA',
+    other: 'Muu',
+    unknown: 'Tundmatu'
+  },
+  tradeTypes: {
+    buy: 'Ost',
+    sell: 'Müük'
+  },
+  timeRanges: {
+    oneWeek: '1 nädal',
+    oneMonth: '1 kuu',
+    threeMonths: '3 kuud',
+    halfYear: '6 kuud',
+    ytd: 'YTD',
+    oneYear: '1 aasta',
+    fiveYears: '5 aastat',
+    all: 'Kõik'
+  },
+  app: {
+    loadingLocalData: 'Kohalike IndexedDB andmete laadimine...',
+    generatingImage: 'Pildi loomine...',
+    imageExportSuccess: 'Pilt eksporditi edukalt.',
+    imageExportFail: 'Pildi eksport ebaõnnestus.',
+    noDataToExport: 'Praegu pole midagi eksportida.',
+    exportFilenamePrefix: 'trade_records'
+  },
+  header: {
+    title: 'Globaalne portfellivaade',
+    demoDescription: 'Praegu näed kärbitud demoandmestikku. Impordi täielik CSV, et näha tervikpilti.',
+    recordsLoaded: '{{count}} tehingut laaditi ja analüüsiti.',
+    lastUpdated: 'Viimati uuendatud: {{value}}',
+    switchToLight: 'Lülitu heledale teemale',
+    switchToDark: 'Lülitu tumedale teemale',
+    settingsRecords: 'Seaded ja tehingud',
+    updatePrices: 'Uuenda hindu',
+    apiKeyRequired: 'API-võti on vajalik',
+    updateWithCache: 'Uuenda hindu vahemäluga',
+    setApiKeyFirst: 'Sisesta enne API-võti',
+    forceRefresh: 'Sunni uuendus',
+    forceRefreshTitle: 'Eira vahemälu ja kuluta päris API limiiti',
+    languageLabel: 'Vaheta keelt',
+    csvTitle: 'CSV väljade juhend',
+    csvIntro: 'Veendu, et CSV-s oleks vähemalt need veerud. Järjekord pole oluline:',
+    csvRows: {
+      date: 'Kuupäev (nt 2025/01/01)',
+      type: 'Tüüp (Ost / Müük)',
+      symbol: 'Sümbol (nt TAL1T.TL või AAPL)',
+      market: 'Turg (valikuline, kasulik käsitsi kirjete puhul)',
+      quantity: 'Kogus',
+      price: 'Ühiku hind (algne valuuta)',
+      amount: 'Kogusumma (algne valuuta)',
+      pnl: 'P&L (müügil kohustuslik, algne valuuta)'
+    },
+    csvNote1: '* Märkus 1: Kuuekohalised sümbolid, mis algavad 6 või 0-ga, tuvastatakse automaatselt Hiina A-aktsiatena (.SS / .SZ).',
+    csvNote2: '* Märkus 2: Muude turgude puhul lisa suffix otse sümboli lõppu, näiteks .TW või .HK.',
+    forceRefreshConfirm: 'Kas sundida uuendust? See eirab 24 tunni vahemälu ja kulutab päris API limiiti.'
+  },
+  summary: {
+    totalRealized: 'Kokku realiseeritud P&L (teisendatud)',
+    totalUnrealized: 'Kokku realiseerimata P&L (teisendatud)',
+    totalValue: 'Praegune portfelli väärtus (teisendatud)',
+    holdingCount: 'Avatud positsioonid',
+    holdingUnit: 'positsiooni'
+  },
+  charts: {
+    trendTitle: 'Kumulatiivne kulutrend',
+    saveImage: 'Salvesta graafik pildina',
+    noTrend: 'Trendi joonistamiseks pole veel piisavalt ajalugu.',
+    realizedTitle: 'Realiseeritud P&L sümboli järgi (müüsid liiga vara / korralik exit)',
+    distributionTitle: 'Portfelli väärtuse jaotus (top 10)',
+    convertedNote: 'Näidatakse valuutas {{currency}}',
+    noPnlData: 'P&L-andmeid veel pole.',
+    noHoldings: 'Avatud positsioone hetkel pole.',
+    legendConverted: '{{label}} (teisendatud)',
+    costSeries: 'Kumulatiivne soetusmaksumus',
+    realizedSeries: 'Kumulatiivne realiseeritud P&L',
+    ifSoldSeries: 'Kui müüksid täna',
+    actualSeries: 'Tegelikult realiseeritud',
+    others: 'Muu'
+  },
+  table: {
+    title: 'Tehinguajalugu sümboli kaupa',
+    subtitle: 'Ava rida, et näha ostu- ja müügitehingute detaile. Summad jäävad turu algses valuutas.',
+    columns: {
+      symbol: 'Sümbol / nimi (turg · valuuta)',
+      holdingQty: 'Praegune kogus',
+      currentValue: 'Viimane hind / turuväärtus',
+      unrealized: 'Realiseerimata P&L',
+      realized: 'Realiseeritud P&L',
+      ifSoldToday: 'Kui müüksid täna',
+      date: 'Kuupäev',
+      type: 'Tüüp',
+      quantity: 'Kogus',
+      price: 'Hind',
+      amount: 'Summa',
+      pnl: 'P&L',
+      actions: 'Toimingud'
+    },
+    manualBadge: 'Käsitsi',
+    manualUpdatedAt: 'Käsitsi uuendatud: {{value}}',
+    apiUpdatedAt: 'API viimane uuendus: {{value}}',
+    notUpdatedYet: 'Pole veel uuendatud',
+    manualNamePlaceholder: 'Käsitsi nimi',
+    currentPricePlaceholder: 'Hind',
+    hedgeSuccess: 'Varem väljumine osutus seekord paremaks sammuks ({{value}})',
+    soldTooEarly: 'Müüsid veidi liiga vara ja jätsid {{value}} lauale',
+    tradeDetails: 'Tehingu detailid',
+    atPrice: '@ {{price}}',
+    quantityAtPrice: '{{quantity}} aktsiat @ {{price}}',
+    mobileHoldingQty: 'Positsioon',
+    mobileUnrealized: 'Realiseerimata',
+    mobileRealized: 'Realiseeritud'
+  },
+  manager: {
+    title: 'Seaded ja tehingulogi',
+    clearAndLoadDemo: 'Puhasta ja lae demo',
+    apiKeyTitle: 'yfapi.net API-võti',
+    getFreeApiKey: 'Hangi tasuta',
+    apiKeyPlaceholder: 'Kleebi siia oma x-api-key (nt A2sD8...)',
+    saveApiKey: 'Salvesta API-võti',
+    baseCurrencyTitle: 'Kokkuvõtte kaartide baasvaluuta',
+    baseCurrencyHelp: '* Kõik välisvaluutas varad teisendatakse live-FX abil sellesse baasvaluutasse, et ülemised kokkuvõttekaardid saaksid kõik korrektselt kokku liita.',
+    hideZeroHolding: 'Peida täielikult suletud positsioonid',
+    manualRecordTitle: 'Lisa tehing käsitsi',
+    fields: {
+      date: 'Kuupäev',
+      type: 'Tüüp',
+      market: 'Turg',
+      symbol: 'Sümbol',
+      quantity: 'Kogus',
+      price: 'Ühiku hind',
+      amount: 'Kogusumma',
+      pnl: 'Realiseeritud P&L (ainult müük)'
+    },
+    placeholders: {
+      symbol: 'Nt TAL1T.TL',
+      quantity: 'Aktsiate arv',
+      price: 'Hind aktsia kohta',
+      amount: 'Selle turu valuutas',
+      pnl: 'Valikuline'
+    },
+    saveChanges: 'Salvesta muudatused',
+    addRecord: 'Lisa',
+    noRecords: 'Tehinguid veel pole.'
+  },
+  notice: {
+    title: 'Tere tulemast Trade Lensi',
+    body: 'Trade Lens on avatud lähtekoodiga tööriist investoritele, mis muudab maakleri CSV-d kulutrendideks, P&L-vaadeteks ja loetavamaks portfellipildiks.',
+    privacy: 'Privaatsus ennekõike: kõik jääb ainult sinu brauserisse (IndexedDB). Midagi ei saadeta serverisse.',
+    apiKey: 'API-võtit kasutatakse ainult hindade küsimiseks yfapi.net-ist ning see salvestatakse samuti lokaalselt.',
+    sourceCode: 'Avatud lähtekood: vaata koodi ja panusta',
+    dismiss: 'Ära näita enam'
+  },
+  messages: {
+    apiKeySaved: 'API-võti salvestati.',
+    manualStockSaved: '{{symbol}} uuendati käsitsi.',
+    needApiKey: 'Sisesta enne hindade uuendamist seadete paneeli yfapi.net API-võti.',
+    cacheFresh: 'Hinnad ja valuutakursid on viimase 24 tunni jooksul juba uuendatud, seega kasutas rakendus limiidi säästmiseks kohalikku vahemälu.',
+    updateSuccess: '{{count}} hinda ja valuutakurssi uuendati.',
+    fetchFailed: 'Päring ebaõnnestus: {{message}}',
+    baseCurrencyChanged: 'Baasvaluuta vahetati valuuta {{currency}} vastu. Valuutakursse uuendatakse...',
+    recordUpdated: 'Tehing kirje uuendati.',
+    dataCleared: 'Andmed puhastati ja demoandmed laaditi uuesti.',
+    clearConfirm: 'Kas kustutada kõik andmed ja laadida demo uuesti? Seda ei saa tagasi võtta.',
+    backupConfirm: 'Kas soovid enne puhastamist eksportida praegused andmed CSV-varukoopiana?'
+  },
+  data: {
+    unknownSymbol: 'Tundmatu sümbol ({{symbol}})',
+    unknown: 'Tundmatu'
+  }
+});
+
+const isIS = mergeLocale(enUS, {
+  common: {
+    language: 'Tungumál',
+    close: 'Loka',
+    cancel: 'Hætta við',
+    save: 'Vista',
+    edit: 'Breyta',
+    delete: 'Eyða',
+    importCsv: 'Flytja inn CSV',
+    exportCsv: 'Flytja út CSV'
+  },
+  currencies: {
+    TWD: 'Nýr taívanskur dalur (TWD)',
+    CNY: 'Kínverskt júan (CNY)',
+    HKD: 'Hong Kong dalur (HKD)',
+    USD: 'Bandaríkjadalur (USD)',
+    JPY: 'Japanskt jen (JPY)',
+    ISK: 'Íslensk króna (ISK)'
+  },
+  markets: {
+    all: 'Allt',
+    chinaA: 'Kínversk A-hlutabréf',
+    hongKong: 'Hong Kong',
+    taiwan: 'Taívan',
+    japan: 'Japan',
+    us: 'Bandaríkin',
+    other: 'Annað',
+    unknown: 'Óþekkt'
+  },
+  tradeTypes: {
+    buy: 'Kaup',
+    sell: 'Sala'
+  },
+  timeRanges: {
+    oneWeek: '1 vika',
+    oneMonth: '1 mán.',
+    threeMonths: '3 mán.',
+    halfYear: '6 mán.',
+    ytd: 'Frá áramótum',
+    oneYear: '1 ár',
+    fiveYears: '5 ár',
+    all: 'Allt'
+  },
+  app: {
+    loadingLocalData: 'Hleð inn staðbundnum IndexedDB-gögnum...',
+    generatingImage: 'Bý til mynd...',
+    imageExportSuccess: 'Mynd var flutt út.',
+    imageExportFail: 'Ekki tókst að flytja mynd út.',
+    noDataToExport: 'Engin gögn til að flytja út núna.',
+    exportFilenamePrefix: 'trade_records'
+  },
+  header: {
+    title: 'Alþjóðlegt eignasafnsyfirlit',
+    demoDescription: 'Þú sérð nú stytt demógagnasett. Flyttu inn allt CSV-skráarsafnið til að fá heildarmyndina.',
+    recordsLoaded: '{{count}} viðskipti hafa verið hlaðin inn og greind.',
+    lastUpdated: 'Síðast uppfært: {{value}}',
+    switchToLight: 'Skipta í ljóst þema',
+    switchToDark: 'Skipta í dökkt þema',
+    settingsRecords: 'Stillingar og viðskipti',
+    updatePrices: 'Uppfæra verð',
+    apiKeyRequired: 'API-lykill þarf',
+    updateWithCache: 'Uppfæra verð með skyndiminni',
+    setApiKeyFirst: 'Settu inn API-lykil fyrst',
+    forceRefresh: 'Þvinga uppfærslu',
+    forceRefreshTitle: 'Sleppa skyndiminni og nota raunverulegt API-kvóta',
+    languageLabel: 'Skipta um tungumál',
+    csvTitle: 'Leiðarvísir að CSV-reitum',
+    csvIntro: 'Gakktu úr skugga um að CSV-skráin hafi að minnsta kosti þessa dálka. Röðin skiptir ekki máli:',
+    csvRows: {
+      date: 'Dagsetning (t.d. 2025/01/01)',
+      type: 'Tegund (Kaup / Sala)',
+      symbol: 'Tákn (t.d. ICEAIR.IC eða AAPL)',
+      market: 'Markaður (valfrjálst, hentugt fyrir handvirkar færslur)',
+      quantity: 'Magn',
+      price: 'Verð á einingu (upprunalegur gjaldmiðill)',
+      amount: 'Heildarupphæð (upprunalegur gjaldmiðill)',
+      pnl: 'P&L (skylda við sölu, upprunalegur gjaldmiðill)'
+    },
+    csvNote1: '* Ath. 1: Sex stafa tákn sem byrja á 6 eða 0 eru sjálfkrafa túlkuð sem kínversk A-hlutabréf (.SS / .SZ).',
+    csvNote2: '* Ath. 2: Fyrir aðra markaði skaltu bæta endingunni beint við táknið, til dæmis .TW eða .HK.',
+    forceRefreshConfirm: 'Viltu þvinga uppfærslu? Þetta hunsar 24 tíma skyndiminni og notar raunverulegt API-kvóta.'
+  },
+  summary: {
+    totalRealized: 'Samtals innleyst P&L (umbreytt)',
+    totalUnrealized: 'Samtals óinnleyst P&L (umbreytt)',
+    totalValue: 'Núverandi virði eignasafns (umbreytt)',
+    holdingCount: 'Opnar stöður',
+    holdingUnit: 'stöður'
+  },
+  charts: {
+    trendTitle: 'Safnað kostnaðarferli',
+    saveImage: 'Vista línurit sem mynd',
+    noTrend: 'Viðskiptasagan er ekki enn næg til að teikna þróun.',
+    realizedTitle: 'Innleyst P&L eftir félagi (selt of snemma / snyrtilegt exit)',
+    distributionTitle: 'Dreifing eignasafnsvirðis (topp 10)',
+    convertedNote: 'Sýnt eftir umbreytingu í {{currency}}',
+    noPnlData: 'Engin P&L-gögn enn.',
+    noHoldings: 'Engar opnar stöður núna.',
+    legendConverted: '{{label}} (umbreytt)',
+    costSeries: 'Safnaður kostnaður',
+    realizedSeries: 'Safnað innleyst P&L',
+    ifSoldSeries: 'Ef þú seldir í dag',
+    actualSeries: 'Raunverulega innleyst',
+    others: 'Annað'
+  },
+  table: {
+    title: 'Viðskiptasaga eftir tákni',
+    subtitle: 'Opnaðu línu til að sjá nánari kaup- og sölusögu. Upphæðir eru áfram sýndar í upprunalegum gjaldmiðli markaðarins.',
+    columns: {
+      symbol: 'Tákn / nafn (markaður · gjaldmiðill)',
+      holdingQty: 'Núverandi magn',
+      currentValue: 'Síðasta verð / markaðsvirði',
+      unrealized: 'Óinnleyst P&L',
+      realized: 'Innleyst P&L',
+      ifSoldToday: 'Ef selt í dag',
+      date: 'Dagsetning',
+      type: 'Tegund',
+      quantity: 'Magn',
+      price: 'Verð',
+      amount: 'Upphæð',
+      pnl: 'P&L',
+      actions: 'Aðgerðir'
+    },
+    manualBadge: 'Handvirkt',
+    manualUpdatedAt: 'Handvirkt uppfært: {{value}}',
+    apiUpdatedAt: 'API síðast uppfært: {{value}}',
+    notUpdatedYet: 'Ekki uppfært enn',
+    manualNamePlaceholder: 'Handvirkt nafn',
+    currentPricePlaceholder: 'Verð',
+    hedgeSuccess: 'Að fara fyrr út reyndist vera betri leikur að þessu sinni ({{value}})',
+    soldTooEarly: 'Þú seldir aðeins of snemma og skildir {{value}} eftir á borðinu',
+    tradeDetails: 'Viðskiptaupplýsingar',
+    atPrice: '@ {{price}}',
+    quantityAtPrice: '{{quantity}} hlutir @ {{price}}',
+    mobileHoldingQty: 'Staða',
+    mobileUnrealized: 'Óinnleyst',
+    mobileRealized: 'Innleyst'
+  },
+  manager: {
+    title: 'Stillingar og viðskiptalisti',
+    clearAndLoadDemo: 'Hreinsa og hlaða demo',
+    apiKeyTitle: 'yfapi.net API-lykill',
+    getFreeApiKey: 'Fá ókeypis',
+    apiKeyPlaceholder: 'Límdu x-api-key hér (t.d. A2sD8...)',
+    saveApiKey: 'Vista API-lykil',
+    baseCurrencyTitle: 'Grunngjaldmiðill yfirlitskorta',
+    baseCurrencyHelp: '* Allar eignir í erlendum gjaldmiðlum eru umbreyttar yfir í þennan grunngjaldmiðil með lifandi FX svo að yfirlitskortin að ofan leggi allt rétt saman.',
+    hideZeroHolding: 'Fela stöður sem eru alveg lokaðar',
+    manualRecordTitle: 'Bæta við viðskiptum handvirkt',
+    fields: {
+      date: 'Dagsetning',
+      type: 'Tegund',
+      market: 'Markaður',
+      symbol: 'Tákn',
+      quantity: 'Magn',
+      price: 'Verð á einingu',
+      amount: 'Heildarupphæð',
+      pnl: 'Innleyst P&L (aðeins við sölu)'
+    },
+    placeholders: {
+      symbol: 'T.d. ICEAIR.IC',
+      quantity: 'Fjöldi hluta',
+      price: 'Verð á hlut',
+      amount: 'Í gjaldmiðli markaðarins',
+      pnl: 'Valfrjálst'
+    },
+    saveChanges: 'Vista breytingar',
+    addRecord: 'Bæta við',
+    noRecords: 'Engin viðskipti enn.'
+  },
+  notice: {
+    title: 'Velkomin í Trade Lens',
+    body: 'Trade Lens er opinn hugbúnaður fyrir fjárfesta sem breytir CSV-skrám frá miðlara í kostnaðarþróun, P&L-yfirsýn og skýrari mynd af eignasafninu.',
+    privacy: 'Persónuvernd fyrst: allt helst í vafranum þínum (IndexedDB). Ekkert er sent á netþjóninn.',
+    apiKey: 'API-lykillinn er eingöngu notaður til að sækja verð frá yfapi.net og er einnig geymdur staðbundið.',
+    sourceCode: 'Opinn hugbúnaður: skoðaðu kóðann og leggðu þitt af mörkum',
+    dismiss: 'Ekki sýna aftur'
+  },
+  messages: {
+    apiKeySaved: 'API-lykill vistaður.',
+    manualStockSaved: '{{symbol}} var uppfært handvirkt.',
+    needApiKey: 'Settu inn API-lykil frá yfapi.net í stillingaspjaldið áður en þú uppfærir verð.',
+    cacheFresh: 'Verð og gjaldeyrisgengi hafa þegar verið uppfærð síðustu 24 klukkustundir, þannig að appið notaði staðbundið skyndiminni til að spara kvóta.',
+    updateSuccess: '{{count}} verð og gjaldeyrisgengi voru uppfærð.',
+    fetchFailed: 'Sótt mistókst: {{message}}',
+    baseCurrencyChanged: 'Grunngjaldmiðli var skipt í {{currency}}. Verið er að uppfæra gengi...',
+    recordUpdated: 'Viðskiptaskráning var uppfærð.',
+    dataCleared: 'Gögn voru hreinsuð og demo-safnið hlaðið aftur inn.',
+    clearConfirm: 'Viltu eyða öllum gögnum og hlaða demo-safninu aftur? Þetta er ekki hægt að afturkalla.',
+    backupConfirm: 'Viltu flytja út núverandi gögn sem CSV-afrit áður en þau eru hreinsuð?'
+  },
+  data: {
+    unknownSymbol: 'Óþekkt tákn ({{symbol}})',
+    unknown: 'Óþekkt'
+  }
+});
+
+const lvLV = mergeLocale(enUS, {
+  common: {
+    language: 'Valoda',
+    close: 'Aizvērt',
+    cancel: 'Atcelt',
+    save: 'Saglabāt',
+    edit: 'Rediģēt',
+    delete: 'Dzēst',
+    importCsv: 'Importēt CSV',
+    exportCsv: 'Eksportēt CSV'
+  },
+  currencies: {
+    TWD: 'Jaunais Taivānas dolārs (TWD)',
+    CNY: 'Ķīnas juaņa (CNY)',
+    HKD: 'Honkongas dolārs (HKD)',
+    USD: 'ASV dolārs (USD)',
+    JPY: 'Japānas jena (JPY)',
+    EUR: 'Eiro (EUR)'
+  },
+  markets: {
+    all: 'Visi',
+    chinaA: 'Ķīnas A akcijas',
+    hongKong: 'Honkonga',
+    taiwan: 'Taivāna',
+    japan: 'Japāna',
+    us: 'ASV',
+    other: 'Citi',
+    unknown: 'Nezināms'
+  },
+  tradeTypes: {
+    buy: 'Pirkums',
+    sell: 'Pārdošana'
+  },
+  timeRanges: {
+    oneWeek: '1 ned.',
+    oneMonth: '1 mēn.',
+    threeMonths: '3 mēn.',
+    halfYear: '6 mēn.',
+    ytd: 'No gada sākuma',
+    oneYear: '1 gads',
+    fiveYears: '5 gadi',
+    all: 'Visi'
+  },
+  app: {
+    loadingLocalData: 'Ielādē vietējos IndexedDB datus...',
+    generatingImage: 'Veido attēlu...',
+    imageExportSuccess: 'Attēls veiksmīgi eksportēts.',
+    imageExportFail: 'Attēla eksportēšana neizdevās.',
+    noDataToExport: 'Pašlaik nav datu eksportam.',
+    exportFilenamePrefix: 'trade_records'
+  },
+  header: {
+    title: 'Globālais portfeļa panelis',
+    demoDescription: 'Pašlaik redzi saīsinātu demo datu kopu. Importē pilno CSV, lai redzētu pilnu ainu.',
+    recordsLoaded: '{{count}} darījumi ielādēti un analizēti.',
+    lastUpdated: 'Pēdējoreiz atjaunināts: {{value}}',
+    switchToLight: 'Pārslēgties uz gaišo tēmu',
+    switchToDark: 'Pārslēgties uz tumšo tēmu',
+    settingsRecords: 'Iestatījumi un darījumi',
+    updatePrices: 'Atjaunināt cenas',
+    apiKeyRequired: 'Nepieciešama API atslēga',
+    updateWithCache: 'Atjaunināt cenas ar kešatmiņu',
+    setApiKeyFirst: 'Vispirms ievadi API atslēgu',
+    forceRefresh: 'Piespiedu atjaunināšana',
+    forceRefreshTitle: 'Ignorēt kešatmiņu un tērēt īsto API limitu',
+    languageLabel: 'Mainīt valodu',
+    csvTitle: 'CSV lauku ceļvedis',
+    csvIntro: 'Pārliecinies, ka CSV failā ir vismaz šīs kolonnas. Secība nav svarīga:',
+    csvRows: {
+      date: 'Datums (piem., 2025/01/01)',
+      type: 'Tips (Pirkums / Pārdošana)',
+      symbol: 'Simbols (piem., SAF1R.RG vai AAPL)',
+      market: 'Tirgus (neobligāti, noder manuāliem ierakstiem)',
+      quantity: 'Daudzums',
+      price: 'Cena par vienību (sākotnējā valūta)',
+      amount: 'Kopējā summa (sākotnējā valūta)',
+      pnl: 'P&L (obligāti pārdošanā, sākotnējā valūta)'
+    },
+    csvNote1: '* Piezīme 1: Sešciparu simboli, kas sākas ar 6 vai 0, tiek automātiski atpazīti kā Ķīnas A akcijas (.SS / .SZ).',
+    csvNote2: '* Piezīme 2: Citos tirgos vienkārši pievieno sufiksu tieši simbolam, piemēram, .TW vai .HK.',
+    forceRefreshConfirm: 'Vai piespiedu kārtā atjaunināt? Tas ignorēs 24 stundu kešatmiņu un patērēs īsto API limitu.'
+  },
+  summary: {
+    totalRealized: 'Kopējais realizētais P&L (pārrēķināts)',
+    totalUnrealized: 'Kopējais nerealizētais P&L (pārrēķināts)',
+    totalValue: 'Pašreizējā portfeļa vērtība (pārrēķināta)',
+    holdingCount: 'Atvērtās pozīcijas',
+    holdingUnit: 'pozīcijas'
+  },
+  charts: {
+    trendTitle: 'Kumulatīvo izmaksu tendence',
+    saveImage: 'Saglabāt grafiku kā attēlu',
+    noTrend: 'Vēl nav pietiekami daudz vēstures, lai uzzīmētu tendenci.',
+    realizedTitle: 'Realizētais P&L pa vērtspapīriem (pārdots par agru / labs exit)',
+    distributionTitle: 'Portfeļa vērtības sadalījums (top 10)',
+    convertedNote: 'Rādīts pēc pārrēķina uz {{currency}}',
+    noPnlData: 'P&L datu vēl nav.',
+    noHoldings: 'Šobrīd nav atvērtu pozīciju.',
+    legendConverted: '{{label}} (pārrēķināts)',
+    costSeries: 'Kumulatīvās izmaksas',
+    realizedSeries: 'Kumulatīvais realizētais P&L',
+    ifSoldSeries: 'Ja pārdotu šodien',
+    actualSeries: 'Faktiski realizēts',
+    others: 'Citi'
+  },
+  table: {
+    title: 'Darījumu vēsture pa simboliem',
+    subtitle: 'Atver rindu, lai redzētu pirkumu un pārdošanu detaļas. Summas joprojām tiek rādītas tirgus sākotnējā valūtā.',
+    columns: {
+      symbol: 'Simbols / nosaukums (tirgus · valūta)',
+      holdingQty: 'Pašreizējais daudzums',
+      currentValue: 'Pēdējā cena / tirgus vērtība',
+      unrealized: 'Nerealizētais P&L',
+      realized: 'Realizētais P&L',
+      ifSoldToday: 'Ja pārdotu šodien',
+      date: 'Datums',
+      type: 'Tips',
+      quantity: 'Daudzums',
+      price: 'Cena',
+      amount: 'Summa',
+      pnl: 'P&L',
+      actions: 'Darbības'
+    },
+    manualBadge: 'Manuāli',
+    manualUpdatedAt: 'Manuāli atjaunināts: {{value}}',
+    apiUpdatedAt: 'API pēdējoreiz atjaunināts: {{value}}',
+    notUpdatedYet: 'Vēl nav atjaunināts',
+    manualNamePlaceholder: 'Manuāls nosaukums',
+    currentPricePlaceholder: 'Cena',
+    hedgeSuccess: 'Agrāka iziešana izrādījās labākais gājiens šoreiz ({{value}})',
+    soldTooEarly: 'Pārdevi mazliet par agru un atstāji {{value}} uz galda',
+    tradeDetails: 'Darījuma detaļas',
+    atPrice: '@ {{price}}',
+    quantityAtPrice: '{{quantity}} akcijas @ {{price}}',
+    mobileHoldingQty: 'Pozīcija',
+    mobileUnrealized: 'Nerealizēts',
+    mobileRealized: 'Realizēts'
+  },
+  manager: {
+    title: 'Iestatījumi un darījumu žurnāls',
+    clearAndLoadDemo: 'Notīrīt un ielādēt demo',
+    apiKeyTitle: 'yfapi.net API atslēga',
+    getFreeApiKey: 'Saņem bez maksas',
+    apiKeyPlaceholder: 'Ielīmē savu x-api-key šeit (piem., A2sD8...)',
+    saveApiKey: 'Saglabāt API atslēgu',
+    baseCurrencyTitle: 'Kopsavilkuma karšu bāzes valūta',
+    baseCurrencyHelp: '* Visi ārvalstu valūtas aktīvi tiek pārrēķināti šajā bāzes valūtā ar live-FX, lai augšējās kopsavilkuma kartes varētu visu korekti saskaitīt.',
+    hideZeroHolding: 'Paslēpt pilnībā slēgtās pozīcijas',
+    manualRecordTitle: 'Pievienot darījumu manuāli',
+    fields: {
+      date: 'Datums',
+      type: 'Tips',
+      market: 'Tirgus',
+      symbol: 'Simbols',
+      quantity: 'Daudzums',
+      price: 'Cena par vienību',
+      amount: 'Kopējā summa',
+      pnl: 'Realizētais P&L (tikai pārdošanā)'
+    },
+    placeholders: {
+      symbol: 'Piem., SAF1R.RG',
+      quantity: 'Akciju skaits',
+      price: 'Cena par akciju',
+      amount: 'Šī tirgus valūtā',
+      pnl: 'Neobligāti'
+    },
+    saveChanges: 'Saglabāt izmaiņas',
+    addRecord: 'Pievienot',
+    noRecords: 'Darījumu vēl nav.'
+  },
+  notice: {
+    title: 'Laipni lūdzam Trade Lens',
+    body: 'Trade Lens ir atvērtā koda rīks investoriem, kas pārveido brokera CSV failus izmaksu tendencēs, P&L skatā un skaidrākā portfeļa pārskatā.',
+    privacy: 'Privātums pirmajā vietā: viss paliek tikai tavā pārlūkā (IndexedDB). Nekas netiek sūtīts uz serveri.',
+    apiKey: 'API atslēga tiek izmantota tikai cenu saņemšanai no yfapi.net un arī tiek glabāta lokāli.',
+    sourceCode: 'Atvērtais kods: apskati kodu un piedalies',
+    dismiss: 'Nerādīt vēlreiz'
+  },
+  messages: {
+    apiKeySaved: 'API atslēga saglabāta.',
+    manualStockSaved: '{{symbol}} atjaunināts manuāli.',
+    needApiKey: 'Pirms cenu atjaunināšanas ievadi yfapi.net API atslēgu iestatījumu panelī.',
+    cacheFresh: 'Cenas un valūtu kursi tika atjaunināti pēdējo 24 stundu laikā, tāpēc lietotne izmantoja lokālo kešatmiņu, lai taupītu limitu.',
+    updateSuccess: '{{count}} cenas un valūtu kursi tika atjaunināti.',
+    fetchFailed: 'Neizdevās ielādēt: {{message}}',
+    baseCurrencyChanged: 'Bāzes valūta nomainīta uz {{currency}}. Tiek atjaunināti valūtu kursi...',
+    recordUpdated: 'Darījuma ieraksts tika atjaunināts.',
+    dataCleared: 'Dati tika notīrīti un demo kopums ielādēts no jauna.',
+    clearConfirm: 'Vai notīrīt visus datus un ielādēt demo no jauna? To nevar atsaukt.',
+    backupConfirm: 'Vai pirms notīrīšanas vēlies eksportēt pašreizējos datus kā CSV rezerves kopiju?'
+  },
+  data: {
+    unknownSymbol: 'Nezināms simbols ({{symbol}})',
+    unknown: 'Nezināms'
+  }
+});
+
+const ltLT = mergeLocale(enUS, {
+  common: {
+    language: 'Kalba',
+    close: 'Uždaryti',
+    cancel: 'Atšaukti',
+    save: 'Išsaugoti',
+    edit: 'Redaguoti',
+    delete: 'Ištrinti',
+    importCsv: 'Importuoti CSV',
+    exportCsv: 'Eksportuoti CSV'
+  },
+  currencies: {
+    TWD: 'Naujasis Taivano doleris (TWD)',
+    CNY: 'Kinijos juanis (CNY)',
+    HKD: 'Honkongo doleris (HKD)',
+    USD: 'JAV doleris (USD)',
+    JPY: 'Japonijos jena (JPY)',
+    EUR: 'Euras (EUR)'
+  },
+  markets: {
+    all: 'Visi',
+    chinaA: 'Kinijos A akcijos',
+    hongKong: 'Honkongas',
+    taiwan: 'Taivanas',
+    japan: 'Japonija',
+    us: 'JAV',
+    other: 'Kita',
+    unknown: 'Nežinoma'
+  },
+  tradeTypes: {
+    buy: 'Pirkimas',
+    sell: 'Pardavimas'
+  },
+  timeRanges: {
+    oneWeek: '1 sav.',
+    oneMonth: '1 mėn.',
+    threeMonths: '3 mėn.',
+    halfYear: '6 mėn.',
+    ytd: 'Nuo metų pradžios',
+    oneYear: '1 metai',
+    fiveYears: '5 metai',
+    all: 'Visi'
+  },
+  app: {
+    loadingLocalData: 'Kraunami vietiniai IndexedDB duomenys...',
+    generatingImage: 'Generuojamas paveikslėlis...',
+    imageExportSuccess: 'Paveikslėlis sėkmingai eksportuotas.',
+    imageExportFail: 'Paveikslėlio eksportuoti nepavyko.',
+    noDataToExport: 'Šiuo metu nėra duomenų eksportui.',
+    exportFilenamePrefix: 'trade_records'
+  },
+  header: {
+    title: 'Pasaulinė portfelio suvestinė',
+    demoDescription: 'Dabar matai sutrumpintą demonstracinį rinkinį. Importuok pilną CSV, kad matytum visą vaizdą.',
+    recordsLoaded: 'Įkelta ir išanalizuota {{count}} sandorių.',
+    lastUpdated: 'Paskutinį kartą atnaujinta: {{value}}',
+    switchToLight: 'Perjungti į šviesią temą',
+    switchToDark: 'Perjungti į tamsią temą',
+    settingsRecords: 'Nustatymai ir sandoriai',
+    updatePrices: 'Atnaujinti kainas',
+    apiKeyRequired: 'Reikalingas API raktas',
+    updateWithCache: 'Atnaujinti kainas naudojant podėlį',
+    setApiKeyFirst: 'Pirmiausia įvesk API raktą',
+    forceRefresh: 'Priverstinis atnaujinimas',
+    forceRefreshTitle: 'Ignoruoti podėlį ir naudoti tikrą API limitą',
+    languageLabel: 'Keisti kalbą',
+    csvTitle: 'CSV laukų gidas',
+    csvIntro: 'Įsitikink, kad CSV turi bent šiuos stulpelius. Eiliškumas nesvarbus:',
+    csvRows: {
+      date: 'Data (pvz. 2025/01/01)',
+      type: 'Tipas (Pirkimas / Pardavimas)',
+      symbol: 'Simbolis (pvz. KNF1L.VS arba AAPL)',
+      market: 'Rinka (nebūtina, naudinga rankiniams įrašams)',
+      quantity: 'Kiekis',
+      price: 'Vieneto kaina (pradinė valiuta)',
+      amount: 'Bendra suma (pradinė valiuta)',
+      pnl: 'P&L (privaloma pardavimo metu, pradinė valiuta)'
+    },
+    csvNote1: '* Pastaba 1: Šešių skaitmenų simboliai, prasidedantys 6 arba 0, automatiškai atpažįstami kaip Kinijos A akcijos (.SS / .SZ).',
+    csvNote2: '* Pastaba 2: Kitoms rinkoms tiesiog pridėk galūnę prie simbolio, pvz. .TW arba .HK.',
+    forceRefreshConfirm: 'Ar priverstinai atnaujinti? Tai ignoruos 24 valandų podėlį ir sunaudos tikrą API limitą.'
+  },
+  summary: {
+    totalRealized: 'Bendras realizuotas P&L (perskaičiuotas)',
+    totalUnrealized: 'Bendras nerealizuotas P&L (perskaičiuotas)',
+    totalValue: 'Dabartinė portfelio vertė (perskaičiuota)',
+    holdingCount: 'Atidarytos pozicijos',
+    holdingUnit: 'pozicijos'
+  },
+  charts: {
+    trendTitle: 'Kaupiamoji sąnaudų kreivė',
+    saveImage: 'Išsaugoti grafiką kaip paveikslėlį',
+    noTrend: 'Dar nepakanka istorijos, kad būtų galima nubraižyti tendenciją.',
+    realizedTitle: 'Realizuotas P&L pagal poziciją (parduota per anksti / tvarkingas exit)',
+    distributionTitle: 'Portfelio vertės pasiskirstymas (top 10)',
+    convertedNote: 'Rodoma perskaičiavus į {{currency}}',
+    noPnlData: 'Kol kas nėra P&L duomenų.',
+    noHoldings: 'Šiuo metu nėra atidarytų pozicijų.',
+    legendConverted: '{{label}} (perskaičiuota)',
+    costSeries: 'Kaupiamoji savikaina',
+    realizedSeries: 'Kaupiamasis realizuotas P&L',
+    ifSoldSeries: 'Jei parduotum šiandien',
+    actualSeries: 'Faktiškai realizuota',
+    others: 'Kita'
+  },
+  table: {
+    title: 'Sandorių istorija pagal simbolį',
+    subtitle: 'Atverk eilutę, kad pamatytum pirkimų ir pardavimų detales. Sumos vis dar rodomos originalia rinkos valiuta.',
+    columns: {
+      symbol: 'Simbolis / pavadinimas (rinka · valiuta)',
+      holdingQty: 'Dabartinis kiekis',
+      currentValue: 'Paskutinė kaina / rinkos vertė',
+      unrealized: 'Nerealizuotas P&L',
+      realized: 'Realizuotas P&L',
+      ifSoldToday: 'Jei parduotum šiandien',
+      date: 'Data',
+      type: 'Tipas',
+      quantity: 'Kiekis',
+      price: 'Kaina',
+      amount: 'Suma',
+      pnl: 'P&L',
+      actions: 'Veiksmai'
+    },
+    manualBadge: 'Rankinis',
+    manualUpdatedAt: 'Rankiniu būdu atnaujinta: {{value}}',
+    apiUpdatedAt: 'API paskutinį kartą atnaujinta: {{value}}',
+    notUpdatedYet: 'Dar neatnaujinta',
+    manualNamePlaceholder: 'Rankinis pavadinimas',
+    currentPricePlaceholder: 'Kaina',
+    hedgeSuccess: 'Pasirodo, šį kartą išėjimas anksčiau buvo geresnis ėjimas ({{value}})',
+    soldTooEarly: 'Pardavei kiek per anksti ir palikai {{value}} ant stalo',
+    tradeDetails: 'Sandorio detalės',
+    atPrice: '@ {{price}}',
+    quantityAtPrice: '{{quantity}} akcijos @ {{price}}',
+    mobileHoldingQty: 'Pozicija',
+    mobileUnrealized: 'Nerealizuota',
+    mobileRealized: 'Realizuota'
+  },
+  manager: {
+    title: 'Nustatymai ir sandorių žurnalas',
+    clearAndLoadDemo: 'Išvalyti ir įkelti demo',
+    apiKeyTitle: 'yfapi.net API raktas',
+    getFreeApiKey: 'Gauti nemokamai',
+    apiKeyPlaceholder: 'Įklijuok savo x-api-key čia (pvz. A2sD8...)',
+    saveApiKey: 'Išsaugoti API raktą',
+    baseCurrencyTitle: 'Suvestinės kortelių bazinė valiuta',
+    baseCurrencyHelp: '* Visi užsienio valiuta denominuoti aktyvai perskaičiuojami į šią bazinę valiutą naudojant live-FX, kad viršutinės kortelės galėtų viską tvarkingai susumuoti.',
+    hideZeroHolding: 'Slėpti visiškai uždarytas pozicijas',
+    manualRecordTitle: 'Pridėti sandorį ranka',
+    fields: {
+      date: 'Data',
+      type: 'Tipas',
+      market: 'Rinka',
+      symbol: 'Simbolis',
+      quantity: 'Kiekis',
+      price: 'Vieneto kaina',
+      amount: 'Bendra suma',
+      pnl: 'Realizuotas P&L (tik pardavimo metu)'
+    },
+    placeholders: {
+      symbol: 'Pvz. KNF1L.VS',
+      quantity: 'Akcijų skaičius',
+      price: 'Kaina už akciją',
+      amount: 'Tos rinkos valiuta',
+      pnl: 'Nebūtina'
+    },
+    saveChanges: 'Išsaugoti pakeitimus',
+    addRecord: 'Pridėti',
+    noRecords: 'Sandorių dar nėra.'
+  },
+  notice: {
+    title: 'Sveiki atvykę į Trade Lens',
+    body: 'Trade Lens yra atvirojo kodo įrankis investuotojams, kuris brokerio CSV paverčia sąnaudų kreivėmis, P&L vaizdais ir aiškesne portfelio apžvalga.',
+    privacy: 'Privatumas pirmiausia: viskas lieka tik tavo naršyklėje (IndexedDB). Nieko nesiunčiame į serverį.',
+    apiKey: 'API raktas naudojamas tik kainoms gauti iš yfapi.net ir taip pat saugomas lokaliai.',
+    sourceCode: 'Atvirasis kodas: peržiūrėk kodą ir prisidėk',
+    dismiss: 'Daugiau nerodyti'
+  },
+  messages: {
+    apiKeySaved: 'API raktas išsaugotas.',
+    manualStockSaved: '{{symbol}} atnaujintas rankiniu būdu.',
+    needApiKey: 'Prieš atnaujindamas kainas įvesk yfapi.net API raktą nustatymų skydelyje.',
+    cacheFresh: 'Kainos ir valiutų kursai jau buvo atnaujinti per paskutines 24 valandas, todėl programa panaudojo vietinį podėlį, kad taupytų limitą.',
+    updateSuccess: 'Atnaujinta {{count}} kainų ir valiutų kursų.',
+    fetchFailed: 'Nepavyko gauti: {{message}}',
+    baseCurrencyChanged: 'Bazinė valiuta pakeista į {{currency}}. Dabar atnaujinami valiutų kursai...',
+    recordUpdated: 'Sandorio įrašas atnaujintas.',
+    dataCleared: 'Duomenys išvalyti, demo rinkinys įkeltas iš naujo.',
+    clearConfirm: 'Ar išvalyti visus duomenis ir iš naujo įkelti demo? Šio veiksmo atšaukti negalima.',
+    backupConfirm: 'Ar prieš išvalydamas nori eksportuoti dabartinius duomenis kaip CSV atsarginę kopiją?'
+  },
+  data: {
+    unknownSymbol: 'Nežinomas simbolis ({{symbol}})',
+    unknown: 'Nežinoma'
+  }
+});
+
+const filPH = mergeLocale(enUS, {
+  common: {
+    language: 'Wika',
+    close: 'Isara',
+    cancel: 'Kanselahin',
+    save: 'I-save',
+    edit: 'I-edit',
+    delete: 'Burahin',
+    importCsv: 'I-import ang CSV',
+    exportCsv: 'I-export ang CSV'
+  },
+  currencies: {
+    TWD: 'Bagong Taiwan dollar (TWD)',
+    CNY: 'Chinese yuan (CNY)',
+    HKD: 'Hong Kong dollar (HKD)',
+    USD: 'US dollar (USD)',
+    JPY: 'Japanese yen (JPY)',
+    PHP: 'Philippine peso (PHP)'
+  },
+  markets: {
+    all: 'Lahat',
+    chinaA: 'China A-shares',
+    hongKong: 'Hong Kong',
+    taiwan: 'Taiwan',
+    japan: 'Japan',
+    us: 'US',
+    other: 'Iba pa',
+    unknown: 'Hindi alam'
+  },
+  tradeTypes: {
+    buy: 'Bili',
+    sell: 'Benta'
+  },
+  timeRanges: {
+    oneWeek: '1 linggo',
+    oneMonth: '1 buwan',
+    threeMonths: '3 buwan',
+    halfYear: '6 buwan',
+    ytd: 'YTD',
+    oneYear: '1 taon',
+    fiveYears: '5 taon',
+    all: 'Lahat'
+  },
+  app: {
+    loadingLocalData: 'Naglo-load ng local IndexedDB data...',
+    generatingImage: 'Gumagawa ng image...',
+    imageExportSuccess: 'Tagumpay ang pag-export ng image.',
+    imageExportFail: 'Hindi na-export ang image.',
+    noDataToExport: 'Walang data na puwedeng i-export sa ngayon.',
+    exportFilenamePrefix: 'trade_records'
+  },
+  header: {
+    title: 'Global portfolio dashboard',
+    demoDescription: 'Trimmed demo data lang ang nakikita mo ngayon. I-import ang buong CSV para makita ang buong picture.',
+    recordsLoaded: '{{count}} trade records ang na-load at na-analyze.',
+    lastUpdated: 'Huling update: {{value}}',
+    switchToLight: 'Lumipat sa light mode',
+    switchToDark: 'Lumipat sa dark mode',
+    settingsRecords: 'Settings at trades',
+    updatePrices: 'I-update ang prices',
+    apiKeyRequired: 'Kailangan ng API key',
+    updateWithCache: 'I-update ang live prices gamit ang cache',
+    setApiKeyFirst: 'Maglagay muna ng API key',
+    forceRefresh: 'Force refresh',
+    forceRefreshTitle: 'Laktawan ang cache at gumamit ng totoong API quota',
+    languageLabel: 'Palitan ang wika',
+    csvTitle: 'Gabay sa CSV fields',
+    csvIntro: 'Siguraduhin na may kahit mga field na ito ang CSV mo. Hindi mahalaga ang order:',
+    csvRows: {
+      date: 'Petsa (hal. 2025/01/01)',
+      type: 'Uri (Bili / Benta)',
+      symbol: 'Symbol (hal. JFC.PS o AAPL)',
+      market: 'Market (optional, useful sa manual entries)',
+      quantity: 'Dami',
+      price: 'Presyo kada unit (original currency)',
+      amount: 'Kabuuang halaga (original currency)',
+      pnl: 'P&L (required sa benta, original currency)'
+    },
+    csvNote1: '* Note 1: Ang 6-digit na symbols na nagsisimula sa 6 o 0 ay awtomatikong tatratuhing China A-shares (.SS / .SZ).',
+    csvNote2: '* Note 2: Para sa ibang markets, idagdag lang ang suffix direkta sa symbol, gaya ng .TW o .HK.',
+    forceRefreshConfirm: 'I-force refresh ba? Ibe-bypass nito ang 24-hour cache at gagamit ng totoong API quota.'
+  },
+  summary: {
+    totalRealized: 'Kabuuang realized P&L (converted)',
+    totalUnrealized: 'Kabuuang unrealized P&L (converted)',
+    totalValue: 'Kasalukuyang halaga ng holdings (converted)',
+    holdingCount: 'Bukas na holdings',
+    holdingUnit: 'holdings'
+  },
+  charts: {
+    trendTitle: 'Cumulative cost trend',
+    saveImage: 'I-save ang chart bilang image',
+    noTrend: 'Kulang pa ang trade history para makabuo ng trend.',
+    realizedTitle: 'Realized P&L per stock (nauna ang benta / maayos ang exit)',
+    distributionTitle: 'Distribusyon ng holding value (top 10)',
+    convertedNote: 'Lahat ay naka-convert sa {{currency}}',
+    noPnlData: 'Wala pang P&L data.',
+    noHoldings: 'Wala kang bukas na holdings sa ngayon.',
+    legendConverted: '{{label}} (converted)',
+    costSeries: 'Cumulative cost',
+    realizedSeries: 'Cumulative realized P&L',
+    ifSoldSeries: 'Kung ibebenta ngayon',
+    actualSeries: 'Talagang realized',
+    others: 'Iba pa'
+  },
+  table: {
+    title: 'Trade history per stock',
+    subtitle: 'Buksan ang row para makita ang detalye ng bili at benta. Nananatili sa original market currency ang mga halaga.',
+    columns: {
+      symbol: 'Symbol / pangalan (market · currency)',
+      holdingQty: 'Kasalukuyang dami',
+      currentValue: 'Pinakahuling presyo / market value',
+      unrealized: 'Unrealized P&L',
+      realized: 'Realized P&L',
+      ifSoldToday: 'Kung ibebenta ngayon',
+      date: 'Petsa',
+      type: 'Uri',
+      quantity: 'Dami',
+      price: 'Presyo',
+      amount: 'Halaga',
+      pnl: 'P&L',
+      actions: 'Mga aksyon'
+    },
+    manualBadge: 'Manual',
+    manualUpdatedAt: 'Manual na update: {{value}}',
+    apiUpdatedAt: 'Huling API update: {{value}}',
+    notUpdatedYet: 'Hindi pa na-update',
+    manualNamePlaceholder: 'Manual na pangalan',
+    currentPricePlaceholder: 'Presyo',
+    hedgeSuccess: 'Mas okay pala ang maagang labas sa pagkakataong ito ({{value}})',
+    soldTooEarly: 'Medyo napaaga ang benta at naiwan ang {{value}} sa mesa',
+    tradeDetails: 'Detalye ng trade',
+    atPrice: '@ {{price}}',
+    quantityAtPrice: '{{quantity}} shares @ {{price}}',
+    mobileHoldingQty: 'Holding',
+    mobileUnrealized: 'Unrealized',
+    mobileRealized: 'Realized'
+  },
+  manager: {
+    title: 'Settings at trade log',
+    clearAndLoadDemo: 'Burahin at i-load ang demo data',
+    apiKeyTitle: 'yfapi.net API key',
+    getFreeApiKey: 'Kumuha nang libre',
+    apiKeyPlaceholder: 'I-paste ang x-api-key mo dito (hal. A2sD8...)',
+    saveApiKey: 'I-save ang API key',
+    baseCurrencyTitle: 'Base currency ng summary cards',
+    baseCurrencyHelp: '* Ang lahat ng assets na nasa foreign currency ay iko-convert sa base currency na ito gamit ang live FX para maayos na ma-sum ang nasa taas na summary cards.',
+    hideZeroHolding: 'Itago ang mga position na fully closed na',
+    manualRecordTitle: 'Magdagdag ng manual trade',
+    fields: {
+      date: 'Petsa',
+      type: 'Uri',
+      market: 'Market',
+      symbol: 'Symbol',
+      quantity: 'Dami',
+      price: 'Presyo kada unit',
+      amount: 'Kabuuang halaga',
+      pnl: 'Realized P&L (sa benta lang)'
+    },
+    placeholders: {
+      symbol: 'Hal. JFC.PS',
+      quantity: 'Bilang ng shares',
+      price: 'Presyo kada share',
+      amount: 'Sa currency ng market na iyon',
+      pnl: 'Optional'
+    },
+    saveChanges: 'I-save ang mga pagbabago',
+    addRecord: 'Idagdag',
+    noRecords: 'Wala pang trade records.'
+  },
+  notice: {
+    title: 'Welcome sa Trade Lens',
+    body: 'Ang Trade Lens ay isang open-source tool para sa investors na ginagawang mas madaling basahin ang broker CSV sa anyo ng cost trends, P&L views, at portfolio breakdown.',
+    privacy: 'Privacy muna: lahat ng data ay nananatili lang sa browser mo (IndexedDB). Walang ipinapadala sa server.',
+    apiKey: 'Ginagamit lang ang API key para kumuha ng prices mula sa yfapi.net at nananatili rin ito sa local mo.',
+    sourceCode: 'Open source: silipin ang code at makisali',
+    dismiss: 'Huwag nang ipakita ulit'
+  },
+  messages: {
+    apiKeySaved: 'Na-save na ang API key.',
+    manualStockSaved: 'Na-update nang manual ang {{symbol}}.',
+    needApiKey: 'Ilagay muna ang yfapi.net API key sa settings panel bago mag-update ng prices.',
+    cacheFresh: 'Na-update na ang prices at FX rates sa loob ng huling 24 oras, kaya local cache ang ginamit ng app para makatipid sa quota.',
+    updateSuccess: '{{count}} prices at FX rates ang na-update.',
+    fetchFailed: 'Hindi nakuha: {{message}}',
+    baseCurrencyChanged: 'Pinalitan ang base currency sa {{currency}}. Ina-update na ang FX rates...',
+    recordUpdated: 'Na-update ang trade record.',
+    dataCleared: 'Na-clear ang data at na-load muli ang demo set.',
+    clearConfirm: 'Buburahin ba ang lahat ng data at ilo-load muli ang demo? Hindi na ito mababawi.',
+    backupConfirm: 'Gusto mo bang i-export muna bilang CSV backup ang current data bago i-clear?'
+  },
+  data: {
+    unknownSymbol: 'Hindi kilalang symbol ({{symbol}})',
+    unknown: 'Hindi alam'
+  }
+});
+
+const urPK = mergeLocale(enUS, {
+  common: {
+    language: 'زبان',
+    close: 'بند کریں',
+    cancel: 'منسوخ کریں',
+    save: 'محفوظ کریں',
+    edit: 'ترمیم کریں',
+    delete: 'حذف کریں',
+    importCsv: 'CSV درآمد کریں',
+    exportCsv: 'CSV برآمد کریں'
+  },
+  currencies: {
+    TWD: 'نیا تائیوانی ڈالر (TWD)',
+    CNY: 'چینی یوآن (CNY)',
+    HKD: 'ہانگ کانگ ڈالر (HKD)',
+    USD: 'امریکی ڈالر (USD)',
+    JPY: 'جاپانی ین (JPY)',
+    PKR: 'پاکستانی روپیہ (PKR)'
+  },
+  markets: {
+    all: 'سب',
+    chinaA: 'چین اے شیئرز',
+    hongKong: 'ہانگ کانگ',
+    taiwan: 'تائیوان',
+    japan: 'جاپان',
+    us: 'امریکہ',
+    other: 'دیگر',
+    unknown: 'نامعلوم'
+  },
+  tradeTypes: {
+    buy: 'خرید',
+    sell: 'فروخت'
+  },
+  timeRanges: {
+    oneWeek: '1 ہفتہ',
+    oneMonth: '1 ماہ',
+    threeMonths: '3 ماہ',
+    halfYear: '6 ماہ',
+    ytd: 'سال تا تاریخ',
+    oneYear: '1 سال',
+    fiveYears: '5 سال',
+    all: 'سب'
+  },
+  app: {
+    loadingLocalData: 'لوکل IndexedDB ڈیٹا لوڈ ہو رہا ہے...',
+    generatingImage: 'تصویر تیار کی جا رہی ہے...',
+    imageExportSuccess: 'تصویر کامیابی سے ایکسپورٹ ہو گئی۔',
+    imageExportFail: 'تصویر ایکسپورٹ نہیں ہو سکی۔',
+    noDataToExport: 'اس وقت ایکسپورٹ کرنے کے لیے کوئی ڈیٹا نہیں ہے۔',
+    exportFilenamePrefix: 'trade_records'
+  },
+  header: {
+    title: 'عالمی پورٹ فولیو ڈیش بورڈ',
+    demoDescription: 'اس وقت آپ کو مختصر demo data نظر آ رہا ہے۔ مکمل تصویر کے لیے پورا CSV درآمد کریں۔',
+    recordsLoaded: '{{count}} ٹریڈ ریکارڈز لوڈ اور تجزیہ کیے گئے۔',
+    lastUpdated: 'آخری اپڈیٹ: {{value}}',
+    switchToLight: 'لائٹ موڈ پر جائیں',
+    switchToDark: 'ڈارک موڈ پر جائیں',
+    settingsRecords: 'سیٹنگز اور ٹریڈز',
+    updatePrices: 'قیمتیں اپڈیٹ کریں',
+    apiKeyRequired: 'API key درکار ہے',
+    updateWithCache: 'cache کے ساتھ live prices اپڈیٹ کریں',
+    setApiKeyFirst: 'پہلے API key سیٹ کریں',
+    forceRefresh: 'فورس ریفریش',
+    forceRefreshTitle: 'cache چھوڑیں اور اصل API quota استعمال کریں',
+    languageLabel: 'زبان تبدیل کریں',
+    csvTitle: 'CSV فیلڈ گائیڈ',
+    csvIntro: 'یقین کر لیں کہ آپ کے CSV میں کم از کم یہ headings موجود ہیں۔ ترتیب اہم نہیں:',
+    csvRows: {
+      date: 'تاریخ (مثال: 2025/01/01)',
+      type: 'قسم (خرید / فروخت)',
+      symbol: 'سمبل (مثال: HBL.KA یا AAPL)',
+      market: 'مارکیٹ (اختیاری، manual entries کے لیے مفید)',
+      quantity: 'مقدار',
+      price: 'فی یونٹ قیمت (اصل کرنسی)',
+      amount: 'کل رقم (اصل کرنسی)',
+      pnl: 'P&L (فروخت پر لازمی، اصل کرنسی)'
+    },
+    csvNote1: '* نوٹ 1: 6 ہندسوں والے symbols جو 6 یا 0 سے شروع ہوں، خودکار طور پر China A-shares (.SS / .SZ) سمجھے جائیں گے۔',
+    csvNote2: '* نوٹ 2: دوسری مارکیٹس کے لیے suffix براہ راست symbol کے ساتھ لکھیں، جیسے .TW یا .HK۔',
+    forceRefreshConfirm: 'کیا فورس ریفریش کرنا ہے؟ اس سے 24 گھنٹے والی cache نظرانداز ہو جائے گی اور اصل API quota استعمال ہوگا۔'
+  },
+  summary: {
+    totalRealized: 'کل realised P&L (converted)',
+    totalUnrealized: 'کل unrealised P&L (converted)',
+    totalValue: 'موجودہ holdings value (converted)',
+    holdingCount: 'اوپن پوزیشنز',
+    holdingUnit: 'پوزیشنز'
+  },
+  charts: {
+    trendTitle: 'کُل لاگت کا رجحان',
+    saveImage: 'چارٹ کو تصویر کے طور پر محفوظ کریں',
+    noTrend: 'trend بنانے کے لیے ابھی trade history کافی نہیں ہے۔',
+    realizedTitle: 'ہر اسٹاک کا realised P&L (جلدی بیچ دیا / صاف exit)',
+    distributionTitle: 'holding value کی تقسیم (top 10)',
+    convertedNote: '{{currency}} میں convert کر کے دکھایا گیا ہے',
+    noPnlData: 'ابھی P&L ڈیٹا موجود نہیں۔',
+    noHoldings: 'اس وقت کوئی اوپن holdings نہیں ہیں۔',
+    legendConverted: '{{label}} (converted)',
+    costSeries: 'کُل لاگت',
+    realizedSeries: 'کُل realised P&L',
+    ifSoldSeries: 'اگر آج بیچیں',
+    actualSeries: 'حقیقی realised',
+    others: 'دیگر'
+  },
+  table: {
+    title: 'ہر اسٹاک کی trade history',
+    subtitle: 'row کھول کر خرید اور فروخت کی تفصیل دیکھیں۔ تمام رقوم مارکیٹ کی اصل کرنسی میں ہی رہیں گی۔',
+    columns: {
+      symbol: 'سمبل / نام (مارکیٹ · کرنسی)',
+      holdingQty: 'موجودہ مقدار',
+      currentValue: 'آخری قیمت / مارکیٹ ویلیو',
+      unrealized: 'unrealised P&L',
+      realized: 'realised P&L',
+      ifSoldToday: 'اگر آج بیچیں',
+      date: 'تاریخ',
+      type: 'قسم',
+      quantity: 'مقدار',
+      price: 'قیمت',
+      amount: 'رقم',
+      pnl: 'P&L',
+      actions: 'ایکشنز'
+    },
+    manualBadge: 'Manual',
+    manualUpdatedAt: 'manual update: {{value}}',
+    apiUpdatedAt: 'API آخری اپڈیٹ: {{value}}',
+    notUpdatedYet: 'ابھی اپڈیٹ نہیں ہوا',
+    manualNamePlaceholder: 'manual نام',
+    currentPricePlaceholder: 'قیمت',
+    hedgeSuccess: 'جلدی نکلنا اس بار بہتر فیصلہ نکلا ({{value}})',
+    soldTooEarly: 'آپ نے ذرا جلدی بیچ دیا اور {{value}} میز پر چھوڑ دیا',
+    tradeDetails: 'trade details',
+    atPrice: '@ {{price}}',
+    quantityAtPrice: '{{quantity}} shares @ {{price}}',
+    mobileHoldingQty: 'holding',
+    mobileUnrealized: 'unrealised',
+    mobileRealized: 'realised'
+  },
+  manager: {
+    title: 'سیٹنگز اور trade log',
+    clearAndLoadDemo: 'ڈیٹا صاف کریں اور demo لوڈ کریں',
+    apiKeyTitle: 'yfapi.net API key',
+    getFreeApiKey: 'مفت حاصل کریں',
+    apiKeyPlaceholder: 'اپنا x-api-key یہاں paste کریں (مثال: A2sD8...)',
+    saveApiKey: 'API key محفوظ کریں',
+    baseCurrencyTitle: 'summary cards کی base currency',
+    baseCurrencyHelp: '* تمام foreign currency assets کو live FX کے ذریعے اس base currency میں convert کیا جائے گا تاکہ اوپر والی summary cards سب کچھ درست جمع کر سکیں۔',
+    hideZeroHolding: 'مکمل بند پوزیشنز چھپائیں',
+    manualRecordTitle: 'manual trade شامل کریں',
+    fields: {
+      date: 'تاریخ',
+      type: 'قسم',
+      market: 'مارکیٹ',
+      symbol: 'سمبل',
+      quantity: 'مقدار',
+      price: 'فی یونٹ قیمت',
+      amount: 'کل رقم',
+      pnl: 'realised P&L (صرف فروخت پر)'
+    },
+    placeholders: {
+      symbol: 'مثال: HBL.KA',
+      quantity: 'شیئرز کی تعداد',
+      price: 'فی شیئر قیمت',
+      amount: 'اسی مارکیٹ کی کرنسی میں',
+      pnl: 'اختیاری'
+    },
+    saveChanges: 'تبدیلیاں محفوظ کریں',
+    addRecord: 'شامل کریں',
+    noRecords: 'ابھی کوئی trade records نہیں ہیں۔'
+  },
+  notice: {
+    title: 'Trade Lens میں خوش آمدید',
+    body: 'Trade Lens ایک open-source tool ہے جو broker CSV کو cost trend، P&L views اور زیادہ صاف portfolio snapshot میں بدل دیتا ہے۔',
+    privacy: 'privacy پہلے: تمام ڈیٹا صرف آپ کے browser میں رہتا ہے (IndexedDB)۔ کچھ بھی server پر نہیں بھیجا جاتا۔',
+    apiKey: 'API key صرف yfapi.net سے prices لینے کے لیے استعمال ہوتی ہے اور یہ بھی لوکل ہی رہتی ہے۔',
+    sourceCode: 'Open source: code دیکھیں اور حصہ ڈالیں',
+    dismiss: 'دوبارہ نہ دکھائیں'
+  },
+  messages: {
+    apiKeySaved: 'API key محفوظ ہو گئی۔',
+    manualStockSaved: '{{symbol}} کو manual طور پر اپڈیٹ کر دیا گیا۔',
+    needApiKey: 'prices اپڈیٹ کرنے سے پہلے settings panel میں yfapi.net API key درج کریں۔',
+    cacheFresh: 'prices اور FX rates پچھلے 24 گھنٹوں میں اپڈیٹ ہو چکے تھے، اس لیے quota بچانے کے لیے app نے local cache استعمال کی۔',
+    updateSuccess: '{{count}} prices اور FX rates اپڈیٹ کر دیے گئے۔',
+    fetchFailed: 'حاصل نہیں ہو سکا: {{message}}',
+    baseCurrencyChanged: 'base currency کو {{currency}} میں بدل دیا گیا ہے۔ FX rates اپڈیٹ ہو رہے ہیں...',
+    recordUpdated: 'trade record اپڈیٹ ہو گیا۔',
+    dataCleared: 'ڈیٹا صاف کر کے demo data دوبارہ لوڈ کر دیا گیا۔',
+    clearConfirm: 'کیا تمام ڈیٹا صاف کر کے demo دوبارہ لوڈ کرنا ہے؟ یہ عمل واپس نہیں ہو سکے گا۔',
+    backupConfirm: 'کیا صاف کرنے سے پہلے موجودہ ڈیٹا کو CSV backup کے طور پر برآمد کرنا چاہتے ہیں؟'
+  },
+  data: {
+    unknownSymbol: 'نامعلوم symbol ({{symbol}})',
+    unknown: 'نامعلوم'
+  }
+});
+
 export const resources = {
   'zh-TW': { translation: zhTW },
   'yue-Hant-HK': { translation: yueHantHK },
@@ -6400,21 +8437,35 @@ export const resources = {
   'en-CA': { translation: enCA },
   'en-AU': { translation: enAU },
   'en-GB': { translation: enGB },
+  'en-IE': { translation: enIE },
+  'en-NZ': { translation: enNZ },
   'en-SG': { translation: enSG },
+  'en-ZA': { translation: enZA },
   'ja-JP': { translation: jaJP },
   'ko-KR': { translation: koKR },
   'id-ID': { translation: idID },
   'fr-FR': { translation: frFR },
+  'fr-BE': { translation: frBE },
   'fr-CA': { translation: frCA },
+  'fr-CH': { translation: frCH },
   'de-DE': { translation: deDE },
+  'de-AT': { translation: deAT },
+  'de-CH': { translation: deCH },
   'it-IT': { translation: itIT },
+  'it-CH': { translation: itCH },
   'ms-MY': { translation: msMY },
   'nl-NL': { translation: nlNL },
+  'nl-BE': { translation: nlBE },
   'fa-IR': { translation: faIR },
   'he-IL': { translation: heIL },
   'es-419': { translation: es419 },
+  'es-AR': { translation: esAR },
+  'es-CL': { translation: esCL },
+  'es-CO': { translation: esCO },
   'es-MX': { translation: esMX },
+  'es-PE': { translation: esPE },
   'es-ES': { translation: esES },
+  'es-VE': { translation: esVE },
   'pt-BR': { translation: ptBR },
   'pt-PT': { translation: ptPT },
   'pl-PL': { translation: plPL },
@@ -6423,11 +8474,23 @@ export const resources = {
   'ru-RU': { translation: ruRU },
   'sv-SE': { translation: svSE },
   'cs-CZ': { translation: csCZ },
+  'et-EE': { translation: etEE },
+  'is-IS': { translation: isIS },
   'ro-RO': { translation: roRO },
   'hu-HU': { translation: huHU },
   'da-DK': { translation: daDK },
   'el-GR': { translation: elGR },
+  'lv-LV': { translation: lvLV },
+  'lt-LT': { translation: ltLT },
+  'nb-NO': { translation: nbNO },
+  'fi-FI': { translation: fiFI },
+  'fil-PH': { translation: filPH },
   'vi-VN': { translation: viVN },
   'th-TH': { translation: thTH },
-  'ar-SA': { translation: arSA }
+  'ar-SA': { translation: arSA },
+  'ar-EG': { translation: arEG },
+  'ar-AE': { translation: arAE },
+  'ar-KW': { translation: arKW },
+  'ar-QA': { translation: arQA },
+  'ur-PK': { translation: urPK }
 };

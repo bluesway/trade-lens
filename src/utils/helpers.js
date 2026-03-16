@@ -1,5 +1,5 @@
-import { BASE_CURRENCY_OPTIONS, getFormattingLocale } from '../locales/config';
-import { DB_NAME, DB_VERSION, STORE_NAME } from './constants';
+import { BASE_CURRENCY_OPTIONS, getFormattingLocale } from '../locales/config.js';
+import { DB_NAME, DB_VERSION, STORE_NAME } from './constants.js';
 
 const CRYPTO_DEFAULT_QUOTE_CURRENCY = 'USD';
 const CRYPTO_PAIR_REGEX = /^[A-Z0-9]{2,15}-[A-Z]{3,5}$/;
@@ -25,6 +25,7 @@ const MARKET_DEFINITIONS = {
   港股: {
     aliases: ['港股', '香港', 'hongkong', 'hk', 'hkex'],
     currency: 'HKD',
+    defaultSuffix: '.HK',
     suffixes: ['.HK'],
     translationKey: 'markets.hongKong'
   },
@@ -32,7 +33,7 @@ const MARKET_DEFINITIONS = {
     aliases: ['台股', '臺股', '台灣', '臺灣', 'taiwan', 'tw', 'twse', 'tpex'],
     currency: 'TWD',
     defaultSuffix: '.TW',
-    suffixes: ['.TW'],
+    suffixes: ['.TW', '.TWO'],
     translationKey: 'markets.taiwan'
   },
   日股: {
@@ -59,14 +60,14 @@ const MARKET_DEFINITIONS = {
     currency: 'AUD',
     defaultSuffix: '.AX',
     regionCode: 'AU',
-    suffixes: ['.AX']
+    suffixes: ['.AX', '.XA']
   },
   英股: {
     aliases: ['英股', '英國', '英国', 'uk', 'gb', 'greatbritain', 'unitedkingdom', 'lse', 'london'],
     currency: 'GBP',
     defaultSuffix: '.L',
     regionCode: 'GB',
-    suffixes: ['.L']
+    suffixes: ['.L', '.AQ', '.IL', '.XC']
   },
   新加坡股: {
     aliases: ['新加坡股', '新加坡', 'singapore', 'sg', 'sgx'],
@@ -248,7 +249,7 @@ const MARKET_DEFINITIONS = {
     currency: 'SAR',
     defaultSuffix: '.SR',
     regionCode: 'SA',
-    suffixes: ['.SR']
+    suffixes: ['.SR', '.SAU']
   },
   瑞士股: {
     aliases: ['瑞士股', '瑞士', 'switzerland', 'ch', 'six', 'swiss'],
@@ -285,12 +286,26 @@ const MARKET_DEFINITIONS = {
     regionCode: 'BE',
     suffixes: ['.BR']
   },
+  埃及股: {
+    aliases: ['埃及股', '埃及', 'egypt', 'eg', 'egx', 'cairo'],
+    currency: 'EGP',
+    defaultSuffix: '.CA',
+    regionCode: 'EG',
+    suffixes: ['.CA']
+  },
   愛爾蘭股: {
     aliases: ['愛爾蘭股', '爱尔兰股', '愛爾蘭', '爱尔兰', 'ireland', 'ie', 'dublin', 'ise'],
     currency: 'EUR',
     defaultSuffix: '.IR',
     regionCode: 'IE',
     suffixes: ['.IR']
+  },
+  巴基斯坦股: {
+    aliases: ['巴基斯坦股', '巴基斯坦', 'pakistan', 'pk', 'psx', 'karachi'],
+    currency: 'PKR',
+    defaultSuffix: '.KA',
+    regionCode: 'PK',
+    suffixes: ['.KA']
   },
   南非股: {
     aliases: ['南非股', '南非', 'southafrica', 'za', 'jse', 'johannesburg'],
@@ -305,6 +320,97 @@ const MARKET_DEFINITIONS = {
     defaultSuffix: '.BA',
     regionCode: 'AR',
     suffixes: ['.BA']
+  },
+  智利股: {
+    aliases: ['智利股', '智利', 'chile', 'cl', 'santiago', 'bcs', 'bolsadesantiago'],
+    currency: 'CLP',
+    defaultSuffix: '.SN',
+    regionCode: 'CL',
+    suffixes: ['.SN']
+  },
+  哥倫比亞股: {
+    aliases: ['哥倫比亞股', '哥伦比亚股', '哥倫比亞', '哥伦比亚', 'colombia', 'co', 'bvc', 'bogota'],
+    currency: 'COP',
+    defaultSuffix: '.CL',
+    regionCode: 'CO',
+    suffixes: ['.CL']
+  },
+  秘魯股: {
+    aliases: ['秘魯股', '秘鲁股', '秘魯', '秘鲁', 'peru', 'pe', 'bvl', 'lima'],
+    currency: 'USD',
+    defaultSuffix: '.LM',
+    regionCode: 'PE',
+    suffixes: ['.LM']
+  },
+  愛沙尼亞股: {
+    aliases: ['愛沙尼亞股', '爱沙尼亚股', '愛沙尼亞', '爱沙尼亚', 'estonia', 'ee', 'nasdaqtallinn', 'tallinn'],
+    currency: 'EUR',
+    defaultSuffix: '.TL',
+    regionCode: 'EE',
+    suffixes: ['.TL']
+  },
+  冰島股: {
+    aliases: ['冰島股', '冰岛股', '冰島', '冰岛', 'iceland', 'is', 'nasdaqiceland', 'reykjavik'],
+    currency: 'ISK',
+    defaultSuffix: '.IC',
+    regionCode: 'IS',
+    suffixes: ['.IC']
+  },
+  科威特股: {
+    aliases: ['科威特股', '科威特', 'kuwait', 'kw', 'boursakuwait'],
+    currency: 'KWF',
+    defaultSuffix: '.KW',
+    regionCode: 'KW',
+    suffixes: ['.KW']
+  },
+  拉脫維亞股: {
+    aliases: ['拉脫維亞股', '拉脱维亚股', '拉脫維亞', '拉脱维亚', 'latvia', 'lv', 'nasdaqriga', 'riga'],
+    currency: 'EUR',
+    defaultSuffix: '.RG',
+    regionCode: 'LV',
+    suffixes: ['.RG']
+  },
+  立陶宛股: {
+    aliases: ['立陶宛股', '立陶宛', 'lithuania', 'lt', 'nasdaqvilnius', 'vilnius'],
+    currency: 'EUR',
+    defaultSuffix: '.VS',
+    regionCode: 'LT',
+    suffixes: ['.VS']
+  },
+  紐西蘭股: {
+    aliases: ['紐西蘭股', '纽西兰股', '紐西蘭', '纽西兰', 'newzealand', 'nz', 'nzx', 'auckland'],
+    currency: 'NZD',
+    defaultSuffix: '.NZ',
+    regionCode: 'NZ',
+    suffixes: ['.NZ']
+  },
+  菲律賓股: {
+    aliases: ['菲律賓股', '菲律宾股', '菲律賓', '菲律宾', 'philippines', 'ph', 'pse', 'manila'],
+    currency: 'PHP',
+    defaultSuffix: '.PS',
+    regionCode: 'PH',
+    suffixes: ['.PS']
+  },
+  卡達股: {
+    aliases: ['卡達股', '卡塔尔股', '卡達', '卡塔尔', 'qatar', 'qa', 'qse', 'doha'],
+    currency: 'QAR',
+    defaultSuffix: '.QA',
+    regionCode: 'QA',
+    suffixes: ['.QA']
+  },
+  阿聯股: {
+    aliases: ['阿聯股', '阿联股', '阿聯酋股', '阿联酋股', '阿聯酋', '阿联酋', '阿拉伯聯合大公國', '阿拉伯联合大公国', '阿拉伯聯合酋長國', '阿拉伯联合酋长国', 'uae', 'unitedarabemirates', 'abudhabi', 'dubai', 'adx', 'dfm'],
+    currency: 'AED',
+    defaultSuffix: '.AE',
+    regionCode: 'AE',
+    suffixes: ['.AE', '.AD']
+  },
+  委內瑞拉股: {
+    aliases: ['委內瑞拉股', '委内瑞拉股', '委內瑞拉', '委内瑞拉', 'venezuela', 've', 'caracas', 'bvcaracas'],
+    currency: 'USD',
+    defaultSuffix: '.CR',
+    regionCode: 'VE',
+    suffixes: ['.CR']
   },
   虛擬幣: {
     aliases: ['虛擬幣', '虚拟币', '加密貨幣', '加密货币', 'crypto', 'cryptocurrency', 'digitalasset', 'digitalassets'],
@@ -406,9 +512,24 @@ export const MANUAL_MARKET_OPTIONS = [
   '挪威股',
   '芬蘭股',
   '比利時股',
+  '埃及股',
   '愛爾蘭股',
+  '巴基斯坦股',
   '南非股',
   '阿根廷股',
+  '智利股',
+  '哥倫比亞股',
+  '秘魯股',
+  '愛沙尼亞股',
+  '冰島股',
+  '科威特股',
+  '拉脫維亞股',
+  '立陶宛股',
+  '紐西蘭股',
+  '菲律賓股',
+  '卡達股',
+  '阿聯股',
+  '委內瑞拉股',
   '越股',
   '泰股',
   '沙股',
@@ -453,9 +574,24 @@ const MARKET_EXAMPLE_SYMBOLS = {
   挪威股: 'EQNR', // Equinor
   芬蘭股: 'KNEBV', // KONE
   比利時股: 'ABI', // AB InBev
+  埃及股: 'COMI', // Commercial International Bank
   愛爾蘭股: 'RYA', // Ryanair
+  巴基斯坦股: 'HBL', // Habib Bank
   南非股: 'NPN', // Naspers
   阿根廷股: 'GGAL', // Grupo Financiero Galicia
+  智利股: 'BSANTANDER', // Banco Santander Chile
+  哥倫比亞股: 'ECOPETROL', // Ecopetrol
+  秘魯股: 'MINSURI1', // Minsur
+  愛沙尼亞股: 'TAL1T', // Tallink Grupp
+  冰島股: 'ICEAIR', // Icelandair Group
+  科威特股: 'KFH', // Kuwait Finance House
+  拉脫維亞股: 'SAF1R', // SAF Tehnika
+  立陶宛股: 'KNF1L', // KN Energies
+  紐西蘭股: 'FPH', // Fisher & Paykel Healthcare
+  菲律賓股: 'JFC', // Jollibee Foods
+  卡達股: 'QNBK', // Qatar National Bank
+  阿聯股: 'EMAAR', // Emaar Properties
+  委內瑞拉股: 'BVCC', // Bolsa de Valores de Caracas
   越股: 'FPT', // FPT Corporation
   泰股: 'PTT', // PTT
   沙股: '2222', // Saudi Aramco
@@ -788,10 +924,6 @@ export const formatSymbol = (code, market) => {
     return normalizedCode;
   }
 
-  if (/^\d{6}$/.test(normalizedCode) && (normalizedCode.startsWith('6') || normalizedCode.startsWith('0'))) {
-    return normalizedCode.startsWith('6') ? `${normalizedCode}.SS` : `${normalizedCode}.SZ`;
-  }
-
   const normalizedMarket = normalizeMarket(market) || guessMarket(normalizedCode);
   const marketDefinition = getMarketDefinition(normalizedMarket);
 
@@ -799,8 +931,16 @@ export const formatSymbol = (code, market) => {
     return `${normalizedCode}-${marketDefinition?.defaultQuoteCurrency || CRYPTO_DEFAULT_QUOTE_CURRENCY}`;
   }
 
+  if (normalizedMarket === '陸股' && /^\d{6}$/.test(normalizedCode) && (normalizedCode.startsWith('6') || normalizedCode.startsWith('0'))) {
+    return normalizedCode.startsWith('6') ? `${normalizedCode}.SS` : `${normalizedCode}.SZ`;
+  }
+
   if (marketDefinition?.defaultSuffix) {
     return `${normalizedCode}${marketDefinition.defaultSuffix}`;
+  }
+
+  if (/^\d{6}$/.test(normalizedCode) && (normalizedCode.startsWith('6') || normalizedCode.startsWith('0'))) {
+    return normalizedCode.startsWith('6') ? `${normalizedCode}.SS` : `${normalizedCode}.SZ`;
   }
 
   return normalizedCode;
