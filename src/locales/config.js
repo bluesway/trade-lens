@@ -8,6 +8,7 @@ export const SUPPORTED_LOCALES = [
   { code: 'en-US', nativeLabel: 'English (US)', dir: 'ltr' },
   { code: 'en-GB', nativeLabel: 'English (UK)', dir: 'ltr' },
   { code: 'ja-JP', nativeLabel: '日本語', dir: 'ltr' },
+  { code: 'ko-KR', nativeLabel: '한국어', dir: 'ltr' },
   { code: 'ar-SA', nativeLabel: 'العربية', dir: 'rtl' }
 ];
 
@@ -49,6 +50,8 @@ const LOCALE_ALIASES = {
   'en-us': 'en-US',
   ja: 'ja-JP',
   'ja-jp': 'ja-JP',
+  ko: 'ko-KR',
+  'ko-kr': 'ko-KR',
   zh: 'zh-TW',
   'zh-cn': 'zh-CN',
   'zh-hans': 'zh-CN',

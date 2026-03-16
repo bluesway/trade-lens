@@ -1370,6 +1370,202 @@ const jaJP = {
   }
 };
 
+const koKR = {
+  common: {
+    language: '언어',
+    close: '닫기',
+    cancel: '취소',
+    save: '저장',
+    edit: '수정',
+    delete: '삭제',
+    importCsv: 'CSV 가져오기',
+    exportCsv: 'CSV 내보내기'
+  },
+  currencies: {
+    TWD: '대만 달러 (TWD)',
+    CNY: '중국 위안 (CNY)',
+    HKD: '홍콩 달러 (HKD)',
+    USD: '미국 달러 (USD)',
+    JPY: '일본 엔 (JPY)'
+  },
+  markets: {
+    all: '전체',
+    chinaA: '중국 A주',
+    hongKong: '홍콩주',
+    taiwan: '대만주',
+    japan: '일본주',
+    us: '미국주',
+    other: '기타',
+    unknown: '알 수 없음'
+  },
+  tradeTypes: {
+    buy: '매수',
+    sell: '매도'
+  },
+  timeRanges: {
+    oneWeek: '1주',
+    oneMonth: '1개월',
+    threeMonths: '3개월',
+    halfYear: '6개월',
+    ytd: 'YTD',
+    oneYear: '1년',
+    fiveYears: '5년',
+    all: '전체'
+  },
+  app: {
+    loadingLocalData: '로컬 IndexedDB 데이터를 불러오는 중...',
+    generatingImage: '이미지 생성 중...',
+    imageExportSuccess: '이미지 내보내기에 성공했습니다.',
+    imageExportFail: '이미지 내보내기에 실패했습니다.',
+    noDataToExport: '지금은 내보낼 데이터가 없습니다.',
+    exportFilenamePrefix: 'trade_records'
+  },
+  header: {
+    title: '글로벌 투자 포트폴리오 대시보드',
+    demoDescription: '지금은 예시 데이터 일부만 보여주고 있습니다. 전체 CSV를 가져오면 판이 제대로 보입니다.',
+    recordsLoaded: '거래 기록 {{count}}건을 불러와 분석했습니다.',
+    lastUpdated: '마지막 업데이트: {{value}}',
+    switchToLight: '라이트 모드로 전환',
+    switchToDark: '다크 모드로 전환',
+    settingsRecords: '설정 및 거래',
+    updatePrices: '시세 업데이트',
+    apiKeyRequired: 'API 키 필요',
+    updateWithCache: '실시간 시세 업데이트 (캐시 사용)',
+    setApiKeyFirst: '먼저 API 키를 설정하세요',
+    forceRefresh: '강제 새로고침',
+    forceRefreshTitle: '캐시를 무시하고 API 한도를 사용',
+    languageLabel: '언어 변경',
+    csvTitle: 'CSV 필드 안내',
+    csvIntro: 'CSV에는 최소한 아래 헤더가 들어 있어야 합니다. 순서는 상관없습니다.',
+    csvRows: {
+      date: '날짜 (예: 2025/01/01)',
+      type: '구분 (매수 / 매도)',
+      symbol: '종목 코드 (예: AAPL, TSLA)',
+      market: '시장 (선택 입력, 수동 추가 시 참고용)',
+      quantity: '수량',
+      price: '단가 (원통화)',
+      amount: '총금액 (원통화)',
+      pnl: '손익 (매도 시 필수, 원통화)'
+    },
+    csvNote1: '* 참고 1: 6자리 숫자이면서 6 또는 0으로 시작하는 코드는 중국 A주(.SS / .SZ)로 자동 인식합니다.',
+    csvNote2: '* 참고 2: 그 밖의 시장은 종목 코드 뒤에 .TW, .HK 같은 접미사를 직접 붙여 주세요.',
+    forceRefreshConfirm: '강제로 새로고침할까요? 24시간 캐시를 무시하고 실제 API 한도를 사용합니다.'
+  },
+  summary: {
+    totalRealized: '총 실현손익 (환산)',
+    totalUnrealized: '총 평가손익 (환산)',
+    totalValue: '현재 보유 평가금액 (환산)',
+    holdingCount: '보유 종목 수',
+    holdingUnit: '종목'
+  },
+  charts: {
+    trendTitle: '누적 투자 추이',
+    saveImage: '차트를 이미지로 저장',
+    noTrend: '아직 거래 기록이 부족해서 추이를 그릴 수 없습니다.',
+    realizedTitle: '종목별 실현손익 (익절 / 너무 일찍 턴 종목)',
+    distributionTitle: '보유 평가금액 분포 (상위 10종목)',
+    convertedNote: '{{currency}} 기준으로 환산해 표시',
+    noPnlData: '손익 데이터가 아직 없습니다.',
+    noHoldings: '지금은 보유 종목이 없습니다.',
+    legendConverted: '{{label}} (환산 후)',
+    costSeries: '누적 매입원가',
+    realizedSeries: '누적 실현손익',
+    ifSoldSeries: '오늘 판다고 가정하면',
+    actualSeries: '실제 실현손익',
+    others: '기타'
+  },
+  table: {
+    title: '종목별 거래 내역',
+    subtitle: '행을 열면 매수/매도 내역을 볼 수 있습니다. 금액은 각 시장의 원통화로 표시됩니다.',
+    columns: {
+      symbol: '종목 코드 / 이름 (시장 · 통화)',
+      holdingQty: '현재 보유 수량',
+      currentValue: '현재가 / 평가금액',
+      unrealized: '평가손익',
+      realized: '실현손익',
+      ifSoldToday: '오늘 판다고 가정',
+      date: '날짜',
+      type: '구분',
+      quantity: '수량',
+      price: '단가',
+      amount: '금액',
+      pnl: '손익',
+      actions: '작업'
+    },
+    manualBadge: '수동',
+    manualUpdatedAt: '수동 수정: {{value}}',
+    apiUpdatedAt: 'API 마지막 업데이트: {{value}}',
+    notUpdatedYet: '아직 업데이트되지 않음',
+    manualNamePlaceholder: '직접 입력한 종목명',
+    currentPricePlaceholder: '현재가',
+    hedgeSuccess: '먼저 판 게 신의 한 수 ({{value}})',
+    soldTooEarly: '너무 일찍 털었다 ({{value}})',
+    tradeDetails: '체결 내역',
+    atPrice: '@ {{price}}',
+    quantityAtPrice: '{{quantity}}주 @ {{price}}',
+    mobileHoldingQty: '보유 수량',
+    mobileUnrealized: '평가손익',
+    mobileRealized: '실현손익'
+  },
+  manager: {
+    title: '설정 및 거래 기록',
+    clearAndLoadDemo: '초기화 후 예시 데이터 불러오기',
+    apiKeyTitle: 'yfapi.net API 키 설정',
+    getFreeApiKey: '무료 발급받기',
+    apiKeyPlaceholder: 'x-api-key를 붙여 넣으세요 (예: A2sD8...)',
+    saveApiKey: '키 저장',
+    baseCurrencyTitle: '요약 카드 기준 통화',
+    baseCurrencyHelp: '* 모든 외화 자산은 실시간 환율로 이 통화에 맞춰 환산되어 상단 요약 카드에서 한 번에 합산됩니다.',
+    hideZeroHolding: '청산된 종목 숨기기',
+    manualRecordTitle: '거래 직접 추가',
+    fields: {
+      date: '날짜',
+      type: '구분',
+      market: '시장',
+      symbol: '종목 코드',
+      quantity: '수량',
+      price: '단가',
+      amount: '총금액',
+      pnl: '손익 (매도만)'
+    },
+    placeholders: {
+      symbol: '예: AAPL',
+      quantity: '주 수',
+      price: '주당 가격',
+      amount: '해당 시장 통화 기준',
+      pnl: '선택'
+    },
+    saveChanges: '변경 저장',
+    addRecord: '추가',
+    noRecords: '아직 거래 기록이 없습니다.'
+  },
+  notice: {
+    title: 'Trade Lens에 오신 것을 환영합니다',
+    body: '브로커 CSV를 매입 추이, 손익 분포, 보유 비중 차트로 바꿔주는 투자자용 오픈소스 도구입니다.',
+    privacy: '개인정보 우선: 모든 데이터는 브라우저(IndexedDB) 안에만 저장되며 서버로 전송되지 않습니다.',
+    apiKey: 'API 키는 yfapi.net에서 시세를 가져올 때만 쓰이며, 이것도 로컬에만 저장됩니다.',
+    sourceCode: '오픈소스: 코드 보기 및 기여하기',
+    dismiss: '다시 보지 않기'
+  },
+  messages: {
+    apiKeySaved: 'API 키를 저장했습니다.',
+    manualStockSaved: '{{symbol}} 정보를 수동으로 업데이트했습니다.',
+    needApiKey: '시세를 업데이트하려면 먼저 설정 패널에 yfapi.net API 키를 입력하세요.',
+    cacheFresh: '주가와 환율이 최근 24시간 안에 이미 갱신되어 로컬 캐시를 써서 한도를 아꼈습니다.',
+    updateSuccess: '{{count}}개 종목의 시세와 환율 정보를 업데이트했습니다.',
+    fetchFailed: '가져오기에 실패했습니다: {{message}}',
+    baseCurrencyChanged: '기준 통화를 {{currency}}(으)로 바꾸는 중입니다. 환율도 같이 갱신합니다...',
+    recordUpdated: '거래 기록을 업데이트했습니다.',
+    dataCleared: '데이터를 지우고 예시 기록을 불러왔습니다.',
+    clearConfirm: '모든 데이터를 지우고 예시 데이터를 다시 불러올까요? 이 작업은 되돌릴 수 없습니다.',
+    backupConfirm: '지우기 전에 현재 데이터를 CSV로 백업할까요?'
+  },
+  data: {
+    unknownSymbol: '알 수 없는 종목 코드 ({{symbol}})',
+    unknown: '알 수 없음'
+  }
+};
+
 const arSA = {
   common: {
     language: 'اللغة',
@@ -1574,5 +1770,6 @@ export const resources = {
   'en-US': { translation: enUS },
   'en-GB': { translation: enGB },
   'ja-JP': { translation: jaJP },
+  'ko-KR': { translation: koKR },
   'ar-SA': { translation: arSA }
 };
