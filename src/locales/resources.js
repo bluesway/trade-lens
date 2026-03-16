@@ -1566,6 +1566,398 @@ const koKR = {
   }
 };
 
+const idID = {
+  common: {
+    language: 'Bahasa',
+    close: 'Tutup',
+    cancel: 'Batal',
+    save: 'Simpan',
+    edit: 'Edit',
+    delete: 'Hapus',
+    importCsv: 'Impor CSV',
+    exportCsv: 'Ekspor CSV'
+  },
+  currencies: {
+    TWD: 'Dolar Taiwan Baru (TWD)',
+    CNY: 'Yuan Tiongkok (CNY)',
+    HKD: 'Dolar Hong Kong (HKD)',
+    USD: 'Dolar AS (USD)',
+    JPY: 'Yen Jepang (JPY)'
+  },
+  markets: {
+    all: 'Semua',
+    chinaA: 'Saham A Tiongkok',
+    hongKong: 'Saham Hong Kong',
+    taiwan: 'Saham Taiwan',
+    japan: 'Saham Jepang',
+    us: 'Saham AS',
+    other: 'Lainnya',
+    unknown: 'Tidak diketahui'
+  },
+  tradeTypes: {
+    buy: 'Beli',
+    sell: 'Jual'
+  },
+  timeRanges: {
+    oneWeek: '1 minggu',
+    oneMonth: '1 bulan',
+    threeMonths: '3 bulan',
+    halfYear: '6 bulan',
+    ytd: 'YTD',
+    oneYear: '1 tahun',
+    fiveYears: '5 tahun',
+    all: 'Semua'
+  },
+  app: {
+    loadingLocalData: 'Sedang memuat data IndexedDB lokal...',
+    generatingImage: 'Sedang membuat gambar...',
+    imageExportSuccess: 'Ekspor gambar berhasil.',
+    imageExportFail: 'Ekspor gambar gagal.',
+    noDataToExport: 'Saat ini belum ada data untuk diekspor.',
+    exportFilenamePrefix: 'trade_records'
+  },
+  header: {
+    title: 'Dashboard portofolio saham global',
+    demoDescription: 'Saat ini hanya sebagian data contoh yang ditampilkan. Impor CSV lengkap untuk melihat gambaran penuh portofolio.',
+    recordsLoaded: 'Berhasil memuat dan menganalisis {{count}} transaksi',
+    lastUpdated: 'Pembaruan terakhir: {{value}}',
+    switchToLight: 'Ganti ke mode terang',
+    switchToDark: 'Ganti ke mode gelap',
+    settingsRecords: 'Pengaturan & transaksi',
+    updatePrices: 'Perbarui harga',
+    apiKeyRequired: 'API Key harus diatur dulu',
+    updateWithCache: 'Perbarui harga real-time (pakai cache)',
+    setApiKeyFirst: 'Silakan atur API Key terlebih dahulu',
+    forceRefresh: 'Refresh paksa',
+    forceRefreshTitle: 'Lewati cache dan gunakan kuota API asli',
+    languageLabel: 'Ganti bahasa',
+    csvTitle: 'Panduan kolom CSV',
+    csvIntro: 'Pastikan CSV Anda minimal memiliki header berikut. Urutannya tidak masalah:',
+    csvRows: {
+      date: 'Tanggal (contoh: 2025/01/01)',
+      type: 'Jenis (Beli / Jual)',
+      symbol: 'Simbol (contoh: AAPL, TSLA)',
+      market: 'Pasar (opsional, berguna saat tambah manual)',
+      quantity: 'Kuantitas',
+      price: 'Harga per unit (mata uang asal)',
+      amount: 'Nilai total (mata uang asal)',
+      pnl: 'Laba/Rugi (wajib saat jual, mata uang asal)'
+    },
+    csvNote1: '* Catatan 1: Kode 6 digit yang diawali 6 atau 0 akan otomatis dikenali sebagai saham A Tiongkok (.SS / .SZ).',
+    csvNote2: '* Catatan 2: Untuk pasar lain, tambahkan suffix langsung pada simbol seperti .TW atau .HK.',
+    forceRefreshConfirm: 'Yakin ingin refresh paksa? Cache 24 jam akan diabaikan dan kuota API asli akan terpakai.'
+  },
+  summary: {
+    totalRealized: 'Total laba/rugi terealisasi (setelah konversi)',
+    totalUnrealized: 'Total laba/rugi belum terealisasi (setelah konversi)',
+    totalValue: 'Nilai pasar saat ini (setelah konversi)',
+    holdingCount: 'Jumlah posisi terbuka',
+    holdingUnit: 'saham'
+  },
+  charts: {
+    trendTitle: 'Tren modal terkumpul',
+    saveImage: 'Simpan grafik sebagai gambar',
+    noTrend: 'Data transaksi masih belum cukup untuk menggambar tren.',
+    realizedTitle: 'Laba/rugi terealisasi per saham (jual kecepetan / keluar cantik)',
+    distributionTitle: 'Distribusi nilai portofolio (10 teratas)',
+    convertedNote: 'Ditampilkan setelah dikonversi ke {{currency}}',
+    noPnlData: 'Belum ada data laba/rugi saat ini.',
+    noHoldings: 'Saat ini belum ada posisi terbuka.',
+    legendConverted: '{{label}} (setelah konversi)',
+    costSeries: 'Modal terkumpul',
+    realizedSeries: 'Laba/rugi terealisasi terkumpul',
+    ifSoldSeries: 'Kalau jual hari ini',
+    actualSeries: 'Laba/rugi aktual',
+    others: 'Lainnya'
+  },
+  table: {
+    title: 'Riwayat transaksi per saham',
+    subtitle: 'Klik baris untuk melihat detail beli dan jual. Semua nominal tetap ditampilkan dalam mata uang asli pasar tersebut.',
+    columns: {
+      symbol: 'Simbol / nama saham (pasar · mata uang)',
+      holdingQty: 'Kuantitas saat ini',
+      currentValue: 'Harga saat ini / nilai pasar',
+      unrealized: 'Laba/rugi belum terealisasi',
+      realized: 'Laba/rugi terealisasi',
+      ifSoldToday: 'Kalau jual hari ini',
+      date: 'Tanggal',
+      type: 'Jenis',
+      quantity: 'Kuantitas',
+      price: 'Harga',
+      amount: 'Nilai',
+      pnl: 'Laba/Rugi',
+      actions: 'Aksi'
+    },
+    manualBadge: 'Manual',
+    manualUpdatedAt: 'Diubah manual pada: {{value}}',
+    apiUpdatedAt: 'Pembaruan API terakhir: {{value}}',
+    notUpdatedYet: 'Belum diperbarui',
+    manualNamePlaceholder: 'Nama saham manual',
+    currentPricePlaceholder: 'Harga saat ini',
+    hedgeSuccess: 'Keluar lebih awal ternyata lebih oke ({{value}})',
+    soldTooEarly: 'Jual terlalu cepat, kehilangan {{value}}',
+    tradeDetails: 'Detail transaksi',
+    atPrice: '@ {{price}}',
+    quantityAtPrice: '{{quantity}} saham @ {{price}}',
+    mobileHoldingQty: 'Pegangan',
+    mobileUnrealized: 'Belum realisasi',
+    mobileRealized: 'Terealisasi'
+  },
+  manager: {
+    title: 'Pengaturan & catatan transaksi',
+    clearAndLoadDemo: 'Hapus lalu muat data contoh',
+    apiKeyTitle: 'Pengaturan API Key yfapi.net',
+    getFreeApiKey: 'Daftar gratis untuk dapat key',
+    apiKeyPlaceholder: 'Tempel x-api-key Anda di sini (contoh: A2sD8...)',
+    saveApiKey: 'Simpan key',
+    baseCurrencyTitle: 'Mata uang dasar kartu ringkasan',
+    baseCurrencyHelp: '* Semua aset mata uang asing akan dikonversi ke mata uang ini memakai kurs terbaru agar bisa dijumlahkan di kartu ringkasan bagian atas.',
+    hideZeroHolding: 'Sembunyikan transaksi yang sudah tidak punya posisi',
+    manualRecordTitle: 'Tambah transaksi manual',
+    fields: {
+      date: 'Tanggal',
+      type: 'Jenis',
+      market: 'Pasar',
+      symbol: 'Simbol',
+      quantity: 'Kuantitas',
+      price: 'Harga per unit',
+      amount: 'Nilai total',
+      pnl: 'Laba/Rugi (khusus jual)'
+    },
+    placeholders: {
+      symbol: 'Contoh: AAPL',
+      quantity: 'Jumlah saham',
+      price: 'Harga per saham',
+      amount: 'Ikuti mata uang pasar tersebut',
+      pnl: 'Opsional'
+    },
+    saveChanges: 'Simpan perubahan',
+    addRecord: 'Tambah',
+    noRecords: 'Saat ini belum ada transaksi.'
+  },
+  notice: {
+    title: 'Selamat datang di Trade Lens',
+    body: 'Ini adalah alat open source untuk investor yang mengubah CSV broker menjadi grafik modal, distribusi laba/rugi, dan gambaran portofolio yang lebih gampang dibaca.',
+    privacy: 'Privasi didahulukan: semua data hanya disimpan di browser Anda (IndexedDB) dan tidak dikirim ke server.',
+    apiKey: 'API Key hanya dipakai untuk mengambil harga dari yfapi.net dan juga disimpan secara lokal.',
+    sourceCode: 'Open source: lihat kode dan ikut berkontribusi',
+    dismiss: 'Jangan tampilkan lagi'
+  },
+  messages: {
+    apiKeySaved: 'API Key berhasil disimpan.',
+    manualStockSaved: 'Informasi {{symbol}} berhasil diperbarui secara manual.',
+    needApiKey: 'Masukkan API Key yfapi.net di panel pengaturan sebelum memperbarui harga.',
+    cacheFresh: 'Harga saham dan kurs sudah diperbarui dalam 24 jam terakhir, jadi sistem memakai cache lokal untuk menghemat kuota.',
+    updateSuccess: 'Berhasil memperbarui harga saham dan kurs untuk {{count}} item.',
+    fetchFailed: 'Gagal mengambil data: {{message}}',
+    baseCurrencyChanged: 'Mata uang dasar telah diubah ke {{currency}}. Sedang memperbarui kurs...',
+    recordUpdated: 'Catatan transaksi berhasil diperbarui.',
+    dataCleared: 'Data berhasil dihapus dan data contoh dimuat ulang.',
+    clearConfirm: 'Yakin ingin menghapus semua data dan memuat ulang data contoh? Tindakan ini tidak bisa dibatalkan.',
+    backupConfirm: 'Sebelum dihapus, mau ekspor data saat ini sebagai cadangan CSV dulu?'
+  },
+  data: {
+    unknownSymbol: 'Simbol tidak dikenal ({{symbol}})',
+    unknown: 'Tidak diketahui'
+  }
+};
+
+const frFR = {
+  common: {
+    language: 'Langue',
+    close: 'Fermer',
+    cancel: 'Annuler',
+    save: 'Enregistrer',
+    edit: 'Modifier',
+    delete: 'Supprimer',
+    importCsv: 'Importer CSV',
+    exportCsv: 'Exporter CSV'
+  },
+  currencies: {
+    TWD: 'Dollar taïwanais (TWD)',
+    CNY: 'Yuan chinois (CNY)',
+    HKD: 'Dollar de Hong Kong (HKD)',
+    USD: 'Dollar américain (USD)',
+    JPY: 'Yen japonais (JPY)'
+  },
+  markets: {
+    all: 'Tous',
+    chinaA: 'Actions A chinoises',
+    hongKong: 'Actions Hong Kong',
+    taiwan: 'Actions Taïwan',
+    japan: 'Actions japonaises',
+    us: 'Actions US',
+    other: 'Autres',
+    unknown: 'Inconnu'
+  },
+  tradeTypes: {
+    buy: 'Achat',
+    sell: 'Vente'
+  },
+  timeRanges: {
+    oneWeek: '1 sem.',
+    oneMonth: '1 mois',
+    threeMonths: '3 mois',
+    halfYear: '6 mois',
+    ytd: 'YTD',
+    oneYear: '1 an',
+    fiveYears: '5 ans',
+    all: 'Tout'
+  },
+  app: {
+    loadingLocalData: 'Chargement des données IndexedDB locales...',
+    generatingImage: 'Génération de l’image...',
+    imageExportSuccess: 'Export de l’image réussi.',
+    imageExportFail: 'Échec de l’export de l’image.',
+    noDataToExport: 'Aucune donnée à exporter pour le moment.',
+    exportFilenamePrefix: 'trade_records'
+  },
+  header: {
+    title: 'Tableau de bord du portefeuille actions mondial',
+    demoDescription: 'Seule une partie des données de démonstration est affichée pour l’instant. Importez votre CSV complet pour voir l’ensemble du portefeuille.',
+    recordsLoaded: '{{count}} transactions chargées et analysées',
+    lastUpdated: 'Dernière mise à jour : {{value}}',
+    switchToLight: 'Passer en mode clair',
+    switchToDark: 'Passer en mode sombre',
+    settingsRecords: 'Paramètres & transactions',
+    updatePrices: 'Mettre à jour les prix',
+    apiKeyRequired: 'API Key requise',
+    updateWithCache: 'Mettre à jour les prix en temps réel (avec cache)',
+    setApiKeyFirst: 'Veuillez d’abord configurer l’API Key',
+    forceRefresh: 'Forcer l’actualisation',
+    forceRefreshTitle: 'Ignorer le cache et consommer le quota API',
+    languageLabel: 'Changer de langue',
+    csvTitle: 'Guide des colonnes CSV',
+    csvIntro: 'Votre CSV doit contenir au minimum les en-têtes suivants, dans n’importe quel ordre :',
+    csvRows: {
+      date: 'Date (ex. : 2025/01/01)',
+      type: 'Type (Achat / Vente)',
+      symbol: 'Symbole (ex. : AAPL, NVDA)',
+      market: 'Marché (facultatif, utile en saisie manuelle)',
+      quantity: 'Quantité',
+      price: 'Prix unitaire (devise d’origine)',
+      amount: 'Montant total (devise d’origine)',
+      pnl: 'Plus/moins-value (obligatoire à la vente, devise d’origine)'
+    },
+    csvNote1: '* Note 1 : un code à 6 chiffres commençant par 6 ou 0 sera reconnu automatiquement comme une action A chinoise (.SS / .SZ).',
+    csvNote2: '* Note 2 : pour les autres marchés, ajoutez directement le suffixe au symbole comme .TW ou .HK.',
+    forceRefreshConfirm: 'Confirmer l’actualisation forcée ? Le cache de 24 heures sera ignoré et le quota API sera réellement consommé.'
+  },
+  summary: {
+    totalRealized: 'Total des plus/moins-values réalisées (converti)',
+    totalUnrealized: 'Total des plus/moins-values latentes (converti)',
+    totalValue: 'Valeur de marché actuelle (convertie)',
+    holdingCount: 'Nombre de lignes en portefeuille',
+    holdingUnit: 'lignes'
+  },
+  charts: {
+    trendTitle: 'Évolution du capital investi',
+    saveImage: 'Enregistrer le graphique en image',
+    noTrend: 'Il n’y a pas encore assez de transactions pour tracer une tendance.',
+    realizedTitle: 'Plus/moins-values réalisées par titre (vente trop tôt / sortie bien timée)',
+    distributionTitle: 'Répartition de la valeur du portefeuille (top 10)',
+    convertedNote: 'Affiché après conversion en {{currency}}',
+    noPnlData: 'Aucune donnée de plus/moins-value pour le moment.',
+    noHoldings: 'Aucune position ouverte actuellement.',
+    legendConverted: '{{label}} (après conversion)',
+    costSeries: 'Capital investi cumulé',
+    realizedSeries: 'Plus/moins-values réalisées cumulées',
+    ifSoldSeries: 'Si vendu aujourd’hui',
+    actualSeries: 'Réalisé réellement',
+    others: 'Autres'
+  },
+  table: {
+    title: 'Historique par titre',
+    subtitle: 'Cliquez sur une ligne pour voir le détail des achats et ventes. Les montants restent affichés dans la devise d’origine du marché concerné.',
+    columns: {
+      symbol: 'Symbole / nom du titre (marché · devise)',
+      holdingQty: 'Quantité en portefeuille',
+      currentValue: 'Cours actuel / valeur de marché',
+      unrealized: 'Plus/moins-value latente',
+      realized: 'Plus/moins-value réalisée',
+      ifSoldToday: 'Si vendu aujourd’hui',
+      date: 'Date',
+      type: 'Type',
+      quantity: 'Quantité',
+      price: 'Prix',
+      amount: 'Montant',
+      pnl: 'P/L',
+      actions: 'Actions'
+    },
+    manualBadge: 'Manuel',
+    manualUpdatedAt: 'Mis à jour manuellement : {{value}}',
+    apiUpdatedAt: 'Dernière mise à jour API : {{value}}',
+    notUpdatedYet: 'Pas encore mis à jour',
+    manualNamePlaceholder: 'Nom saisi manuellement',
+    currentPricePlaceholder: 'Cours actuel',
+    hedgeSuccess: 'Sortir plus tôt était finalement le bon move ({{value}})',
+    soldTooEarly: 'Vendu trop tôt, manque {{value}}',
+    tradeDetails: 'Détail des transactions',
+    atPrice: '@ {{price}}',
+    quantityAtPrice: '{{quantity}} actions @ {{price}}',
+    mobileHoldingQty: 'Position',
+    mobileUnrealized: 'Latent',
+    mobileRealized: 'Réalisé'
+  },
+  manager: {
+    title: 'Paramètres & historique',
+    clearAndLoadDemo: 'Effacer et charger les données de démonstration',
+    apiKeyTitle: 'Configuration de l’API Key yfapi.net',
+    getFreeApiKey: 'Créer une clé gratuite',
+    apiKeyPlaceholder: 'Collez votre x-api-key ici (ex. : A2sD8...)',
+    saveApiKey: 'Enregistrer la clé',
+    baseCurrencyTitle: 'Devise de base des cartes récapitulatives',
+    baseCurrencyHelp: '* Tous les actifs en devise étrangère sont convertis dans cette devise avec le taux de change le plus récent afin de pouvoir être additionnés dans les cartes récapitulatives.',
+    hideZeroHolding: 'Masquer les titres soldés',
+    manualRecordTitle: 'Ajouter une transaction manuellement',
+    fields: {
+      date: 'Date',
+      type: 'Type',
+      market: 'Marché',
+      symbol: 'Symbole',
+      quantity: 'Quantité',
+      price: 'Prix unitaire',
+      amount: 'Montant total',
+      pnl: 'Plus/moins-value (vente uniquement)'
+    },
+    placeholders: {
+      symbol: 'Ex. : AAPL',
+      quantity: 'Nombre d’actions',
+      price: 'Prix par action',
+      amount: 'Dans la devise du marché concerné',
+      pnl: 'Facultatif'
+    },
+    saveChanges: 'Enregistrer les modifications',
+    addRecord: 'Ajouter',
+    noRecords: 'Aucune transaction pour le moment.'
+  },
+  notice: {
+    title: 'Bienvenue sur Trade Lens',
+    body: 'Cet outil open source pour investisseurs transforme les CSV de courtier en courbes de capital investi, répartitions de P/L et vues portefeuille plus lisibles.',
+    privacy: 'Priorité à la confidentialité : toutes les données restent uniquement dans votre navigateur (IndexedDB) et ne sont pas envoyées au serveur.',
+    apiKey: 'L’API Key sert uniquement à récupérer les cours via yfapi.net et reste elle aussi stockée localement.',
+    sourceCode: 'Open source : consultez le code et contribuez',
+    dismiss: 'Ne plus afficher'
+  },
+  messages: {
+    apiKeySaved: 'API Key enregistrée.',
+    manualStockSaved: 'Les informations de {{symbol}} ont été mises à jour manuellement.',
+    needApiKey: 'Veuillez saisir l’API Key yfapi.net dans le panneau de configuration avant de mettre les prix à jour.',
+    cacheFresh: 'Les cours et taux de change ont déjà été mis à jour dans les dernières 24 heures ; le cache local a donc été utilisé pour économiser le quota.',
+    updateSuccess: 'Cours et taux de change mis à jour pour {{count}} éléments.',
+    fetchFailed: 'Échec de récupération : {{message}}',
+    baseCurrencyChanged: 'La devise de base a été changée en {{currency}}. Mise à jour des taux de change en cours...',
+    recordUpdated: 'Historique de transactions mis à jour.',
+    dataCleared: 'Les données ont été effacées et les données de démonstration rechargées.',
+    clearConfirm: 'Confirmer la suppression de toutes les données et le rechargement des données de démonstration ? Cette action est irréversible.',
+    backupConfirm: 'Avant d’effacer, voulez-vous exporter les données actuelles en CSV de sauvegarde ?'
+  },
+  data: {
+    unknownSymbol: 'Symbole inconnu ({{symbol}})',
+    unknown: 'Inconnu'
+  }
+};
+
 const msMY = {
   common: {
     language: 'Bahasa',
@@ -2359,6 +2751,8 @@ export const resources = {
   'en-GB': { translation: enGB },
   'ja-JP': { translation: jaJP },
   'ko-KR': { translation: koKR },
+  'id-ID': { translation: idID },
+  'fr-FR': { translation: frFR },
   'ms-MY': { translation: msMY },
   'vi-VN': { translation: viVN },
   'th-TH': { translation: thTH },

@@ -17,6 +17,7 @@ const BUY_TYPE_TERMS = [
   'bid',
   'long',
   'beli',
+  'achat',
   'mua',
   'ซื้อ',
   '매수',
@@ -34,6 +35,7 @@ const SELL_TYPE_TERMS = [
   'ask',
   'short',
   'jual',
+  'vente',
   'bán',
   'ขาย',
   '매도',
@@ -120,21 +122,21 @@ export const parseCSV = (text) => {
   if (lines.length === 0) return [];
 
   let headerIdx = lines.findIndex((line) =>
-    ['代號', '代碼', 'Symbol', 'Simbol', 'Mã', 'Mã CK', 'สัญลักษณ์', 'ชื่อย่อ', '종목코드', '티커'].some((label) => line.includes(label))
-    && ['類型', '動作', 'Type', 'Jenis', 'Loại', 'ประเภท', 'ฝั่ง', '구분', '유형'].some((label) => line.includes(label))
+    ['代號', '代碼', 'Symbol', 'Simbol', 'Mã', 'Mã CK', 'Symbole', 'Ticker', 'สัญลักษณ์', 'ชื่อย่อ', '종목코드', '티커'].some((label) => line.includes(label))
+    && ['類型', '動作', 'Type', 'Jenis', 'Loại', 'Type d\'ordre', 'ประเภท', 'ฝั่ง', '구분', '유형'].some((label) => line.includes(label))
   );
   if (headerIdx === -1) headerIdx = 0; 
 
   const rawHeaders = lines[headerIdx].replace(/^\uFEFF/, '').split(',').map(h => h.trim());
   const mapping = {
-    '日期': ['日期', '交易日期', '成交日期', 'Date', 'Trade Date', 'Tarikh', 'Ngày', 'Ngày giao dịch', '日付', '取引日', 'التاريخ', 'วันที่', 'วันที่ซื้อขาย', '날짜', '거래일', '체결일'],
-    '類型': ['類型', '交易類別', '動作', 'Type', 'Action', 'Side', 'Jenis', 'Loại', 'Giao dịch', '区分', '種類', '売買区分', 'النوع', 'الإجراء', 'ประเภท', 'ฝั่ง', 'สถานะ', '구분', '유형', '매매구분'],
-    '代號': ['代號', '股票代號', '代碼', 'Symbol', 'Ticker', 'Stock Code', 'Simbol', 'Kod', 'Mã', 'Mã CK', 'Mã chứng khoán', '銘柄コード', 'コード', 'ティッカー', 'الرمز', 'สัญลักษณ์', 'ชื่อย่อ', 'ticker', '종목코드', '종목', '티커'],
-    '市場': ['市場', '交易所', 'Market', 'Exchange', 'Pasaran', 'Thị trường', '取引所', 'السوق', 'البورصة', 'ตลาด', '시장'],
-    '數量': ['數量', '成交股數', '股數', 'Quantity', 'Qty', 'Shares', 'Kuantiti', 'Bilangan unit', 'Bilangan saham', 'Số lượng', 'Khối lượng', '数量', '株数', 'الكمية', 'عدد الأسهم', 'จำนวน', 'จำนวนหุ้น', '수량', '주수'],
-    '單價': ['單價', '成交價', '成交單價', 'Price', 'Execution Price', 'Harga', 'Harga seunit', 'Giá', 'Giá khớp', 'Đơn giá', '単価', '価格', '約定価格', 'سعر الوحدة', 'السعر', 'ราคา', 'ราคาต่อหุ้น', 'ราคาต่อหน่วย', '단가', '체결가', '가격'],
-    '總金額': ['總金額', '成交金額', '淨額', 'Amount', 'Total Amount', 'Net Amount', 'Jumlah', 'Jumlah keseluruhan', 'Nilai', 'Giá trị', 'Tổng giá trị', '金額', '合計金額', '約定代金', 'إجمالي المبلغ', 'إجمالي القيمة', 'القيمة', 'มูลค่า', 'มูลค่ารวม', 'ยอดรวม', '금액', '총금액', '총액'],
-    '損益': ['損益', '實現損益', 'PnL', 'Realized PnL', 'Profit', 'P&L', 'Untung/Rugi', 'Untung rugi', 'Lãi/Lỗ', 'Lãi lỗ', 'Lãi/Lỗ đã chốt', '実現損益', 'الربح أو الخسارة', 'الربح/الخسارة', 'الأرباح والخسائر', 'กำไรขาดทุน', 'กำไร/ขาดทุน', '손익', '실현손익']
+    '日期': ['日期', '交易日期', '成交日期', 'Date', 'Trade Date', 'Tanggal', 'Tarikh', 'Ngày', 'Ngày giao dịch', 'Date opération', 'Date de transaction', '日付', '取引日', 'التاريخ', 'วันที่', 'วันที่ซื้อขาย', '날짜', '거래일', '체결일'],
+    '類型': ['類型', '交易類別', '動作', 'Type', 'Action', 'Side', 'Jenis', 'Loại', 'Giao dịch', 'Type d\'ordre', 'Ordre', '区分', '種類', '売買区分', 'النوع', 'الإجراء', 'ประเภท', 'ฝั่ง', 'สถานะ', '구분', '유형', '매매구분'],
+    '代號': ['代號', '股票代號', '代碼', 'Symbol', 'Ticker', 'Stock Code', 'Simbol', 'Kode', 'Kod', 'Mã', 'Mã CK', 'Mã chứng khoán', 'Symbole', 'Code valeur', '銘柄コード', 'コード', 'ティッカー', 'الرمز', 'สัญลักษณ์', 'ชื่อย่อ', 'ticker', '종목코드', '종목', '티커'],
+    '市場': ['市場', '交易所', 'Market', 'Exchange', 'Pasar', 'Pasaran', 'Thị trường', 'Marché', 'Place de marché', '取引所', 'السوق', 'البورصة', 'ตลาด', '시장'],
+    '數量': ['數量', '成交股數', '股數', 'Quantity', 'Qty', 'Shares', 'Kuantitas', 'Jumlah saham', 'Kuantiti', 'Bilangan unit', 'Bilangan saham', 'Số lượng', 'Khối lượng', 'Quantité', '数量', '株数', 'الكمية', 'عدد الأسهم', 'จำนวน', 'จำนวนหุ้น', '수량', '주수'],
+    '單價': ['單價', '成交價', '成交單價', 'Price', 'Execution Price', 'Harga', 'Harga per unit', 'Harga seunit', 'Giá', 'Giá khớp', 'Đơn giá', 'Prix', 'Prix unitaire', '単価', '価格', '約定価格', 'سعر الوحدة', 'السعر', 'ราคา', 'ราคาต่อหุ้น', 'ราคาต่อหน่วย', '단가', '체결가', '가격'],
+    '總金額': ['總金額', '成交金額', '淨額', 'Amount', 'Total Amount', 'Net Amount', 'Nilai', 'Jumlah', 'Jumlah keseluruhan', 'Giá trị', 'Tổng giá trị', 'Montant', 'Montant total', 'Valeur totale', '金額', '合計金額', '約定代金', 'إجمالي المبلغ', 'إجمالي القيمة', 'القيمة', 'มูลค่า', 'มูลค่ารวม', 'ยอดรวม', '금액', '총금액', '총액'],
+    '損益': ['損益', '實現損益', 'PnL', 'Realized PnL', 'Profit', 'P&L', 'Untung/Rugi', 'Untung rugi', 'Laba/Rugi', 'Lãi/Lỗ', 'Lãi lỗ', 'Lãi/Lỗ đã chốt', 'Plus/moins-value', 'Plus-value', 'Moins-value', 'Gain/Perte', '実現損益', 'الربح أو الخسارة', 'الربح/الخسارة', 'الأرباح والخسائر', 'กำไรขาดทุน', 'กำไร/ขาดทุน', '손익', '실현손익']
   };
 
   const headerMap = {};
