@@ -28,6 +28,24 @@ const DEFAULT_NEW_RECORD = {
 };
 
 const ONE_DAY = 24 * 60 * 60 * 1000;
+const FX_BRIDGE_CURRENCY = 'USD';
+
+const getFxRateSymbols = (fromCurrency, toCurrency) => {
+  if (!fromCurrency || !toCurrency || fromCurrency === toCurrency) {
+    return [];
+  }
+
+  const directPair = `${fromCurrency}${toCurrency}=X`;
+  if (fromCurrency === FX_BRIDGE_CURRENCY || toCurrency === FX_BRIDGE_CURRENCY) {
+    return [directPair];
+  }
+
+  return [
+    directPair,
+    `${fromCurrency}${FX_BRIDGE_CURRENCY}=X`,
+    `${FX_BRIDGE_CURRENCY}${toCurrency}=X`
+  ];
+};
 
 const getNumericValue = (value) => parseFloat(String(value || '0').replace(/[^0-9.-]+/g, '')) || 0;
 
@@ -123,7 +141,22 @@ export function useTradeData(showToast) {
 
   const getExchangeRate = (fromCurrency, toCurrency) => {
     if (fromCurrency === toCurrency) return 1;
-    return exchangeRates[`${fromCurrency}${toCurrency}=X`]?.rate || 1;
+
+    const directRate = exchangeRates[`${fromCurrency}${toCurrency}=X`]?.rate;
+    if (Number.isFinite(directRate) && directRate > 0) {
+      return directRate;
+    }
+
+    const sourceToUsdRate = exchangeRates[`${fromCurrency}${FX_BRIDGE_CURRENCY}=X`]?.rate;
+    const usdToTargetRate = exchangeRates[`${FX_BRIDGE_CURRENCY}${toCurrency}=X`]?.rate;
+    if (
+      Number.isFinite(sourceToUsdRate) && sourceToUsdRate > 0
+      && Number.isFinite(usdToTargetRate) && usdToTargetRate > 0
+    ) {
+      return sourceToUsdRate * usdToTargetRate;
+    }
+
+    return 1;
   };
 
   const handleSaveApiKey = () => {
@@ -196,11 +229,12 @@ export function useTradeData(showToast) {
         const currency = cached?.currency || fallbackCurrency;
 
         if (currency && currency !== targetBaseCurrency) {
-          const rateKey = `${currency}${targetBaseCurrency}=X`;
-          const cachedRate = exchangeRates[rateKey];
-          if (isForce || !cachedRate || now - cachedRate.timestamp > ONE_DAY) {
-            currenciesToFetch.add(rateKey);
-          }
+          getFxRateSymbols(currency, targetBaseCurrency).forEach((rateKey) => {
+            const cachedRate = exchangeRates[rateKey];
+            if (isForce || !cachedRate || now - cachedRate.timestamp > ONE_DAY) {
+              currenciesToFetch.add(rateKey);
+            }
+          });
         }
       });
 
@@ -208,7 +242,9 @@ export function useTradeData(showToast) {
         uniqueSymbols.forEach((symbol) => {
           const currency = getCurrencyBySymbolOrMarket(symbol, marketBySymbol.get(symbol));
           if (currency && currency !== targetBaseCurrency) {
-            currenciesToFetch.add(`${currency}${targetBaseCurrency}=X`);
+            getFxRateSymbols(currency, targetBaseCurrency).forEach((rateKey) => {
+              currenciesToFetch.add(rateKey);
+            });
           }
         });
       }
@@ -257,7 +293,9 @@ export function useTradeData(showToast) {
 
             const itemCurrency = item.currency || getCurrencyBySymbolOrMarket(item.symbol, marketBySymbol.get(item.symbol));
             if (itemCurrency && itemCurrency !== targetBaseCurrency) {
-              currenciesToFetch.add(`${itemCurrency}${targetBaseCurrency}=X`);
+              getFxRateSymbols(itemCurrency, targetBaseCurrency).forEach((rateKey) => {
+                currenciesToFetch.add(rateKey);
+              });
             }
           });
         }

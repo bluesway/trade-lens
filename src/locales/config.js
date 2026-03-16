@@ -25,7 +25,22 @@ export const SUPPORTED_LOCALES = [
   { code: 'ar-SA', nativeLabel: 'العربية', dir: 'rtl' }
 ];
 
-export const BASE_CURRENCY_OPTIONS = ['TWD', 'CNY', 'HKD', 'USD', 'JPY'];
+export const BASE_CURRENCY_OPTIONS = [
+  'TWD',
+  'CNY',
+  'HKD',
+  'USD',
+  'JPY',
+  'EUR',
+  'GBP',
+  'SGD',
+  'KRW',
+  'IDR',
+  'MYR',
+  'VND',
+  'THB',
+  'SAR'
+];
 
 export const MARKET_TRANSLATION_KEYS = {
   全部: 'markets.all',

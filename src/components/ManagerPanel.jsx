@@ -9,6 +9,7 @@ import {
 } from '../locales/config';
 import {
   formatGregorianReferenceDate,
+  getLocalizedCurrencyName,
   formatLocalizedCurrency,
   formatLocalizedNumber,
   shouldShowGregorianReference
@@ -50,6 +51,16 @@ export default function ManagerPanel({
   const showGregorianReference = shouldShowGregorianReference(activeLocale);
   const tradeTypeOptions = ['買入', '賣出'];
   const marketOptions = ['陸股', '港股', '台股', '日股', '美股', '其他'];
+
+  const getCurrencyOptionLabel = (currency) => {
+    const translationKey = `currencies.${currency}`;
+    if (i18n.exists(translationKey)) {
+      return t(translationKey);
+    }
+
+    const localizedName = getLocalizedCurrencyName(currency, activeLocale);
+    return localizedName === currency ? currency : `${localizedName} (${currency})`;
+  };
 
   const renderTradeDate = (value) => {
     const localizedDate = formatDate(value, activeLocale);
@@ -143,7 +154,7 @@ export default function ManagerPanel({
             >
               {BASE_CURRENCY_OPTIONS.map((currency) => (
                 <option key={currency} value={currency}>
-                  {t(`currencies.${currency}`)}
+                  {getCurrencyOptionLabel(currency)}
                 </option>
               ))}
             </select>

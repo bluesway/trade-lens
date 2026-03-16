@@ -16,6 +16,8 @@ const DEFAULT_PERCENT_OPTIONS = {
   signDisplay: 'exceptZero'
 };
 
+const currencyDisplayNameCache = new Map();
+
 const toNumber = (value) => {
   const normalizedValue = typeof value === 'string'
     ? value.replace(/[^0-9.-]+/g, '')
@@ -79,6 +81,27 @@ export const formatLocalizedCurrency = (value, currency, locale, options = {}) =
     ...(signed ? { signDisplay: 'exceptZero' } : {}),
     ...numberFormatOptions
   }).format(toNumber(value));
+};
+
+export const getLocalizedCurrencyName = (currency, locale) => {
+  if (!currency) return '';
+
+  const formattingLocale = getFormattingLocale(locale);
+  const cacheKey = `${formattingLocale}:${currency}`;
+  if (currencyDisplayNameCache.has(cacheKey)) {
+    return currencyDisplayNameCache.get(cacheKey);
+  }
+
+  let localizedName = currency;
+  try {
+    const displayNames = new Intl.DisplayNames([formattingLocale], { type: 'currency' });
+    localizedName = displayNames.of(currency) || currency;
+  } catch (error) {
+    localizedName = currency;
+  }
+
+  currencyDisplayNameCache.set(cacheKey, localizedName);
+  return localizedName;
 };
 
 export const formatLocalizedPercent = (value, locale, options = DEFAULT_PERCENT_OPTIONS) => {
