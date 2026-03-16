@@ -1,3 +1,41 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html[dir='rtl'] body {
+  direction: rtl;
+}
+
+html[dir='rtl'] .text-left {
+  text-align: right;
+}
+
+html[dir='rtl'] .left-0 {
+  left: auto;
+  right: 0;
+}
+
+html[dir='rtl'] .right-0 {
+  right: auto;
+  left: 0;
+}
+
+html[dir='rtl'] .right-4 {
+  right: auto;
+  left: 1rem;
+}
+
+html[dir='rtl'] .right-6 {
+  right: auto;
+  left: 1.5rem;
+}
+
+html[dir='rtl'] .pl-4 {
+  padding-left: 0;
+  padding-right: 1rem;
+}
+
+html[dir='rtl'] .recharts-wrapper,
+html[dir='rtl'] .recharts-surface {
+  direction: ltr;
+}

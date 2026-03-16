@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { RefreshCw, ShieldCheck } from 'lucide-react';
 import { toPng } from 'html-to-image';
+import { useTranslation } from 'react-i18next';
 import { useTradeData } from './hooks/useTradeData';
+import { isRtlLocale, normalizeLocale } from './locales/config';
 
 import ChartsSection from './components/ChartsSection';
 import DataTable from './components/DataTable';
@@ -14,10 +16,13 @@ export default function App() {
   const [toastMsg, setToastMsg] = useState('');
   const [darkMode, setDarkMode] = useState(false);
   const [showUserNotice, setShowUserNotice] = useState(false);
+  const { t, i18n } = useTranslation();
 
   const pieChartRef = useRef(null);
   const barChartRef = useRef(null);
   const trendChartRef = useRef(null);
+  const activeLocale = normalizeLocale(i18n.resolvedLanguage || i18n.language);
+  const isRtl = isRtlLocale(activeLocale);
 
   const showToast = (message) => {
     setToastMsg(message);
@@ -91,6 +96,11 @@ export default function App() {
     setShowUserNotice(savedShowNotice);
   }, []);
 
+  useEffect(() => {
+    document.documentElement.lang = activeLocale;
+    document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+  }, [activeLocale, isRtl]);
+
   const dismissNotice = () => {
     setShowUserNotice(false);
     localStorage.setItem('tr_show_user_notice', 'false');
@@ -112,7 +122,7 @@ export default function App() {
     if (!ref.current) return;
 
     try {
-      showToast('正在產生圖片...');
+      showToast(t('app.generatingImage'));
       const dataUrl = await toPng(ref.current, {
         backgroundColor: darkMode ? '#0f172a' : '#ffffff',
         style: {
@@ -123,10 +133,10 @@ export default function App() {
       link.download = `${fileName}.png`;
       link.href = dataUrl;
       link.click();
-      showToast('圖片匯出成功！');
+      showToast(t('app.imageExportSuccess'));
     } catch (error) {
       console.error(error);
-      showToast('圖片匯出失敗');
+      showToast(t('app.imageExportFail'));
     }
   };
 
@@ -143,7 +153,7 @@ export default function App() {
 
   const handleExportCSV = () => {
     if (rawData.length === 0) {
-      showToast('目前沒有資料可匯出！');
+      showToast(t('app.noDataToExport'));
       return;
     }
 
@@ -163,7 +173,7 @@ export default function App() {
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `trade_records_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `${t('app.exportFilenamePrefix')}_${new Date().toISOString().slice(0, 10)}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -175,14 +185,14 @@ export default function App() {
       <div className="min-h-screen transition-colors duration-300 bg-slate-50 dark:bg-slate-900/50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3 text-slate-500 dark:text-slate-400">
           <RefreshCw size={24} className="animate-spin text-blue-500" />
-          <p className="font-medium">載入本機 IndexedDB 資料中...</p>
+          <p className="font-medium">{t('app.loadingLocalData')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'dark bg-slate-950 text-slate-200' : 'bg-slate-50 dark:bg-slate-900/50 text-slate-800 dark:text-slate-200'} p-4 md:p-8 font-sans`}>
+    <div dir={isRtl ? 'rtl' : 'ltr'} className={`min-h-screen transition-colors duration-300 ${darkMode ? 'dark bg-slate-950 text-slate-200' : 'bg-slate-50 dark:bg-slate-900/50 text-slate-800 dark:text-slate-200'} p-4 md:p-8 font-sans`}>
       {toastMsg && (
         <div className="fixed bottom-6 right-6 bg-slate-800 dark:bg-blue-600 text-white px-5 py-3 rounded-xl shadow-2xl z-50 animate-fade-in-up border border-white/10 flex items-center gap-2">
           <ShieldCheck size={18} />

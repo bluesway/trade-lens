@@ -1,6 +1,22 @@
 import React, { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Database, DollarSign, Edit2, Info, Key, Plus, Trash2, X } from 'lucide-react';
-import { formatDate, formatSymbol, guessMarket } from '../utils/helpers';
+import {
+  BASE_CURRENCY_OPTIONS,
+  MARKET_TRANSLATION_KEYS,
+  TRADE_TYPE_TRANSLATION_KEYS,
+  normalizeLocale
+} from '../locales/config';
+import {
+  formatLocalizedCurrency,
+  formatLocalizedNumber
+} from '../utils/localization';
+import {
+  formatDate,
+  formatSymbol,
+  getCurrencyBySymbolOrMarket,
+  guessMarket
+} from '../utils/helpers';
 import { STOCK_MAPPING } from '../utils/constants';
 
 export default function ManagerPanel({
@@ -26,7 +42,16 @@ export default function ManagerPanel({
   updateNewRecPrice,
   updateNewRecQuantity
 }) {
+  const { t, i18n } = useTranslation();
   const formRef = useRef(null);
+  const activeLocale = normalizeLocale(i18n.resolvedLanguage || i18n.language);
+  const tradeTypeOptions = ['買入', '賣出'];
+  const marketOptions = ['陸股', '港股', '台股', '日股', '美股', '其他'];
+
+  const parseNumericValue = (value) => {
+    const numericValue = Number(String(value || '').replace(/[^0-9.-]+/g, ''));
+    return Number.isFinite(numericValue) ? numericValue : null;
+  };
 
   useEffect(() => {
     if (editingIndex !== null) {
@@ -39,16 +64,16 @@ export default function ManagerPanel({
       <div className="flex justify-between items-center mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
         <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
           <Database className="text-blue-600" />
-          設定與紀錄管理
+          {t('manager.title')}
         </h2>
         <div className="flex gap-2">
           <button
             onClick={handleClearData}
             className="px-3 py-1.5 text-sm bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40 rounded-md font-medium transition-colors"
           >
-            清除並載入範例
+            {t('manager.clearAndLoadDemo')}
           </button>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" title={t('common.close')}>
             <X size={20} />
           </button>
         </div>
@@ -59,7 +84,7 @@ export default function ManagerPanel({
           <div className="flex justify-between items-start mb-3">
             <label className="flex items-center gap-2 text-sm font-bold text-blue-900 dark:text-blue-100">
               <Key size={16} />
-              yfapi.net API 金鑰設定
+              {t('manager.apiKeyTitle')}
             </label>
             <a
               href="https://financeapi.net/dashboard"
@@ -68,13 +93,13 @@ export default function ManagerPanel({
               className="text-xs font-semibold flex items-center gap-1 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-300 hover:bg-blue-600 hover:text-white transition-colors px-2.5 py-1 rounded-md"
             >
               <Info size={14} />
-              免費註冊取得
+              {t('manager.getFreeApiKey')}
             </a>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="password"
-              placeholder="請貼上您的 x-api-key (例如: A2sD8...)"
+              placeholder={t('manager.apiKeyPlaceholder')}
               value={apiKey}
               onChange={(event) => setApiKey(event.target.value)}
               className="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-mono bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
@@ -83,7 +108,7 @@ export default function ManagerPanel({
               onClick={handleSaveApiKey}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm whitespace-nowrap"
             >
-              儲存金鑰
+              {t('manager.saveApiKey')}
             </button>
           </div>
         </div>
@@ -91,7 +116,7 @@ export default function ManagerPanel({
         <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-xl">
           <label className="flex items-center gap-2 text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">
             <DollarSign size={16} />
-            總計面板基礎幣別 (Base Currency)
+            {t('manager.baseCurrencyTitle')}
           </label>
           <div className="flex gap-3">
             <select
@@ -99,21 +124,21 @@ export default function ManagerPanel({
               onChange={(event) => handleSaveBaseCurrency(event.target.value)}
               className="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
             >
-              <option value="TWD">新台幣 (TWD)</option>
-              <option value="CNY">人民幣 (CNY)</option>
-              <option value="HKD">港幣 (HKD)</option>
-              <option value="USD">美金 (USD)</option>
-              <option value="JPY">日圓 (JPY)</option>
+              {BASE_CURRENCY_OPTIONS.map((currency) => (
+                <option key={currency} value={currency}>
+                  {t(`currencies.${currency}`)}
+                </option>
+              ))}
             </select>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-            * 所有的外幣資產都會透過即時匯率轉換成此幣別，以便在上方總計看板中進行加總計算。
+            {t('manager.baseCurrencyHelp')}
           </p>
         </div>
       </div>
 
       <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-4 rounded-xl mb-6 flex items-center justify-between">
-        <span className="text-sm font-bold text-slate-800 dark:text-slate-200">隱藏目前無持股的交易紀錄</span>
+        <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{t('manager.hideZeroHolding')}</span>
         <label className="relative inline-flex items-center cursor-pointer">
           <input
             type="checkbox"
@@ -127,11 +152,11 @@ export default function ManagerPanel({
 
       <div ref={formRef} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-4 rounded-xl mb-6">
         <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700 pb-2">
-          <Plus size={16} /> 手動新增單筆紀錄
+          <Plus size={16} /> {t('manager.manualRecordTitle')}
         </h4>
         <div className="flex flex-wrap gap-4 items-end">
           <div className="w-[130px]">
-            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">日期</label>
+            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">{t('manager.fields.date')}</label>
             <input
               type="date"
               value={newRec.date}
@@ -140,76 +165,78 @@ export default function ManagerPanel({
             />
           </div>
           <div className="w-[80px]">
-            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">類型</label>
+            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">{t('manager.fields.type')}</label>
             <select
               value={newRec.type}
               onChange={(event) => updateNewRecField('type', event.target.value)}
               className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
             >
-              <option>買入</option>
-              <option>賣出</option>
+              {tradeTypeOptions.map((tradeType) => (
+                <option key={tradeType} value={tradeType}>
+                  {t(TRADE_TYPE_TRANSLATION_KEYS[tradeType])}
+                </option>
+              ))}
             </select>
           </div>
           <div className="w-[100px]">
-            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">市場</label>
+            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">{t('manager.fields.market')}</label>
             <select
               value={newRec.market}
               onChange={(event) => updateNewRecField('market', event.target.value)}
               className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium text-blue-700 dark:text-blue-300"
             >
-              <option>陸股</option>
-              <option>港股</option>
-              <option>台股</option>
-              <option>日股</option>
-              <option>美股</option>
-              <option>其他</option>
+              {marketOptions.map((market) => (
+                <option key={market} value={market}>
+                  {t(MARKET_TRANSLATION_KEYS[market])}
+                </option>
+              ))}
             </select>
           </div>
           <div className="flex-1 min-w-[100px]">
-            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">代號</label>
+            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">{t('manager.fields.symbol')}</label>
             <input
               type="text"
-              placeholder="如: AAPL"
+              placeholder={t('manager.placeholders.symbol')}
               value={newRec.code}
               onChange={(event) => updateNewRecField('code', event.target.value)}
               className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div className="flex-1 min-w-[100px]">
-            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">數量</label>
+            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">{t('manager.fields.quantity')}</label>
             <input
               type="number"
-              placeholder="股數"
+              placeholder={t('manager.placeholders.quantity')}
               value={newRec.qty}
               onChange={(event) => updateNewRecQuantity(event.target.value)}
               className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div className="flex-1 min-w-[100px]">
-            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">單價 (原幣)</label>
+            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">{t('manager.fields.price')}</label>
             <input
               type="number"
-              placeholder="單股價格"
+              placeholder={t('manager.placeholders.price')}
               value={newRec.price}
               onChange={(event) => updateNewRecPrice(event.target.value)}
               className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div className="flex-1 min-w-[120px]">
-            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">總金額 (原幣)</label>
+            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">{t('manager.fields.amount')}</label>
             <input
               type="number"
-              placeholder="依該市場幣別"
+              placeholder={t('manager.placeholders.amount')}
               value={newRec.amount}
               onChange={(event) => updateNewRecAmount(event.target.value)}
               className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div className="flex-1 min-w-[120px]">
-            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">損益 (賣出填,原幣)</label>
+            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">{t('manager.fields.pnl')}</label>
             <input
               type="number"
-              placeholder="選填"
+              placeholder={t('manager.placeholders.pnl')}
               value={newRec.pnl}
               onChange={(event) => updateNewRecField('pnl', event.target.value)}
               className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -221,7 +248,7 @@ export default function ManagerPanel({
                 onClick={cancelEditingRecord}
                 className="flex items-center justify-center bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors h-[38px] w-[80px]"
               >
-                取消
+                {t('common.cancel')}
               </button>
             )}
             <button
@@ -229,7 +256,7 @@ export default function ManagerPanel({
               disabled={!newRec.date || !newRec.code || !newRec.qty || !newRec.amount}
               className="flex items-center justify-center bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed h-[38px] min-w-[80px]"
             >
-              {editingIndex !== null ? '儲存變更' : '加入'}
+              {editingIndex !== null ? t('manager.saveChanges') : t('manager.addRecord')}
             </button>
           </div>
         </div>
@@ -239,14 +266,14 @@ export default function ManagerPanel({
         <table className="w-full text-left text-sm whitespace-nowrap">
           <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 sticky top-0 shadow-sm z-10">
             <tr>
-              <th className="px-4 py-3 font-semibold">日期</th>
-              <th className="px-4 py-3 font-semibold">類型</th>
-              <th className="px-4 py-3 font-semibold">代號 / 股名 (市場)</th>
-              <th className="px-4 py-3 font-semibold text-right">數量</th>
-              <th className="px-4 py-3 font-semibold text-right">單價(原幣)</th>
-              <th className="px-4 py-3 font-semibold text-right">總金額(原幣)</th>
-              <th className="px-4 py-3 font-semibold text-right">損益(原幣)</th>
-              <th className="px-4 py-3 font-semibold text-center w-16">操作</th>
+              <th className="px-4 py-3 font-semibold">{t('table.columns.date')}</th>
+              <th className="px-4 py-3 font-semibold">{t('table.columns.type')}</th>
+              <th className="px-4 py-3 font-semibold">{t('table.columns.symbol')}</th>
+              <th className="px-4 py-3 font-semibold text-right">{t('table.columns.quantity')}</th>
+              <th className="px-4 py-3 font-semibold text-right">{t('table.columns.price')}</th>
+              <th className="px-4 py-3 font-semibold text-right">{t('table.columns.amount')}</th>
+              <th className="px-4 py-3 font-semibold text-right">{t('table.columns.pnl')}</th>
+              <th className="px-4 py-3 font-semibold text-center w-16">{t('table.columns.actions')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -260,11 +287,16 @@ export default function ManagerPanel({
                 }
 
                 const symbol = formatSymbol(row['代號'], market);
-                const resolvedName = liveData[symbol]?.name || STOCK_MAPPING[symbol]?.name || '未知';
+                const currency = getCurrencyBySymbolOrMarket(symbol, market);
+                const resolvedName = liveData[symbol]?.name || STOCK_MAPPING[symbol]?.name || t('data.unknown');
+                const quantityValue = parseNumericValue(row['數量']);
+                const priceValue = parseNumericValue(row['單價']);
+                const amountValue = parseNumericValue(row['總金額']);
+                const pnlValue = parseNumericValue(row['損益']);
 
                 return (
                   <tr key={row.originalIndex} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                    <td className="px-4 py-2 text-slate-600 dark:text-slate-400">{formatDate(row['日期'])}</td>
+                    <td className="px-4 py-2 text-slate-600 dark:text-slate-400">{formatDate(row['日期'], activeLocale)}</td>
                     <td className="px-4 py-2">
                       <span
                         className={`px-2 py-0.5 rounded text-xs font-medium ${
@@ -273,35 +305,43 @@ export default function ManagerPanel({
                             : 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
                         }`}
                       >
-                        {row['類型']}
+                        {t(TRADE_TYPE_TRANSLATION_KEYS[row['類型']])}
                       </span>
                     </td>
                     <td className="px-4 py-2">
                       <div className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                         {symbol}
                         <span className="text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded">
-                          {market}
+                          {t(MARKET_TRANSLATION_KEYS[market] || 'markets.unknown')}
                         </span>
                       </div>
                       <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{resolvedName}</div>
                     </td>
-                    <td className="px-4 py-2 text-right text-slate-700 dark:text-slate-300">{row['數量']}</td>
-                    <td className="px-4 py-2 text-right text-slate-500 dark:text-slate-400">{row['單價']}</td>
-                    <td className="px-4 py-2 text-right font-medium text-slate-800 dark:text-slate-200">{row['總金額']}</td>
-                    <td className="px-4 py-2 text-right text-slate-500 dark:text-slate-400">{row['損益'] || '-'}</td>
+                    <td className="px-4 py-2 text-right text-slate-700 dark:text-slate-300">
+                      {quantityValue === null ? '-' : formatLocalizedNumber(quantityValue, activeLocale, { maximumFractionDigits: 4 })}
+                    </td>
+                    <td className="px-4 py-2 text-right text-slate-500 dark:text-slate-400">
+                      {priceValue === null ? '-' : formatLocalizedCurrency(priceValue, currency, activeLocale)}
+                    </td>
+                    <td className="px-4 py-2 text-right font-medium text-slate-800 dark:text-slate-200">
+                      {amountValue === null ? '-' : formatLocalizedCurrency(amountValue, currency, activeLocale)}
+                    </td>
+                    <td className="px-4 py-2 text-right text-slate-500 dark:text-slate-400">
+                      {pnlValue === null ? '-' : formatLocalizedCurrency(pnlValue, currency, activeLocale, { signed: true })}
+                    </td>
                     <td className="px-4 py-2 text-center">
                       <div className="flex items-center justify-center gap-2">
                         <button
                           onClick={() => handleEditRecord(row.originalIndex)}
                           className="text-slate-400 hover:text-blue-500 transition-colors p-1"
-                          title="編輯"
+                          title={t('common.edit')}
                         >
                           <Edit2 size={16} />
                         </button>
                         <button
                           onClick={() => handleDeleteRecord(row.originalIndex)}
                           className="text-slate-400 hover:text-rose-500 transition-colors p-1"
-                          title="刪除"
+                          title={t('common.delete')}
                         >
                           <Trash2 size={16} />
                         </button>
@@ -313,7 +353,7 @@ export default function ManagerPanel({
             {rawData.length === 0 && (
               <tr>
                 <td colSpan="8" className="px-4 py-8 text-center text-slate-400 dark:text-slate-500">
-                  目前沒有任何紀錄
+                  {t('manager.noRecords')}
                 </td>
               </tr>
             )}

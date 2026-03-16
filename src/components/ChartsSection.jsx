@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Area,
   AreaChart,
@@ -15,7 +16,12 @@ import {
   YAxis
 } from 'recharts';
 import { Camera } from 'lucide-react';
+import { TREND_RANGE_TRANSLATION_KEYS, normalizeLocale } from '../locales/config';
 import { COLORS } from '../utils/constants';
+import {
+  formatLocalizedCompactNumber,
+  formatLocalizedPercent
+} from '../utils/localization';
 
 export default function ChartsSection({
   barChartRef,
@@ -30,6 +36,10 @@ export default function ChartsSection({
   trendData,
   trendTimeRange
 }) {
+  const { t, i18n } = useTranslation();
+  const activeLocale = normalizeLocale(i18n.resolvedLanguage || i18n.language);
+  const timeRangeKeys = ['1週', '1月', '3月', '半年', 'YTD', '1年', '5年', '全部'];
+
   const pnlGradientOffset = useMemo(() => {
     if (!trendData || trendData.length === 0) return 0;
 
@@ -79,7 +89,7 @@ export default function ChartsSection({
               }`}
               style={{ backgroundColor: isIfSoldToday ? undefined : entry.color || entry.fill }}
             />
-            <span>{entry.value} (換算後)</span>
+            <span>{t('charts.legendConverted', { label: entry.value })}</span>
           </li>
         );
       })}
@@ -91,17 +101,17 @@ export default function ChartsSection({
       <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800" ref={trendChartRef}>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-            累積投資趨勢變化
+            {t('charts.trendTitle')}
             <button
               onClick={() => exportChartAsImage(trendChartRef, 'net_worth_trend')}
               className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-md transition-all"
-              title="將圖表存為圖片"
+              title={t('charts.saveImage')}
             >
               <Camera size={16} />
             </button>
           </h3>
           <div className="flex flex-wrap gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
-            {['1週', '1月', '3月', '半年', 'YTD', '1年', '5年', '全部'].map((timeRange) => (
+            {timeRangeKeys.map((timeRange) => (
               <button
                 key={timeRange}
                 onClick={() => setTrendTimeRange(timeRange)}
@@ -111,7 +121,7 @@ export default function ChartsSection({
                     : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                 }`}
               >
-                {timeRange}
+                {t(TREND_RANGE_TRANSLATION_KEYS[timeRange])}
               </button>
             ))}
           </div>
@@ -143,7 +153,7 @@ export default function ChartsSection({
                 />
                 <YAxis
                   yAxisId="left"
-                  tickFormatter={(value) => `${value > 1000 ? `${(value / 1000).toFixed(0)}k` : value}`}
+                  tickFormatter={(value) => formatLocalizedCompactNumber(value, activeLocale)}
                   tick={{ fontSize: 11, fill: '#818cf8' }}
                   orientation="left"
                   stroke="#818cf8"
@@ -155,19 +165,15 @@ export default function ChartsSection({
                   orientation="right"
                   axisLine={false}
                   tickLine={false}
-                  tick={(props) => {
-                    const { payload, x, y } = props;
-                    const value = payload.value;
-                    const isNegative = value < 0;
-                    const fill = isNegative ? '#ef4444' : '#10b981';
-                    const formattedValue = value > 1000
-                      ? `${(value / 1000).toFixed(0)}k`
-                      : value < -1000
-                        ? `${(value / 1000).toFixed(0)}k`
-                        : value;
+                    tick={(props) => {
+                      const { payload, x, y } = props;
+                      const value = payload.value;
+                      const isNegative = value < 0;
+                      const fill = isNegative ? '#ef4444' : '#10b981';
+                      const formattedValue = formatLocalizedCompactNumber(value, activeLocale);
 
-                    return (
-                      <text x={x} y={y} dy={4} fill={fill} fontSize={11} textAnchor="start">
+                      return (
+                        <text x={x} y={y} dy={4} fill={fill} fontSize={11} textAnchor="start">
                         {formattedValue}
                       </text>
                     );
@@ -179,7 +185,7 @@ export default function ChartsSection({
                   yAxisId="left"
                   type="monotone"
                   dataKey="costBase"
-                  name="累積投入本金"
+                  name={t('charts.costSeries')}
                   stroke="#818cf8"
                   strokeWidth={3}
                   fillOpacity={1}
@@ -189,7 +195,7 @@ export default function ChartsSection({
                   yAxisId="right"
                   type="monotone"
                   dataKey="realizedPnlBase"
-                  name="累積已實現損益"
+                  name={t('charts.realizedSeries')}
                   stroke="url(#colorPnlSplit)"
                   strokeWidth={2}
                   fillOpacity={1}
@@ -199,7 +205,7 @@ export default function ChartsSection({
             </ResponsiveContainer>
           ) : (
             <div className="flex h-full items-center justify-center text-slate-400 dark:text-slate-500">
-              目前尚無足夠的交易紀錄以繪製走勢
+              {t('charts.noTrend')}
             </div>
           )}
         </div>
@@ -209,17 +215,17 @@ export default function ChartsSection({
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800" ref={barChartRef}>
           <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              各股已實現損益 (賣飛/避險榜)
+              {t('charts.realizedTitle')}
               <button
                 onClick={() => exportChartAsImage(barChartRef, 'realized_pnl_chart')}
                 className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-md transition-all"
-                title="將圖表存為圖片"
+                title={t('charts.saveImage')}
               >
                 <Camera size={16} />
               </button>
             </div>
             <span className="text-xs font-normal text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
-              統一換算為 {baseCurrency} 繪製
+              {t('charts.convertedNote', { currency: baseCurrency })}
             </span>
           </h3>
           <div className="h-80">
@@ -235,12 +241,12 @@ export default function ChartsSection({
                   />
                   <XAxis xAxisId={1} dataKey="name" hide />
                   <YAxis
-                    tickFormatter={(value) => `${value > 1000 ? `${(value / 1000).toFixed(0)}k` : value}`}
+                    tickFormatter={(value) => formatLocalizedCompactNumber(value, activeLocale)}
                     tick={{ fontSize: 12, fill: darkMode ? '#94a3b8' : '#64748b' }}
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: darkMode ? '#1e293b' : '#f1f5f9' }} />
                   <Legend content={renderCustomLegend} verticalAlign="top" wrapperStyle={{ paddingBottom: '20px' }} />
-                  <Bar xAxisId={1} dataKey="ifSoldTodayPnlBase" name="若今天才賣" radius={[4, 4, 0, 0]}>
+                  <Bar xAxisId={1} dataKey="ifSoldTodayPnlBase" name={t('charts.ifSoldSeries')} radius={[4, 4, 0, 0]}>
                     {chartData.pnlData.map((entry, index) => (
                       <Cell
                         key={`cell-if-${index}`}
@@ -252,7 +258,7 @@ export default function ChartsSection({
                       />
                     ))}
                   </Bar>
-                  <Bar xAxisId={0} dataKey="realizedPnlBase" name="實際已實現" radius={[4, 4, 0, 0]}>
+                  <Bar xAxisId={0} dataKey="realizedPnlBase" name={t('charts.actualSeries')} radius={[4, 4, 0, 0]}>
                     {chartData.pnlData.map((entry, index) => (
                       <Cell key={`cell-actual-${index}`} fill={entry.realizedPnlBase >= 0 ? '#10B981' : '#EF4444'} />
                     ))}
@@ -261,7 +267,7 @@ export default function ChartsSection({
               </ResponsiveContainer>
             ) : (
               <div className="flex h-full items-center justify-center text-slate-400 dark:text-slate-500">
-                目前無損益資料
+                {t('charts.noPnlData')}
               </div>
             )}
           </div>
@@ -270,17 +276,17 @@ export default function ChartsSection({
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800" ref={pieChartRef}>
           <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              持股市值分佈 (Top 10)
+              {t('charts.distributionTitle')}
               <button
                 onClick={() => exportChartAsImage(pieChartRef, 'portfolio_distribution')}
                 className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-md transition-all"
-                title="將圖表存為圖片"
+                title={t('charts.saveImage')}
               >
                 <Camera size={16} />
               </button>
             </div>
             <span className="text-xs font-normal text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
-              統一換算為 {baseCurrency} 繪製
+              {t('charts.convertedNote', { currency: baseCurrency })}
             </span>
           </h3>
           <div className="h-80">
@@ -297,7 +303,10 @@ export default function ChartsSection({
                     dataKey="currentValueBase"
                     nameKey="name"
                     labelLine
-                    label={({ name, percent }) => `${name.substring(0, 4)} ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) => `${String(name).slice(0, 4)} ${formatLocalizedPercent(percent * 100, activeLocale, {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0
+                    })}`}
                   >
                     {chartData.holdingData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -308,7 +317,7 @@ export default function ChartsSection({
               </ResponsiveContainer>
             ) : (
               <div className="flex h-full items-center justify-center text-slate-400 dark:text-slate-500">
-                目前空手無持股
+                {t('charts.noHoldings')}
               </div>
             )}
           </div>

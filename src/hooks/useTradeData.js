@@ -1,6 +1,20 @@
 import { useEffect, useMemo, useState } from 'react';
-import { asyncStorage, formatSymbol, guessMarket, parseCSV } from '../utils/helpers';
-import { CURRENCY_SYMBOLS, DEFAULT_CSV, STOCK_MAPPING } from '../utils/constants';
+import { useTranslation } from 'react-i18next';
+import { normalizeLocale } from '../locales/config';
+import {
+  formatLocalizedCurrency,
+  formatLocalizedDate,
+  formatLocalizedNumber,
+  formatLocalizedPercent
+} from '../utils/localization';
+import {
+  asyncStorage,
+  formatSymbol,
+  getCurrencyBySymbolOrMarket,
+  guessMarket,
+  parseCSV
+} from '../utils/helpers';
+import { DEFAULT_CSV, STOCK_MAPPING } from '../utils/constants';
 
 const DEFAULT_NEW_RECORD = {
   date: '',
@@ -15,14 +29,6 @@ const DEFAULT_NEW_RECORD = {
 
 const ONE_DAY = 24 * 60 * 60 * 1000;
 
-const MARKET_CURRENCY_MAP = {
-  美股: 'USD',
-  台股: 'TWD',
-  港股: 'HKD',
-  陸股: 'CNY',
-  日股: 'JPY'
-};
-
 const getNumericValue = (value) => parseFloat(String(value || '0').replace(/[^0-9.-]+/g, '')) || 0;
 
 const getResetRecord = (currentRecord, clearPrice = true) => ({
@@ -35,18 +41,8 @@ const getResetRecord = (currentRecord, clearPrice = true) => ({
   pnl: ''
 });
 
-const getCurrencyBySymbolOrMarket = (symbol, market) => {
-  const normalizedSymbol = String(symbol || '').trim().toUpperCase();
-
-  if (normalizedSymbol.endsWith('.TW')) return 'TWD';
-  if (normalizedSymbol.endsWith('.HK')) return 'HKD';
-  if (normalizedSymbol.endsWith('.SZ') || normalizedSymbol.endsWith('.SS')) return 'CNY';
-  if (normalizedSymbol.endsWith('.T')) return 'JPY';
-
-  return MARKET_CURRENCY_MAP[market] || 'CNY';
-};
-
 export function useTradeData(showToast) {
+  const { t, i18n } = useTranslation();
   const [isAppLoaded, setIsAppLoaded] = useState(false);
   const [rawData, setRawData] = useState([]);
   const [isDemo, setIsDemo] = useState(true);
@@ -67,6 +63,7 @@ export function useTradeData(showToast) {
   const [newRec, setNewRec] = useState(DEFAULT_NEW_RECORD);
   const [isLoadingPrices, setIsLoadingPrices] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(null);
+  const activeLocale = normalizeLocale(i18n.resolvedLanguage || i18n.language);
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -131,7 +128,7 @@ export function useTradeData(showToast) {
 
   const handleSaveApiKey = () => {
     asyncStorage.set('yfapi_net_key', apiKey);
-    showToast('API 金鑰已更新並儲存！');
+    showToast(t('messages.apiKeySaved'));
   };
 
   const handleSaveManualStock = (symbol) => {
@@ -147,13 +144,13 @@ export function useTradeData(showToast) {
     setManualStockData(updatedManualStockData);
     asyncStorage.set('tr_manual_stock_data', JSON.stringify(updatedManualStockData));
     setEditingStockSymbol(null);
-    showToast(`已手動更新 ${symbol} 的資訊`);
+    showToast(t('messages.manualStockSaved', { symbol }));
   };
 
   const fetchLivePrices = async (isForce = false, targetBaseCurrency = baseCurrency) => {
     if (!apiKey) {
       setShowManager(true);
-      showToast('請先於管理面板輸入 yfapi.net 金鑰才能更新股價');
+      showToast(t('messages.needApiKey'));
       return;
     }
 
@@ -219,7 +216,7 @@ export function useTradeData(showToast) {
       if (codesToFetch.length === 0 && currenciesToFetch.size === 0) {
         setLastUpdate(new Date());
         setIsLoadingPrices(false);
-        showToast('所有股價與匯率均在 24 小時內更新過，自動使用本機快取以節省額度！');
+        showToast(t('messages.cacheFresh'));
         return;
       }
 
@@ -243,13 +240,7 @@ export function useTradeData(showToast) {
         );
 
         if (!response.ok) {
-          throw new Error(
-            response.status === 429
-              ? 'API 額度已耗盡 (429)'
-              : response.status === 403
-                ? 'API Key 無效 (403)'
-                : `伺服器錯誤: ${response.status}`
-          );
+          throw new Error(`HTTP ${response.status}`);
         }
 
         const json = await response.json();
@@ -330,9 +321,9 @@ export function useTradeData(showToast) {
       asyncStorage.set('tr_dashboard_cache', JSON.stringify(updatedLiveData));
       asyncStorage.set('tr_exchange_rates', JSON.stringify(updatedExchangeRates));
       setLastUpdate(new Date());
-      showToast(`成功更新 ${fetchedCount} 檔股票與匯率資訊！`);
+      showToast(t('messages.updateSuccess', { count: formatLocalizedNumber(fetchedCount, activeLocale) }));
     } catch (error) {
-      showToast(`抓取失敗: ${error.message}`);
+      showToast(t('messages.fetchFailed', { message: error.message }));
     } finally {
       setIsLoadingPrices(false);
     }
@@ -341,7 +332,7 @@ export function useTradeData(showToast) {
   const handleSaveBaseCurrency = (currency) => {
     setBaseCurrency(currency);
     asyncStorage.set('tr_base_currency', currency);
-    showToast(`基礎計價幣別已更改為 ${currency}，正在更新匯率...`);
+    showToast(t('messages.baseCurrencyChanged', { currency }));
 
     setTimeout(() => {
       fetchLivePrices(false, currency);
@@ -374,7 +365,7 @@ export function useTradeData(showToast) {
       updatedRawData = [...rawData];
       updatedRawData[editingIndex] = row;
       setEditingIndex(null);
-      showToast('交易紀錄已更新！');
+      showToast(t('messages.recordUpdated'));
     } else {
       updatedRawData = [...rawData, row];
     }
@@ -426,9 +417,9 @@ export function useTradeData(showToast) {
   };
 
   const handleClearData = (exportBackup) => {
-    if (window.confirm('確定要清除所有資料並載入範例嗎？此動作無法復原！')) {
+    if (window.confirm(t('messages.clearConfirm'))) {
       if (rawData.length > 0 && !isDemo) {
-        if (window.confirm('在清除之前，是否需要先將目前的資料匯出為 CSV 備份？')) {
+        if (window.confirm(t('messages.backupConfirm'))) {
           exportBackup?.();
         }
       }
@@ -437,7 +428,7 @@ export function useTradeData(showToast) {
       setRawData(parseCSV(DEFAULT_CSV));
       setIsDemo(true);
       setShowManager(false);
-      showToast('已清除資料並載入範例');
+      showToast(t('messages.dataCleared'));
     }
   };
 
@@ -524,7 +515,7 @@ export function useTradeData(showToast) {
           symbol,
           rawCode,
           market,
-          name: STOCK_MAPPING[symbol]?.name || `未知代號 (${symbol})`,
+          name: STOCK_MAPPING[symbol]?.name || t('data.unknownSymbol', { symbol }),
           currentPrice: STOCK_MAPPING[symbol]?.price || 0,
           currency: getCurrencyBySymbolOrMarket(symbol, market),
           holdingQty: 0,
@@ -603,7 +594,6 @@ export function useTradeData(showToast) {
           isManualName,
           lastUpdateTimestamp,
           currency,
-          currencySymbol: CURRENCY_SYMBOLS[currency] || currency,
           exchangeRate,
           currentValueOriginal,
           unrealizedPnlOriginal,
@@ -622,7 +612,7 @@ export function useTradeData(showToast) {
         };
       })
       .sort((a, b) => b.realizedPnlBase - a.realizedPnlBase);
-  }, [baseCurrency, exchangeRates, isAppLoaded, liveData, manualStockData, rawData]);
+  }, [baseCurrency, exchangeRates, isAppLoaded, liveData, manualStockData, rawData, t]);
 
   const chartData = useMemo(() => {
     let holdingData = [];
@@ -639,7 +629,7 @@ export function useTradeData(showToast) {
         .reduce((total, item) => total + item.currentValueBase, 0);
 
       topHoldings.push({
-        name: '其它',
+        name: t('charts.others'),
         currentValueBase: otherHoldingsValue,
         symbol: 'OTHERS'
       });
@@ -648,7 +638,7 @@ export function useTradeData(showToast) {
 
     const pnlData = processedData.filter((item) => item.realizedPnlBase !== 0);
     return { holdingData, pnlData };
-  }, [processedData]);
+  }, [processedData, t]);
 
   const requestSort = (key) => {
     let direction = 'desc';
@@ -821,9 +811,12 @@ export function useTradeData(showToast) {
 
     return filtered.map((item) => ({
       ...item,
-      displayDate: item.date.substring(5)
+      displayDate: formatLocalizedDate(item.date, activeLocale, {
+        month: 'short',
+        day: 'numeric'
+      })
     }));
-  }, [baseCurrency, exchangeRates, isAppLoaded, rawData, trendTimeRange]);
+  }, [activeLocale, baseCurrency, exchangeRates, isAppLoaded, rawData, trendTimeRange]);
 
   const availableMarkets = useMemo(
     () => Array.from(new Set(processedData.map((stock) => stock.market))).filter(Boolean),
@@ -843,21 +836,15 @@ export function useTradeData(showToast) {
     ? (summary.totalUnrealizedPnl / summary.totalHoldingCost) * 100
     : 0;
 
-  const formatBaseCurrency = (value) => (
-    `${CURRENCY_SYMBOLS[baseCurrency] || baseCurrency} ${Number(value || 0).toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    })}`
+  const formatBaseCurrency = (value, options = {}) => (
+    formatLocalizedCurrency(value, baseCurrency, activeLocale, options)
   );
 
-  const formatOriginalCurrency = (value, symbol) => (
-    `${symbol}${Number(value || 0).toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    })}`
+  const formatOriginalCurrency = (value, currency, options = {}) => (
+    formatLocalizedCurrency(value, currency || baseCurrency, activeLocale, options)
   );
 
-  const formatPercent = (value) => `${value > 0 ? '+' : ''}${Number(value || 0).toFixed(2)}%`;
+  const formatPercent = (value, options = {}) => formatLocalizedPercent(value, activeLocale, options);
 
   return {
     apiKey,

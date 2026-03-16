@@ -1,5 +1,13 @@
 import { DB_NAME, DB_VERSION, STORE_NAME } from './constants';
 
+const MARKET_CURRENCY_MAP = {
+  美股: 'USD',
+  台股: 'TWD',
+  港股: 'HKD',
+  陸股: 'CNY',
+  日股: 'JPY'
+};
+
 export const initDB = () => {
   return new Promise((resolve, reject) => {
     if (typeof window === 'undefined') return reject('No window');
@@ -144,9 +152,25 @@ export const formatSymbol = (code, market) => {
   }
 };
 
-export const formatDate = (dateStr) => {
+export const getCurrencyBySymbolOrMarket = (symbol, market) => {
+  const normalizedSymbol = String(symbol || '').trim().toUpperCase();
+
+  if (normalizedSymbol.endsWith('.TW')) return 'TWD';
+  if (normalizedSymbol.endsWith('.HK')) return 'HKD';
+  if (normalizedSymbol.endsWith('.SZ') || normalizedSymbol.endsWith('.SS')) return 'CNY';
+  if (normalizedSymbol.endsWith('.T')) return 'JPY';
+
+  return MARKET_CURRENCY_MAP[market] || 'CNY';
+};
+
+export const formatDate = (dateStr, locale = 'zh-TW', options = {}) => {
   if (!dateStr) return '';
   const d = new Date(dateStr);
   if (isNaN(d.getTime())) return dateStr;
-  return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+  return new Intl.DateTimeFormat(locale, {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    ...options
+  }).format(d);
 };
