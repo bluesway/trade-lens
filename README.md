@@ -81,6 +81,10 @@
 - 日本語：[`README.ja-JP.md`](https://github.com/bluesway/trade-lens/blob/master/README.ja-JP.md)
 - English (US)：[`README.en-US.md`](https://github.com/bluesway/trade-lens/blob/master/README.en-US.md)
 
+### 維運文件
+
+- 部署流程：[`docs/deploy.md`](docs/deploy.md)
+
 ## 技術組成
 
 - React 18

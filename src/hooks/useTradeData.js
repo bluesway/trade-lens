@@ -16,6 +16,15 @@ import {
 } from '../utils/helpers';
 import { DEFAULT_CSV, STOCK_MAPPING } from '../utils/constants';
 
+const STORAGE_KEYS = {
+  apiKey: 'yfapi_net_key',
+  baseCurrency: 'tr_base_currency',
+  dashboardCache: 'tr_dashboard_cache',
+  dashboardData: 'tr_dashboard_data',
+  exchangeRates: 'tr_exchange_rates',
+  manualStockData: 'tr_manual_stock_data'
+};
+
 const DEFAULT_NEW_RECORD = {
   date: '',
   type: '買入',
@@ -29,6 +38,14 @@ const DEFAULT_NEW_RECORD = {
 
 const ONE_DAY = 24 * 60 * 60 * 1000;
 const FX_BRIDGE_CURRENCY = 'USD';
+const TREND_RANGE_MS_MAP = {
+  '1週': 7 * ONE_DAY,
+  '1月': 30 * ONE_DAY,
+  '3月': 90 * ONE_DAY,
+  半年: 180 * ONE_DAY,
+  '1年': 365 * ONE_DAY,
+  '5年': 5 * 365 * ONE_DAY
+};
 
 const getFxRateSymbols = (fromCurrency, toCurrency) => {
   if (!fromCurrency || !toCurrency || fromCurrency === toCurrency) {
@@ -59,6 +76,20 @@ const getResetRecord = (currentRecord, clearPrice = true) => ({
   pnl: ''
 });
 
+const resolveMarket = (code, market) => {
+  if (market && market !== '未知') return market;
+  return guessMarket(code);
+};
+
+const formatDateForInput = (dateValue) => {
+  const parsedDate = new Date(dateValue);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return dateValue;
+  }
+
+  return `${parsedDate.getFullYear()}-${String(parsedDate.getMonth() + 1).padStart(2, '0')}-${String(parsedDate.getDate()).padStart(2, '0')}`;
+};
+
 export function useTradeData(showToast) {
   const { t, i18n } = useTranslation();
   const [isAppLoaded, setIsAppLoaded] = useState(false);
@@ -83,16 +114,37 @@ export function useTradeData(showToast) {
   const [lastUpdate, setLastUpdate] = useState(null);
   const activeLocale = normalizeLocale(i18n.resolvedLanguage || i18n.language);
 
+  const persistValue = (key, value) => asyncStorage.set(key, value);
+  const persistJson = (key, value) => persistValue(key, JSON.stringify(value));
+  const persistRawData = (updatedRawData) => {
+    setRawData(updatedRawData);
+    persistJson(STORAGE_KEYS.dashboardData, updatedRawData);
+  };
+  const resetToDemoData = () => {
+    asyncStorage.remove(STORAGE_KEYS.dashboardData);
+    setRawData(parseCSV(DEFAULT_CSV));
+  };
+  const persistManualData = (updatedManualStockData) => {
+    setManualStockData(updatedManualStockData);
+    persistJson(STORAGE_KEYS.manualStockData, updatedManualStockData);
+  };
+  const persistMarketData = (updatedLiveData, updatedExchangeRates) => {
+    setLiveData(updatedLiveData);
+    setExchangeRates(updatedExchangeRates);
+    persistJson(STORAGE_KEYS.dashboardCache, updatedLiveData);
+    persistJson(STORAGE_KEYS.exchangeRates, updatedExchangeRates);
+  };
+
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        const savedKey = await asyncStorage.get('yfapi_net_key');
+        const savedKey = await asyncStorage.get(STORAGE_KEYS.apiKey);
         if (savedKey) setApiKey(savedKey);
 
-        const savedCurrency = await asyncStorage.get('tr_base_currency');
+        const savedCurrency = await asyncStorage.get(STORAGE_KEYS.baseCurrency);
         if (savedCurrency) setBaseCurrency(savedCurrency);
 
-        const savedCache = await asyncStorage.get('tr_dashboard_cache');
+        const savedCache = await asyncStorage.get(STORAGE_KEYS.dashboardCache);
         if (savedCache) {
           const parsedCache = JSON.parse(savedCache);
           setLiveData(parsedCache);
@@ -106,17 +158,17 @@ export function useTradeData(showToast) {
           }
         }
 
-        const savedManual = await asyncStorage.get('tr_manual_stock_data');
+        const savedManual = await asyncStorage.get(STORAGE_KEYS.manualStockData);
         if (savedManual) {
           setManualStockData(JSON.parse(savedManual));
         }
 
-        const savedRates = await asyncStorage.get('tr_exchange_rates');
+        const savedRates = await asyncStorage.get(STORAGE_KEYS.exchangeRates);
         if (savedRates) {
           setExchangeRates(JSON.parse(savedRates));
         }
 
-        const savedData = await asyncStorage.get('tr_dashboard_data');
+        const savedData = await asyncStorage.get(STORAGE_KEYS.dashboardData);
         if (savedData) {
           const parsed = JSON.parse(savedData);
           if (parsed && parsed.length > 0) {
@@ -160,7 +212,7 @@ export function useTradeData(showToast) {
   };
 
   const handleSaveApiKey = () => {
-    asyncStorage.set('yfapi_net_key', apiKey);
+    persistValue(STORAGE_KEYS.apiKey, apiKey);
     showToast(t('messages.apiKeySaved'));
   };
 
@@ -174,8 +226,7 @@ export function useTradeData(showToast) {
       }
     };
 
-    setManualStockData(updatedManualStockData);
-    asyncStorage.set('tr_manual_stock_data', JSON.stringify(updatedManualStockData));
+    persistManualData(updatedManualStockData);
     setEditingStockSymbol(null);
     showToast(t('messages.manualStockSaved', { symbol }));
   };
@@ -192,10 +243,7 @@ export function useTradeData(showToast) {
         const code = String(row['代號'] || '').trim();
         if (!code) return null;
 
-        let market = row['市場'] || '未知';
-        if (market === '未知' || !market) {
-          market = guessMarket(code);
-        }
+        const market = resolveMarket(code, row['市場']);
 
         return {
           market,
@@ -317,8 +365,7 @@ export function useTradeData(showToast) {
         });
 
         if (isManualDataChanged) {
-          setManualStockData(updatedManualStockData);
-          asyncStorage.set('tr_manual_stock_data', JSON.stringify(updatedManualStockData));
+          persistManualData(updatedManualStockData);
         }
       }
 
@@ -354,10 +401,7 @@ export function useTradeData(showToast) {
         }
       }
 
-      setLiveData(updatedLiveData);
-      setExchangeRates(updatedExchangeRates);
-      asyncStorage.set('tr_dashboard_cache', JSON.stringify(updatedLiveData));
-      asyncStorage.set('tr_exchange_rates', JSON.stringify(updatedExchangeRates));
+      persistMarketData(updatedLiveData, updatedExchangeRates);
       setLastUpdate(new Date());
       showToast(t('messages.updateSuccess', { count: formatLocalizedNumber(fetchedCount, activeLocale) }));
     } catch (error) {
@@ -369,7 +413,7 @@ export function useTradeData(showToast) {
 
   const handleSaveBaseCurrency = (currency) => {
     setBaseCurrency(currency);
-    asyncStorage.set('tr_base_currency', currency);
+    persistValue(STORAGE_KEYS.baseCurrency, currency);
     showToast(t('messages.baseCurrencyChanged', { currency }));
 
     setTimeout(() => {
@@ -379,9 +423,8 @@ export function useTradeData(showToast) {
 
   const importCsvText = (text) => {
     const parsedData = parseCSV(text);
-    setRawData(parsedData);
+    persistRawData(parsedData);
     setIsDemo(false);
-    asyncStorage.set('tr_dashboard_data', JSON.stringify(parsedData));
   };
 
   const handleAddRecord = () => {
@@ -408,15 +451,13 @@ export function useTradeData(showToast) {
       updatedRawData = [...rawData, row];
     }
 
-    setRawData(updatedRawData);
-    asyncStorage.set('tr_dashboard_data', JSON.stringify(updatedRawData));
+    persistRawData(updatedRawData);
     setNewRec((currentRecord) => getResetRecord(currentRecord));
   };
 
   const handleDeleteRecord = (index) => {
     const updatedRawData = rawData.filter((_, rowIndex) => rowIndex !== index);
-    setRawData(updatedRawData);
-    asyncStorage.set('tr_dashboard_data', JSON.stringify(updatedRawData));
+    persistRawData(updatedRawData);
 
     if (updatedRawData.length === 0) {
       setIsDemo(true);
@@ -431,17 +472,11 @@ export function useTradeData(showToast) {
   const handleEditRecord = (index) => {
     const row = rawData[index];
 
-    let dateValue = row['日期'];
-    const parsedDate = new Date(dateValue);
-    if (!Number.isNaN(parsedDate.getTime())) {
-      dateValue = `${parsedDate.getFullYear()}-${String(parsedDate.getMonth() + 1).padStart(2, '0')}-${String(parsedDate.getDate()).padStart(2, '0')}`;
-    }
-
     setNewRec({
-      date: dateValue,
+      date: formatDateForInput(row['日期']),
       type: row['類型'],
       code: row['代號'],
-      market: row['市場'] || guessMarket(row['代號']),
+      market: resolveMarket(row['代號'], row['市場']),
       qty: row['數量'],
       amount: row['總金額'],
       pnl: row['損益'] || ''
@@ -462,8 +497,7 @@ export function useTradeData(showToast) {
         }
       }
 
-      asyncStorage.remove('tr_dashboard_data');
-      setRawData(parseCSV(DEFAULT_CSV));
+      resetToDemoData();
       setIsDemo(true);
       setShowManager(false);
       showToast(t('messages.dataCleared'));
@@ -538,10 +572,7 @@ export function useTradeData(showToast) {
       const type = row['類型'];
       if (!rawCode || !type) return;
 
-      let market = row['市場'] || '未知';
-      if (market === '未知' || !market) {
-        market = guessMarket(rawCode);
-      }
+      const market = resolveMarket(rawCode, row['市場']);
 
       const symbol = formatSymbol(rawCode, market);
       const quantity = parseFloat(row['數量']) || 0;
@@ -765,10 +796,7 @@ export function useTradeData(showToast) {
       const type = row['類型'];
       if (!rawCode || !type) return;
 
-      let market = row['市場'] || '未知';
-      if (market === '未知' || !market) {
-        market = guessMarket(rawCode);
-      }
+      const market = resolveMarket(rawCode, row['市場']);
 
       const symbol = formatSymbol(rawCode, market);
       const date = row['日期'];
@@ -829,21 +857,12 @@ export function useTradeData(showToast) {
     });
 
     const now = Date.now();
-    const rangeMsMap = {
-      '1週': 7 * 24 * 60 * 60 * 1000,
-      '1月': 30 * 24 * 60 * 60 * 1000,
-      '3月': 90 * 24 * 60 * 60 * 1000,
-      半年: 180 * 24 * 60 * 60 * 1000,
-      '1年': 365 * 24 * 60 * 60 * 1000,
-      '5年': 5 * 365 * 24 * 60 * 60 * 1000
-    };
-
     let filtered = aggregatedByDate;
     if (trendTimeRange === 'YTD') {
       const yearToDate = new Date(new Date().getFullYear(), 0, 1).getTime();
       filtered = aggregatedByDate.filter((item) => item.timestamp >= yearToDate);
-    } else if (rangeMsMap[trendTimeRange]) {
-      const cutoff = now - rangeMsMap[trendTimeRange];
+    } else if (TREND_RANGE_MS_MAP[trendTimeRange]) {
+      const cutoff = now - TREND_RANGE_MS_MAP[trendTimeRange];
       filtered = aggregatedByDate.filter((item) => item.timestamp >= cutoff);
     }
 
