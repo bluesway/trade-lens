@@ -5,15 +5,17 @@ import { DEFAULT_LOCALE, SUPPORTED_LOCALES, normalizeLocale } from './locales/co
 import { resources } from './locales/resources';
 
 const supportedLngs = SUPPORTED_LOCALES.map(({ code }) => code);
+const defaultNamespace = 'translation';
 
 export const i18nReady = i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources,
+    ns: [defaultNamespace],
+    defaultNS: defaultNamespace,
     fallbackLng: DEFAULT_LOCALE,
     supportedLngs,
-    nonExplicitSupportedLngs: true,
     load: 'currentOnly',
     initImmediate: false,
     interpolation: {
