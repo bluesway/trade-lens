@@ -16,8 +16,11 @@ import {
   normalizeLocale
 } from '../locales/config';
 import {
+  formatGregorianReferenceDate,
+  formatGregorianReferenceDateTime,
   formatLocalizedDateTime,
-  formatLocalizedNumber
+  formatLocalizedNumber,
+  shouldShowGregorianReference
 } from '../utils/localization';
 import { formatDate } from '../utils/helpers';
 
@@ -41,6 +44,21 @@ export default function DataTable({
 }) {
   const { t, i18n } = useTranslation();
   const activeLocale = normalizeLocale(i18n.resolvedLanguage || i18n.language);
+  const showGregorianReference = shouldShowGregorianReference(activeLocale);
+
+  const renderTradeDate = (value) => {
+    const localizedDate = formatDate(value, activeLocale);
+    if (!showGregorianReference) {
+      return localizedDate;
+    }
+
+    return (
+      <div className="leading-tight">
+        <div>{localizedDate}</div>
+        <div className="text-[10px] text-slate-400 dark:text-slate-500">{formatGregorianReferenceDate(value)}</div>
+      </div>
+    );
+  };
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
@@ -208,12 +226,18 @@ export default function DataTable({
                             {stock.isManualName
                               ? t('table.manualUpdatedAt', {
                                 value: stock.lastUpdateTimestamp
-                                  ? formatLocalizedDateTime(stock.lastUpdateTimestamp, activeLocale)
+                                  ? [
+                                    formatLocalizedDateTime(stock.lastUpdateTimestamp, activeLocale),
+                                    showGregorianReference ? `(${formatGregorianReferenceDateTime(stock.lastUpdateTimestamp)})` : ''
+                                  ].filter(Boolean).join(' ')
                                   : t('table.notUpdatedYet')
                               })
                               : t('table.apiUpdatedAt', {
                                 value: stock.lastUpdateTimestamp
-                                  ? formatLocalizedDateTime(stock.lastUpdateTimestamp, activeLocale)
+                                  ? [
+                                    formatLocalizedDateTime(stock.lastUpdateTimestamp, activeLocale),
+                                    showGregorianReference ? `(${formatGregorianReferenceDateTime(stock.lastUpdateTimestamp)})` : ''
+                                  ].filter(Boolean).join(' ')
                                   : t('table.notUpdatedYet')
                               })}
                           </div>
@@ -251,12 +275,18 @@ export default function DataTable({
                               {stock.isManualPrice
                                 ? t('table.manualUpdatedAt', {
                                   value: stock.lastUpdateTimestamp
-                                    ? formatLocalizedDateTime(stock.lastUpdateTimestamp, activeLocale)
+                                    ? [
+                                      formatLocalizedDateTime(stock.lastUpdateTimestamp, activeLocale),
+                                      showGregorianReference ? `(${formatGregorianReferenceDateTime(stock.lastUpdateTimestamp)})` : ''
+                                    ].filter(Boolean).join(' ')
                                     : t('table.notUpdatedYet')
                                 })
                                 : t('table.apiUpdatedAt', {
                                   value: stock.lastUpdateTimestamp
-                                    ? formatLocalizedDateTime(stock.lastUpdateTimestamp, activeLocale)
+                                    ? [
+                                      formatLocalizedDateTime(stock.lastUpdateTimestamp, activeLocale),
+                                      showGregorianReference ? `(${formatGregorianReferenceDateTime(stock.lastUpdateTimestamp)})` : ''
+                                    ].filter(Boolean).join(' ')
                                     : t('table.notUpdatedYet')
                                 })}
                             </div>
@@ -350,7 +380,7 @@ export default function DataTable({
                             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                               {stock.history.map((historyRow, index) => (
                                 <tr key={index} className="hover:bg-slate-50 dark:hover:bg-slate-900/50">
-                                  <td className="px-4 py-2 text-slate-600 dark:text-slate-400">{formatDate(historyRow['日期'], activeLocale)}</td>
+                                  <td className="px-4 py-2 text-slate-600 dark:text-slate-400">{renderTradeDate(historyRow['日期'])}</td>
                                   <td className="px-4 py-2">
                                     <span
                                       className={`px-1.5 py-0.5 rounded font-medium ${
@@ -492,7 +522,7 @@ export default function DataTable({
                             >
                               {t(TRADE_TYPE_TRANSLATION_KEYS[historyRow['類型']])}
                             </span>
-                            <span className="text-slate-500 dark:text-slate-400">{formatDate(historyRow['日期'], activeLocale)}</span>
+                            <div className="text-slate-500 dark:text-slate-400">{renderTradeDate(historyRow['日期'])}</div>
                           </div>
                           <div className="text-slate-600 dark:text-slate-400">
                             {t('table.quantityAtPrice', {

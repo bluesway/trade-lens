@@ -12,7 +12,12 @@ import {
   Upload
 } from 'lucide-react';
 import { SUPPORTED_LOCALES, normalizeLocale } from '../locales/config';
-import { formatLocalizedDateTime, formatLocalizedNumber } from '../utils/localization';
+import {
+  formatGregorianReferenceDateTime,
+  formatLocalizedDateTime,
+  formatLocalizedNumber,
+  shouldShowGregorianReference
+} from '../utils/localization';
 
 export default function Header({
   apiKey,
@@ -30,6 +35,7 @@ export default function Header({
 }) {
   const { t, i18n } = useTranslation();
   const activeLocale = normalizeLocale(i18n.resolvedLanguage || i18n.language);
+  const showGregorianReference = shouldShowGregorianReference(activeLocale);
   const csvRowKeys = ['date', 'type', 'symbol', 'market', 'quantity', 'price', 'amount', 'pnl'];
 
   const handleLocaleChange = (event) => {
@@ -50,7 +56,10 @@ export default function Header({
             {isDemo ? t('header.demoDescription') : t('header.recordsLoaded', { count: formatLocalizedNumber(rawDataCount, activeLocale) })}
           </p>
           {lastUpdate && (
-            <span className="text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2.5 py-1 rounded-full flex items-center gap-1.5 w-fit font-medium border border-blue-100 dark:border-blue-800">
+            <span
+              className="text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2.5 py-1 rounded-full flex items-center gap-1.5 w-fit font-medium border border-blue-100 dark:border-blue-800"
+              title={showGregorianReference ? formatGregorianReferenceDateTime(lastUpdate) : undefined}
+            >
               <Clock size={14} />
               {t('header.lastUpdated', { value: formatLocalizedDateTime(lastUpdate, activeLocale) })}
             </span>

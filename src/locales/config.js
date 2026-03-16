@@ -95,11 +95,8 @@ export const getLocaleDirection = (value) => getLocaleMeta(value).dir;
 
 export const isRtlLocale = (value) => getLocaleDirection(value) === 'rtl';
 
-const FORMAT_LOCALE_OVERRIDES = {
-  'th-TH': 'th-TH-u-ca-gregory'
+export const getFormattingLocale = (value) => {
+  return normalizeLocale(value);
 };
 
-export const getFormattingLocale = (value) => {
-  const localeCode = normalizeLocale(value);
-  return FORMAT_LOCALE_OVERRIDES[localeCode] || localeCode;
-};
+export const usesDualCalendarDateDisplay = (value) => normalizeLocale(value) === 'th-TH';

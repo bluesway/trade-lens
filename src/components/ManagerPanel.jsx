@@ -8,8 +8,10 @@ import {
   normalizeLocale
 } from '../locales/config';
 import {
+  formatGregorianReferenceDate,
   formatLocalizedCurrency,
-  formatLocalizedNumber
+  formatLocalizedNumber,
+  shouldShowGregorianReference
 } from '../utils/localization';
 import {
   formatDate,
@@ -45,8 +47,23 @@ export default function ManagerPanel({
   const { t, i18n } = useTranslation();
   const formRef = useRef(null);
   const activeLocale = normalizeLocale(i18n.resolvedLanguage || i18n.language);
+  const showGregorianReference = shouldShowGregorianReference(activeLocale);
   const tradeTypeOptions = ['買入', '賣出'];
   const marketOptions = ['陸股', '港股', '台股', '日股', '美股', '其他'];
+
+  const renderTradeDate = (value) => {
+    const localizedDate = formatDate(value, activeLocale);
+    if (!showGregorianReference) {
+      return localizedDate;
+    }
+
+    return (
+      <div className="leading-tight">
+        <div>{localizedDate}</div>
+        <div className="text-[10px] text-slate-400 dark:text-slate-500">{formatGregorianReferenceDate(value)}</div>
+      </div>
+    );
+  };
 
   const parseNumericValue = (value) => {
     const numericValue = Number(String(value || '').replace(/[^0-9.-]+/g, ''));
@@ -296,7 +313,7 @@ export default function ManagerPanel({
 
                 return (
                   <tr key={row.originalIndex} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                    <td className="px-4 py-2 text-slate-600 dark:text-slate-400">{formatDate(row['日期'], activeLocale)}</td>
+                    <td className="px-4 py-2 text-slate-600 dark:text-slate-400">{renderTradeDate(row['日期'])}</td>
                     <td className="px-4 py-2">
                       <span
                         className={`px-2 py-0.5 rounded text-xs font-medium ${

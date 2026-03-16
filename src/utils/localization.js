@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '../locales/config';
+import { getFormattingLocale, usesDualCalendarDateDisplay } from '../locales/config';
 
 const DEFAULT_DECIMAL_OPTIONS = {
   minimumFractionDigits: 0,
@@ -30,6 +30,27 @@ const getValidDate = (value) => {
 
   const dateValue = value instanceof Date ? value : new Date(value);
   return Number.isNaN(dateValue.getTime()) ? null : dateValue;
+};
+
+const padTwoDigits = (value) => String(value).padStart(2, '0');
+
+const formatGregorianReference = (value, includeTime = false) => {
+  const parsedDate = getValidDate(value);
+  if (!parsedDate) {
+    return typeof value === 'string' ? value : '';
+  }
+
+  const year = parsedDate.getFullYear();
+  const month = padTwoDigits(parsedDate.getMonth() + 1);
+  const day = padTwoDigits(parsedDate.getDate());
+
+  if (!includeTime) {
+    return `${year}-${month}-${day}`;
+  }
+
+  const hours = padTwoDigits(parsedDate.getHours());
+  const minutes = padTwoDigits(parsedDate.getMinutes());
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
 };
 
 export const formatLocalizedNumber = (value, locale, options = DEFAULT_DECIMAL_OPTIONS) => (
@@ -97,3 +118,9 @@ export const formatLocalizedDateTime = (value, locale, options = {}) => {
     ...options
   }).format(parsedDate);
 };
+
+export const formatGregorianReferenceDate = (value) => formatGregorianReference(value, false);
+
+export const formatGregorianReferenceDateTime = (value) => formatGregorianReference(value, true);
+
+export const shouldShowGregorianReference = (locale) => usesDualCalendarDateDisplay(locale);
