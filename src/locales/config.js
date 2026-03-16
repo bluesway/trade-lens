@@ -9,6 +9,7 @@ export const SUPPORTED_LOCALES = [
   { code: 'en-GB', nativeLabel: 'English (UK)', dir: 'ltr' },
   { code: 'ja-JP', nativeLabel: '日本語', dir: 'ltr' },
   { code: 'ko-KR', nativeLabel: '한국어', dir: 'ltr' },
+  { code: 'th-TH', nativeLabel: 'ไทย', dir: 'ltr' },
   { code: 'ar-SA', nativeLabel: 'العربية', dir: 'rtl' }
 ];
 
@@ -52,6 +53,8 @@ const LOCALE_ALIASES = {
   'ja-jp': 'ja-JP',
   ko: 'ko-KR',
   'ko-kr': 'ko-KR',
+  th: 'th-TH',
+  'th-th': 'th-TH',
   zh: 'zh-TW',
   'zh-cn': 'zh-CN',
   'zh-hans': 'zh-CN',
@@ -91,3 +94,12 @@ export const getLocaleMeta = (value) => {
 export const getLocaleDirection = (value) => getLocaleMeta(value).dir;
 
 export const isRtlLocale = (value) => getLocaleDirection(value) === 'rtl';
+
+const FORMAT_LOCALE_OVERRIDES = {
+  'th-TH': 'th-TH-u-ca-gregory'
+};
+
+export const getFormattingLocale = (value) => {
+  const localeCode = normalizeLocale(value);
+  return FORMAT_LOCALE_OVERRIDES[localeCode] || localeCode;
+};

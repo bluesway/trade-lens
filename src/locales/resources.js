@@ -1566,6 +1566,202 @@ const koKR = {
   }
 };
 
+const thTH = {
+  common: {
+    language: 'ภาษา',
+    close: 'ปิด',
+    cancel: 'ยกเลิก',
+    save: 'บันทึก',
+    edit: 'แก้ไข',
+    delete: 'ลบ',
+    importCsv: 'นำเข้า CSV',
+    exportCsv: 'ส่งออก CSV'
+  },
+  currencies: {
+    TWD: 'ดอลลาร์ไต้หวันใหม่ (TWD)',
+    CNY: 'หยวนจีน (CNY)',
+    HKD: 'ดอลลาร์ฮ่องกง (HKD)',
+    USD: 'ดอลลาร์สหรัฐ (USD)',
+    JPY: 'เยนญี่ปุ่น (JPY)'
+  },
+  markets: {
+    all: 'ทั้งหมด',
+    chinaA: 'หุ้นจีน A',
+    hongKong: 'หุ้นฮ่องกง',
+    taiwan: 'หุ้นไต้หวัน',
+    japan: 'หุ้นญี่ปุ่น',
+    us: 'หุ้นสหรัฐ',
+    other: 'อื่น ๆ',
+    unknown: 'ไม่ทราบ'
+  },
+  tradeTypes: {
+    buy: 'ซื้อ',
+    sell: 'ขาย'
+  },
+  timeRanges: {
+    oneWeek: '1 สัปดาห์',
+    oneMonth: '1 เดือน',
+    threeMonths: '3 เดือน',
+    halfYear: '6 เดือน',
+    ytd: 'YTD',
+    oneYear: '1 ปี',
+    fiveYears: '5 ปี',
+    all: 'ทั้งหมด'
+  },
+  app: {
+    loadingLocalData: 'กำลังโหลดข้อมูล IndexedDB ในเครื่อง...',
+    generatingImage: 'กำลังสร้างรูปภาพ...',
+    imageExportSuccess: 'ส่งออกรูปภาพสำเร็จ',
+    imageExportFail: 'ส่งออกรูปภาพไม่สำเร็จ',
+    noDataToExport: 'ตอนนี้ยังไม่มีข้อมูลให้ส่งออก',
+    exportFilenamePrefix: 'trade_records'
+  },
+  header: {
+    title: 'แดชบอร์ดพอร์ตลงทุนทั่วโลก',
+    demoDescription: 'ตอนนี้แสดงแค่ข้อมูลตัวอย่างบางส่วน นำเข้า CSV ฉบับเต็มแล้วจะเห็นภาพครบกว่า',
+    recordsLoaded: 'โหลดและวิเคราะห์รายการซื้อขายแล้ว {{count}} รายการ',
+    lastUpdated: 'อัปเดตล่าสุด: {{value}}',
+    switchToLight: 'สลับเป็นโหมดสว่าง',
+    switchToDark: 'สลับเป็นโหมดมืด',
+    settingsRecords: 'ตั้งค่าและรายการซื้อขาย',
+    updatePrices: 'อัปเดตราคา',
+    apiKeyRequired: 'ต้องตั้งค่า API key ก่อน',
+    updateWithCache: 'อัปเดตราคาแบบเรียลไทม์ (ใช้แคช)',
+    setApiKeyFirst: 'กรุณาตั้งค่า API key ก่อน',
+    forceRefresh: 'รีเฟรชแบบบังคับ',
+    forceRefreshTitle: 'ข้ามแคชและใช้โควตา API จริง',
+    languageLabel: 'เปลี่ยนภาษา',
+    csvTitle: 'คำอธิบายฟิลด์ CSV',
+    csvIntro: 'โปรดตรวจสอบว่า CSV มีหัวคอลัมน์อย่างน้อยดังต่อไปนี้ โดยไม่จำเป็นต้องเรียงลำดับ:',
+    csvRows: {
+      date: 'วันที่ (เช่น 2025/01/01)',
+      type: 'ประเภท (ซื้อ / ขาย)',
+      symbol: 'สัญลักษณ์ (เช่น AAPL, TSLA)',
+      market: 'ตลาด (ไม่บังคับ ใช้เป็นข้อมูลอ้างอิงเวลาเพิ่มเอง)',
+      quantity: 'จำนวน',
+      price: 'ราคาต่อหน่วย (สกุลเงินเดิม)',
+      amount: 'มูลค่ารวม (สกุลเงินเดิม)',
+      pnl: 'กำไร/ขาดทุน (กรอกตอนขาย, สกุลเงินเดิม)'
+    },
+    csvNote1: '* หมายเหตุ 1: รหัส 6 หลักที่ขึ้นต้นด้วย 6 หรือ 0 จะถูกมองเป็นหุ้นจีน A (.SS / .SZ) อัตโนมัติ',
+    csvNote2: '* หมายเหตุ 2: ตลาดอื่น ๆ ให้เติม suffix ต่อท้ายสัญลักษณ์โดยตรง เช่น .TW หรือ .HK',
+    forceRefreshConfirm: 'แน่ใจไหมว่าจะรีเฟรชแบบบังคับ? ระบบจะไม่ใช้แคช 24 ชั่วโมงและจะใช้โควตา API จริง'
+  },
+  summary: {
+    totalRealized: 'กำไร/ขาดทุนที่รับรู้รวม (หลังแปลงสกุล)',
+    totalUnrealized: 'กำไร/ขาดทุนที่ยังไม่รับรู้รวม (หลังแปลงสกุล)',
+    totalValue: 'มูลค่าพอร์ตปัจจุบัน (หลังแปลงสกุล)',
+    holdingCount: 'จำนวนหุ้นที่ถือ',
+    holdingUnit: 'ตัว'
+  },
+  charts: {
+    trendTitle: 'แนวโน้มต้นทุนสะสม',
+    saveImage: 'บันทึกกราฟเป็นรูปภาพ',
+    noTrend: 'ตอนนี้รายการซื้อขายยังไม่พอสำหรับวาดกราฟ',
+    realizedTitle: 'กำไร/ขาดทุนที่รับรู้รายตัว (ขายหมู / ลงจากดอยทัน)',
+    distributionTitle: 'สัดส่วนมูลค่าพอร์ต (10 อันดับแรก)',
+    convertedNote: 'แปลงเป็น {{currency}} เพื่อแสดงผล',
+    noPnlData: 'ตอนนี้ยังไม่มีข้อมูลกำไร/ขาดทุน',
+    noHoldings: 'ตอนนี้ยังไม่มีสถานะคงค้าง',
+    legendConverted: '{{label}} (หลังแปลงสกุล)',
+    costSeries: 'ต้นทุนสะสม',
+    realizedSeries: 'กำไร/ขาดทุนที่รับรู้สะสม',
+    ifSoldSeries: 'ถ้าขายวันนี้',
+    actualSeries: 'กำไร/ขาดทุนที่รับรู้จริง',
+    others: 'อื่น ๆ'
+  },
+  table: {
+    title: 'รายการซื้อขายรายหุ้น',
+    subtitle: 'กดดูแต่ละแถวเพื่อเปิดรายละเอียดการซื้อและขาย โดยมูลค่าจะยังแสดงในสกุลเงินเดิมของตลาดนั้น',
+    columns: {
+      symbol: 'สัญลักษณ์ / ชื่อหุ้น (ตลาด · สกุลเงิน)',
+      holdingQty: 'จำนวนที่ถืออยู่',
+      currentValue: 'ราคาปัจจุบัน / มูลค่า',
+      unrealized: 'กำไร/ขาดทุนที่ยังไม่รับรู้',
+      realized: 'กำไร/ขาดทุนที่รับรู้จริง',
+      ifSoldToday: 'ถ้าขายวันนี้',
+      date: 'วันที่',
+      type: 'ประเภท',
+      quantity: 'จำนวน',
+      price: 'ราคา',
+      amount: 'มูลค่า',
+      pnl: 'กำไร/ขาดทุน',
+      actions: 'จัดการ'
+    },
+    manualBadge: 'กรอกเอง',
+    manualUpdatedAt: 'แก้เองเมื่อ: {{value}}',
+    apiUpdatedAt: 'อัปเดตจาก API ล่าสุด: {{value}}',
+    notUpdatedYet: 'ยังไม่ได้อัปเดต',
+    manualNamePlaceholder: 'ชื่อหุ้นที่กรอกเอง',
+    currentPricePlaceholder: 'ราคาปัจจุบัน',
+    hedgeSuccess: 'ขายออกไปก่อนคุ้มกว่า ({{value}})',
+    soldTooEarly: 'ขายหมูไป {{value}}',
+    tradeDetails: 'รายละเอียดรายการ',
+    atPrice: '@ {{price}}',
+    quantityAtPrice: '{{quantity}} หุ้น @ {{price}}',
+    mobileHoldingQty: 'จำนวนที่ถือ',
+    mobileUnrealized: 'ยังไม่รับรู้',
+    mobileRealized: 'รับรู้แล้ว'
+  },
+  manager: {
+    title: 'ตั้งค่าและบันทึกรายการ',
+    clearAndLoadDemo: 'ล้างข้อมูลแล้วโหลดตัวอย่าง',
+    apiKeyTitle: 'ตั้งค่า API key ของ yfapi.net',
+    getFreeApiKey: 'สมัครฟรีเพื่อรับ key',
+    apiKeyPlaceholder: 'วาง x-api-key ของคุณที่นี่ (เช่น A2sD8...)',
+    saveApiKey: 'บันทึก key',
+    baseCurrencyTitle: 'สกุลเงินหลักของการ์ดสรุป',
+    baseCurrencyHelp: '* สินทรัพย์ต่างสกุลทั้งหมดจะถูกแปลงเป็นสกุลเงินนี้ด้วยอัตราแลกเปลี่ยนล่าสุด เพื่อรวมยอดบนการ์ดสรุปด้านบน',
+    hideZeroHolding: 'ซ่อนรายการที่ขายออกหมดแล้ว',
+    manualRecordTitle: 'เพิ่มรายการด้วยตนเอง',
+    fields: {
+      date: 'วันที่',
+      type: 'ประเภท',
+      market: 'ตลาด',
+      symbol: 'สัญลักษณ์',
+      quantity: 'จำนวน',
+      price: 'ราคาต่อหน่วย',
+      amount: 'มูลค่ารวม',
+      pnl: 'กำไร/ขาดทุน (กรอกตอนขาย)'
+    },
+    placeholders: {
+      symbol: 'เช่น: AAPL',
+      quantity: 'จำนวนหุ้น',
+      price: 'ราคาต่อหุ้น',
+      amount: 'ใช้สกุลของตลาดนั้น',
+      pnl: 'ไม่บังคับ'
+    },
+    saveChanges: 'บันทึกการเปลี่ยนแปลง',
+    addRecord: 'เพิ่ม',
+    noRecords: 'ตอนนี้ยังไม่มีรายการใด ๆ'
+  },
+  notice: {
+    title: 'ยินดีต้อนรับสู่ Trade Lens',
+    body: 'นี่คือเครื่องมือโอเพนซอร์สสำหรับนักลงทุน ที่แปลง CSV จากโบรกเกอร์ให้กลายเป็นกราฟต้นทุน การกระจายกำไร/ขาดทุน และภาพรวมพอร์ตแบบดูง่าย',
+    privacy: 'ความเป็นส่วนตัวมาก่อน: ข้อมูลทั้งหมดถูกเก็บไว้ในเบราว์เซอร์ของคุณเท่านั้น (IndexedDB) และจะไม่ถูกส่งขึ้นเซิร์ฟเวอร์',
+    apiKey: 'API key ใช้แค่สำหรับดึงราคาจาก yfapi.net และก็เก็บไว้ในเครื่องเช่นกัน',
+    sourceCode: 'โอเพนซอร์ส: ดูโค้ดและร่วมพัฒนา',
+    dismiss: 'ไม่ต้องแสดงอีก'
+  },
+  messages: {
+    apiKeySaved: 'บันทึก API key เรียบร้อยแล้ว',
+    manualStockSaved: 'อัปเดตข้อมูล {{symbol}} ด้วยตนเองแล้ว',
+    needApiKey: 'กรุณากรอก API key ของ yfapi.net ในแผงจัดการก่อนอัปเดตราคา',
+    cacheFresh: 'ราคาหุ้นและอัตราแลกเปลี่ยนถูกอัปเดตภายใน 24 ชั่วโมงที่ผ่านมาแล้ว ระบบจึงใช้แคชในเครื่องเพื่อประหยัดโควตา',
+    updateSuccess: 'อัปเดตราคาหุ้นและอัตราแลกเปลี่ยนของ {{count}} รายการเรียบร้อย',
+    fetchFailed: 'ดึงข้อมูลไม่สำเร็จ: {{message}}',
+    baseCurrencyChanged: 'เปลี่ยนสกุลเงินหลักเป็น {{currency}} แล้ว กำลังอัปเดตอัตราแลกเปลี่ยน...',
+    recordUpdated: 'อัปเดตรายการซื้อขายเรียบร้อยแล้ว',
+    dataCleared: 'ล้างข้อมูลและโหลดข้อมูลตัวอย่างเรียบร้อย',
+    clearConfirm: 'แน่ใจไหมว่าจะล้างข้อมูลทั้งหมดแล้วโหลดตัวอย่างใหม่? การกระทำนี้ย้อนกลับไม่ได้',
+    backupConfirm: 'ก่อนล้างข้อมูล ต้องการส่งออกข้อมูลปัจจุบันเป็น CSV ไว้สำรองก่อนหรือไม่?'
+  },
+  data: {
+    unknownSymbol: 'สัญลักษณ์ที่ไม่รู้จัก ({{symbol}})',
+    unknown: 'ไม่ทราบ'
+  }
+};
+
 const arSA = {
   common: {
     language: 'اللغة',
@@ -1771,5 +1967,6 @@ export const resources = {
   'en-GB': { translation: enGB },
   'ja-JP': { translation: jaJP },
   'ko-KR': { translation: koKR },
+  'th-TH': { translation: thTH },
   'ar-SA': { translation: arSA }
 };

@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '../locales/config';
 import { DB_NAME, DB_VERSION, STORE_NAME } from './constants';
 
 const MARKET_CURRENCY_MAP = {
@@ -15,6 +16,7 @@ const BUY_TYPE_TERMS = [
   'bot',
   'bid',
   'long',
+  'ซื้อ',
   '매수',
   '매입',
   '買付',
@@ -29,6 +31,7 @@ const SELL_TYPE_TERMS = [
   'sld',
   'ask',
   'short',
+  'ขาย',
   '매도',
   '매각',
   '沽',
@@ -113,21 +116,21 @@ export const parseCSV = (text) => {
   if (lines.length === 0) return [];
 
   let headerIdx = lines.findIndex((line) =>
-    ['代號', '代碼', 'Symbol', '종목코드', '티커'].some((label) => line.includes(label))
-    && ['類型', '動作', 'Type', '구분', '유형'].some((label) => line.includes(label))
+    ['代號', '代碼', 'Symbol', 'สัญลักษณ์', 'ชื่อย่อ', '종목코드', '티커'].some((label) => line.includes(label))
+    && ['類型', '動作', 'Type', 'ประเภท', 'ฝั่ง', '구분', '유형'].some((label) => line.includes(label))
   );
   if (headerIdx === -1) headerIdx = 0; 
 
   const rawHeaders = lines[headerIdx].replace(/^\uFEFF/, '').split(',').map(h => h.trim());
   const mapping = {
-    '日期': ['日期', '交易日期', '成交日期', 'Date', 'Trade Date', '日付', '取引日', 'التاريخ', '날짜', '거래일', '체결일'],
-    '類型': ['類型', '交易類別', '動作', 'Type', 'Action', 'Side', '区分', '種類', '売買区分', 'النوع', 'الإجراء', '구분', '유형', '매매구분'],
-    '代號': ['代號', '股票代號', '代碼', 'Symbol', 'Ticker', 'Stock Code', '銘柄コード', 'コード', 'ティッカー', 'الرمز', '종목코드', '종목', '티커'],
-    '市場': ['市場', '交易所', 'Market', 'Exchange', '取引所', 'السوق', 'البورصة', '시장'],
-    '數量': ['數量', '成交股數', '股數', 'Quantity', 'Qty', 'Shares', '数量', '株数', 'الكمية', 'عدد الأسهم', '수량', '주수'],
-    '單價': ['單價', '成交價', '成交單價', 'Price', 'Execution Price', '単価', '価格', '約定価格', 'سعر الوحدة', 'السعر', '단가', '체결가', '가격'],
-    '總金額': ['總金額', '成交金額', '淨額', 'Amount', 'Total Amount', 'Net Amount', '金額', '合計金額', '約定代金', 'إجمالي المبلغ', 'إجمالي القيمة', 'القيمة', '금액', '총금액', '총액'],
-    '損益': ['損益', '實現損益', 'PnL', 'Realized PnL', 'Profit', 'P&L', '実現損益', 'الربح أو الخسارة', 'الربح/الخسارة', 'الأرباح والخسائر', '손익', '실현손익']
+    '日期': ['日期', '交易日期', '成交日期', 'Date', 'Trade Date', '日付', '取引日', 'التاريخ', 'วันที่', 'วันที่ซื้อขาย', '날짜', '거래일', '체결일'],
+    '類型': ['類型', '交易類別', '動作', 'Type', 'Action', 'Side', '区分', '種類', '売買区分', 'النوع', 'الإجراء', 'ประเภท', 'ฝั่ง', 'สถานะ', '구분', '유형', '매매구분'],
+    '代號': ['代號', '股票代號', '代碼', 'Symbol', 'Ticker', 'Stock Code', '銘柄コード', 'コード', 'ティッカー', 'الرمز', 'สัญลักษณ์', 'ชื่อย่อ', 'ticker', '종목코드', '종목', '티커'],
+    '市場': ['市場', '交易所', 'Market', 'Exchange', '取引所', 'السوق', 'البورصة', 'ตลาด', '시장'],
+    '數量': ['數量', '成交股數', '股數', 'Quantity', 'Qty', 'Shares', '数量', '株数', 'الكمية', 'عدد الأسهم', 'จำนวน', 'จำนวนหุ้น', '수량', '주수'],
+    '單價': ['單價', '成交價', '成交單價', 'Price', 'Execution Price', '単価', '価格', '約定価格', 'سعر الوحدة', 'السعر', 'ราคา', 'ราคาต่อหุ้น', 'ราคาต่อหน่วย', '단가', '체결가', '가격'],
+    '總金額': ['總金額', '成交金額', '淨額', 'Amount', 'Total Amount', 'Net Amount', '金額', '合計金額', '約定代金', 'إجمالي المبلغ', 'إجمالي القيمة', 'القيمة', 'มูลค่า', 'มูลค่ารวม', 'ยอดรวม', '금액', '총금액', '총액'],
+    '損益': ['損益', '實現損益', 'PnL', 'Realized PnL', 'Profit', 'P&L', '実現損益', 'الربح أو الخسارة', 'الربح/الخسارة', 'الأرباح والخسائر', 'กำไรขาดทุน', 'กำไร/ขาดทุน', '손익', '실현손익']
   };
 
   const headerMap = {};
@@ -213,7 +216,7 @@ export const formatDate = (dateStr, locale = 'zh-TW', options = {}) => {
   if (!dateStr) return '';
   const d = new Date(dateStr);
   if (isNaN(d.getTime())) return dateStr;
-  return new Intl.DateTimeFormat(locale, {
+  return new Intl.DateTimeFormat(getFormattingLocale(locale), {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',

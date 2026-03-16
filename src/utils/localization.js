@@ -1,4 +1,4 @@
-import { normalizeLocale } from '../locales/config';
+import { getFormattingLocale } from '../locales/config';
 
 const DEFAULT_DECIMAL_OPTIONS = {
   minimumFractionDigits: 0,
@@ -33,14 +33,14 @@ const getValidDate = (value) => {
 };
 
 export const formatLocalizedNumber = (value, locale, options = DEFAULT_DECIMAL_OPTIONS) => (
-  new Intl.NumberFormat(normalizeLocale(locale), {
+  new Intl.NumberFormat(getFormattingLocale(locale), {
     ...DEFAULT_DECIMAL_OPTIONS,
     ...options
   }).format(toNumber(value))
 );
 
 export const formatLocalizedCompactNumber = (value, locale, options = {}) => (
-  new Intl.NumberFormat(normalizeLocale(locale), {
+  new Intl.NumberFormat(getFormattingLocale(locale), {
     notation: 'compact',
     maximumFractionDigits: 1,
     ...options
@@ -50,7 +50,7 @@ export const formatLocalizedCompactNumber = (value, locale, options = {}) => (
 export const formatLocalizedCurrency = (value, currency, locale, options = {}) => {
   const { signed = false, ...numberFormatOptions } = options;
 
-  return new Intl.NumberFormat(normalizeLocale(locale), {
+  return new Intl.NumberFormat(getFormattingLocale(locale), {
     style: 'currency',
     currency,
     currencyDisplay: 'symbol',
@@ -63,7 +63,7 @@ export const formatLocalizedCurrency = (value, currency, locale, options = {}) =
 export const formatLocalizedPercent = (value, locale, options = DEFAULT_PERCENT_OPTIONS) => {
   const { signed = true, ...numberFormatOptions } = options;
 
-  return new Intl.NumberFormat(normalizeLocale(locale), {
+  return new Intl.NumberFormat(getFormattingLocale(locale), {
     style: 'percent',
     ...DEFAULT_PERCENT_OPTIONS,
     ...(signed ? {} : { signDisplay: 'auto' }),
@@ -77,7 +77,7 @@ export const formatLocalizedDate = (value, locale, options = {}) => {
     return typeof value === 'string' ? value : '';
   }
 
-  return new Intl.DateTimeFormat(normalizeLocale(locale), {
+  return new Intl.DateTimeFormat(getFormattingLocale(locale), {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -91,7 +91,7 @@ export const formatLocalizedDateTime = (value, locale, options = {}) => {
     return typeof value === 'string' ? value : '';
   }
 
-  return new Intl.DateTimeFormat(normalizeLocale(locale), {
+  return new Intl.DateTimeFormat(getFormattingLocale(locale), {
     dateStyle: 'medium',
     timeStyle: 'short',
     ...options
