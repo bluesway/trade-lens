@@ -8,6 +8,48 @@ const MARKET_CURRENCY_MAP = {
   日股: 'JPY'
 };
 
+const BUY_TYPE_TERMS = [
+  '買',
+  '买',
+  'buy',
+  'bot',
+  'bid',
+  'long',
+  '買付',
+  '買い',
+  'شراء'
+];
+
+const SELL_TYPE_TERMS = [
+  '賣',
+  '卖',
+  'sell',
+  'sld',
+  'ask',
+  'short',
+  '沽',
+  '売',
+  'بيع'
+];
+
+const normalizeHeaderLabel = (value) => String(value || '')
+  .trim()
+  .toLowerCase()
+  .replace(/[\s_()[\]{}:：/\\.-]+/g, '');
+
+const matchesHeaderLabel = (rawHeader, keyword) => {
+  const normalizedHeader = normalizeHeaderLabel(rawHeader);
+  const normalizedKeyword = normalizeHeaderLabel(keyword);
+
+  if (!normalizedHeader || !normalizedKeyword) {
+    return false;
+  }
+
+  return normalizedHeader === normalizedKeyword
+    || normalizedHeader.includes(normalizedKeyword)
+    || normalizedKeyword.includes(normalizedHeader);
+};
+
 export const initDB = () => {
   return new Promise((resolve, reject) => {
     if (typeof window === 'undefined') return reject('No window');
@@ -74,21 +116,21 @@ export const parseCSV = (text) => {
 
   const rawHeaders = lines[headerIdx].replace(/^\uFEFF/, '').split(',').map(h => h.trim());
   const mapping = {
-    '日期': ['日期', '交易日期', '成交日期', 'Date', 'Trade Date'],
-    '類型': ['類型', '交易類別', '動作', 'Type', 'Action', 'Side'],
-    '代號': ['代號', '股票代號', '代碼', 'Symbol', 'Ticker', 'Stock Code'],
-    '市場': ['市場', '交易所', 'Market', 'Exchange'],
-    '數量': ['數量', '成交股數', '股數', 'Quantity', 'Qty', 'Shares'],
-    '單價': ['單價', '成交價', '成交單價', 'Price', 'Execution Price'],
-    '總金額': ['總金額', '成交金額', '淨額', 'Amount', 'Total Amount', 'Net Amount'],
-    '損益': ['損益', '實現損益', 'PnL', 'Realized PnL', 'Profit']
+    '日期': ['日期', '交易日期', '成交日期', 'Date', 'Trade Date', '日付', '取引日', 'التاريخ'],
+    '類型': ['類型', '交易類別', '動作', 'Type', 'Action', 'Side', '区分', '種類', '売買区分', 'النوع', 'الإجراء'],
+    '代號': ['代號', '股票代號', '代碼', 'Symbol', 'Ticker', 'Stock Code', '銘柄コード', 'コード', 'ティッカー', 'الرمز'],
+    '市場': ['市場', '交易所', 'Market', 'Exchange', '取引所', 'السوق', 'البورصة'],
+    '數量': ['數量', '成交股數', '股數', 'Quantity', 'Qty', 'Shares', '数量', '株数', 'الكمية', 'عدد الأسهم'],
+    '單價': ['單價', '成交價', '成交單價', 'Price', 'Execution Price', '単価', '価格', '約定価格', 'سعر الوحدة', 'السعر'],
+    '總金額': ['總金額', '成交金額', '淨額', 'Amount', 'Total Amount', 'Net Amount', '金額', '合計金額', '約定代金', 'إجمالي المبلغ', 'إجمالي القيمة', 'القيمة'],
+    '損益': ['損益', '實現損益', 'PnL', 'Realized PnL', 'Profit', 'P&L', '実現損益', 'الربح أو الخسارة', 'الربح/الخسارة', 'الأرباح والخسائر']
   };
 
   const headerMap = {};
   rawHeaders.forEach((h, idx) => {
     for (const [standard, keywords] of Object.entries(mapping)) {
-      if (keywords.some(k => h.includes(standard) || standard.includes(h) || h.toLowerCase() === k.toLowerCase())) {
-        if (!headerMap[standard]) headerMap[standard] = idx;
+      if (keywords.some((keyword) => matchesHeaderLabel(h, keyword))) {
+        if (headerMap[standard] === undefined) headerMap[standard] = idx;
       }
     }
   });
@@ -116,8 +158,8 @@ export const parseCSV = (text) => {
       });
       if (obj['類型']) {
         const t = obj['類型'].toLowerCase();
-        if (t.includes('買') || t.includes('buy') || t.includes('bot')) obj['類型'] = '買入';
-        else if (t.includes('賣') || t.includes('sell') || t.includes('sld')) obj['類型'] = '賣出';
+        if (BUY_TYPE_TERMS.some((term) => t.includes(term.toLowerCase()))) obj['類型'] = '買入';
+        else if (SELL_TYPE_TERMS.some((term) => t.includes(term.toLowerCase()))) obj['類型'] = '賣出';
       }
       result.push(obj);
     }
