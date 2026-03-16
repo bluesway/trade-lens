@@ -5,17 +5,17 @@
 # Trade Lens
 
 <p align="center">
-  Privacy-first portfolio analytics for global stock investors.
+  隱私優先的全球股票交易儀表板，讓你的 CSV 不再只是報稅素材。
 </p>
 
 <p align="center">
-  <a href="#readme-tw">繁體中文（台灣）</a>
+  <strong>繁體中文（台灣）</strong>
   ·
-  <a href="#readme-cn">简体中文（中国）</a>
+  <a href="README.zh-CN.md">简体中文（中国）</a>
   ·
-  <a href="#readme-jp">日本語</a>
+  <a href="README.ja-JP.md">日本語</a>
   ·
-  <a href="#readme-en-us">English (US)</a>
+  <a href="README.en-US.md">English (US)</a>
 </p>
 
 <p align="center">
@@ -33,45 +33,23 @@
   </a>
 </p>
 
-## Preview
-
-<table>
-  <tr>
-    <td align="center" width="50%">
-      <strong>繁體中文（台灣）</strong><br>
-      <img src="screenshots/readme/trade-lens-tw.png" alt="Trade Lens screenshot in Traditional Chinese (Taiwan)" width="100%">
-    </td>
-    <td align="center" width="50%">
-      <strong>简体中文（中国）</strong><br>
-      <img src="screenshots/readme/trade-lens-cn.png" alt="Trade Lens screenshot in Simplified Chinese (China)" width="100%">
-    </td>
-  </tr>
-  <tr>
-    <td align="center" width="50%">
-      <strong>日本語</strong><br>
-      <img src="screenshots/readme/trade-lens-jp.png" alt="Trade Lens screenshot in Japanese" width="100%">
-    </td>
-    <td align="center" width="50%">
-      <strong>English (US)</strong><br>
-      <img src="screenshots/readme/trade-lens-en-us.png" alt="Trade Lens screenshot in English (US)" width="100%">
-    </td>
-  </tr>
-</table>
+<p align="center">
+  <img src="screenshots/readme/trade-lens-tw.png" alt="Trade Lens 台灣繁中介面預覽" width="100%">
+</p>
 
 ---
 
-<a id="readme-tw"></a>
-## 繁體中文（台灣）
+## 產品介紹
 
-**Trade Lens** 是一套隱私優先的全球股票交易儀表板，能把券商 CSV 轉成持股總覽、成本走勢、損益分布，以及「若今日賣出」這種很有感的後悔藥分析。資料全程只留在你的瀏覽器，不需要註冊，也不用把交易紀錄送去別人的伺服器。
+**Trade Lens** 是一套隱私優先的全球股票交易儀表板，能把券商 CSV 轉成持股總覽、成本走勢、損益分布，還有那種一看就會心頭一震的「若今日賣出」復盤分析。資料全程只留在你的瀏覽器，不需要註冊，也不用把交易紀錄交給別人的伺服器保管。
 
 ### 特色
 
 - 支援美股、港股、台股、陸股與日股。
-- 可匯入券商 CSV，也能手動補單、調整股名與現價。
+- 可匯入券商 CSV，也能手動補單、調整股名與最新價格。
 - 串接 `yfapi.net` 取得即時股價與匯率換算。
 - 內建多語系介面、深色模式與行動裝置版排版。
-- 用「若今日賣出」對照實際已實現損益，快速看出賣飛還是避險成功。
+- 用「若今日賣出」對照實際已實現損益，快速看出到底是賣飛還是避險有功。
 
 ### 快速開始
 
@@ -90,103 +68,18 @@
    ```
 4. 在管理面板貼上 `yfapi.net` API Key，然後匯入你的 CSV。
 
----
+### 你會拿它來幹嘛
 
-<a id="readme-cn"></a>
-## 简体中文（中国）
+- 把分散在不同券商或市場的交易紀錄拉回同一個畫面。
+- 快速看懂目前持股、成本、未實現損益與已實現損益。
+- 用「若今日賣出」的角度檢查自己是神逃頂，還是只是提早下車。
+- 不想把敏感交易資料丟上雲端時，照樣能做像樣的投資復盤。
 
-**Trade Lens** 是一款以隐私为优先的全球股票交易仪表盘，可以把券商 CSV 转成持仓总览、成本走势、盈亏分布，以及“如果今天卖出”的复盘视角。所有数据都只保留在浏览器本地，不需要注册，也不会把交易记录上传到服务器。
+### 其他語言文件
 
-### 特性
-
-- 支持美股、港股、台股、中国 A 股和日股。
-- 可导入券商 CSV，也支持手动补录、修改股名和现价。
-- 接入 `yfapi.net` 获取实时股价与汇率换算。
-- 内建多语言界面、深色模式与移动端适配。
-- 通过“如果今天卖出”对照实际已实现盈亏，快速看出是卖飞还是成功对冲。
-
-### 快速开始
-
-1. 克隆仓库
-   ```bash
-   git clone https://git.bluesway.org/bluesway/trade-lens.git
-   cd trade-lens
-   ```
-2. 安装依赖
-   ```bash
-   npm install
-   ```
-3. 启动开发环境
-   ```bash
-   npm run dev
-   ```
-4. 在管理面板填入 `yfapi.net` API Key，然后导入你的 CSV。
-
----
-
-<a id="readme-jp"></a>
-## 日本語
-
-**Trade Lens** は、プライバシー重視で設計されたグローバル株式向けの取引ダッシュボードです。証券会社の CSV を、保有状況、取得原価の推移、損益分布、さらに「今日売却した場合」の比較分析までまとめて可視化できます。データはブラウザ内だけに保存され、サーバーへ送信されません。
-
-### 特長
-
-- 米国株、香港株、台湾株、中国 A 株、日本株に対応。
-- 証券会社 CSV の読み込みに加え、手入力での取引追加や銘柄名の補正も可能。
-- `yfapi.net` を使って株価と為替を更新。
-- 多言語 UI、ダークモード、モバイル表示に対応。
-- 「今日売却した場合」と実際の実現損益を比べて、利確が上手かったか早売りだったかを見やすく表示。
-
-### クイックスタート
-
-1. リポジトリを取得
-   ```bash
-   git clone https://git.bluesway.org/bluesway/trade-lens.git
-   cd trade-lens
-   ```
-2. 依存関係をインストール
-   ```bash
-   npm install
-   ```
-3. 開発サーバーを起動
-   ```bash
-   npm run dev
-   ```
-4. 管理パネルで `yfapi.net` の API キーを設定し、CSV を読み込んでください。
-
----
-
-<a id="readme-en-us"></a>
-## English (US)
-
-**Trade Lens** is a privacy-first trading dashboard for global stock investors. It turns brokerage CSV exports into holdings views, cost-basis trends, P&L breakdowns, and a highly practical “If Sold Today” lens for reviewing exits. Your data stays in the browser, so there is no account system and no server-side trade storage.
-
-### Highlights
-
-- Supports U.S., Hong Kong, Taiwan, China A-share, and Japan equity markets.
-- Imports brokerage CSV files and also supports manual trade entry and name overrides.
-- Uses `yfapi.net` for live quotes and FX conversion.
-- Includes multilingual UI support, dark mode, and responsive layouts.
-- Compares realized P&L with “If Sold Today” outcomes so you can spot timely exits vs. missed upside.
-
-### Quick Start
-
-1. Clone the repository
-   ```bash
-   git clone https://git.bluesway.org/bluesway/trade-lens.git
-   cd trade-lens
-   ```
-2. Install dependencies
-   ```bash
-   npm install
-   ```
-3. Start the development server
-   ```bash
-   npm run dev
-   ```
-4. Add your `yfapi.net` API key in the manager panel, then import your CSV.
-
----
+- 简体中文（中国）：[`README.zh-CN.md`](README.zh-CN.md)
+- 日本語：[`README.ja-JP.md`](README.ja-JP.md)
+- English (US)：[`README.en-US.md`](README.en-US.md)
 
 ## Tech Stack
 
