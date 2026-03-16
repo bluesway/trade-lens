@@ -6,7 +6,7 @@ import { resources } from './locales/resources';
 
 const supportedLngs = SUPPORTED_LOCALES.map(({ code }) => code);
 
-void i18n
+export const i18nReady = i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
@@ -15,6 +15,7 @@ void i18n
     supportedLngs,
     nonExplicitSupportedLngs: true,
     load: 'currentOnly',
+    initImmediate: false,
     interpolation: {
       escapeValue: false
     },
@@ -29,9 +30,13 @@ void i18n
     }
   });
 
-const resolvedLocale = normalizeLocale(i18n.resolvedLanguage || i18n.language);
-if (resolvedLocale !== i18n.language) {
-  void i18n.changeLanguage(resolvedLocale);
-}
+void i18nReady.then(() => {
+  const resolvedLocale = normalizeLocale(i18n.resolvedLanguage || i18n.language);
+  if (resolvedLocale !== i18n.language) {
+    return i18n.changeLanguage(resolvedLocale);
+  }
+
+  return null;
+});
 
 export default i18n;
