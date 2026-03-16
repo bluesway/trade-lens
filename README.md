@@ -11,11 +11,11 @@
 <p align="center">
   <strong>繁體中文（台灣）</strong>
   ·
-  <a href="https://git.bluesway.org/bluesway/trade-lens/src/branch/master/README.zh-CN.md">简体中文（中国）</a>
+  <a href="/README.zh-CN.md">简体中文（中国）</a>
   ·
-  <a href="https://git.bluesway.org/bluesway/trade-lens/src/branch/master/README.ja-JP.md">日本語</a>
+  <a href="/README.ja-JP.md">日本語</a>
   ·
-  <a href="https://git.bluesway.org/bluesway/trade-lens/src/branch/master/README.en-US.md">English (US)</a>
+  <a href="/README.en-US.md">English (US)</a>
 </p>
 
 <p align="center">
@@ -77,9 +77,9 @@
 
 ### 其他語言文件
 
-- 简体中文（中国）：[`README.zh-CN.md`](https://git.bluesway.org/bluesway/trade-lens/src/branch/master/README.zh-CN.md)
-- 日本語：[`README.ja-JP.md`](https://git.bluesway.org/bluesway/trade-lens/src/branch/master/README.ja-JP.md)
-- English (US)：[`README.en-US.md`](https://git.bluesway.org/bluesway/trade-lens/src/branch/master/README.en-US.md)
+- 简体中文（中国）：[`README.zh-CN.md`](/README.zh-CN.md)
+- 日本語：[`README.ja-JP.md`](/README.ja-JP.md)
+- English (US)：[`README.en-US.md`](/README.en-US.md)
 
 ## 技術組成
 
@@ -92,4 +92,4 @@
 
 ## 授權條款
 
-本專案採 **MIT License** 授權，詳見 [`LICENSE`](https://git.bluesway.org/bluesway/trade-lens/src/branch/master/LICENSE)。
+本專案採 **MIT License** 授權，詳見 [`LICENSE`](/LICENSE)。

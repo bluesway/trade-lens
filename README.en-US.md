@@ -9,11 +9,11 @@
 </p>
 
 <p align="center">
-  <a href="https://git.bluesway.org/bluesway/trade-lens">繁體中文（台灣）</a>
+  <a href="/README.md">繁體中文（台灣）</a>
   ·
-  <a href="https://git.bluesway.org/bluesway/trade-lens/src/branch/master/README.zh-CN.md">简体中文（中国）</a>
+  <a href="/README.zh-CN.md">简体中文（中国）</a>
   ·
-  <a href="https://git.bluesway.org/bluesway/trade-lens/src/branch/master/README.ja-JP.md">日本語</a>
+  <a href="/README.ja-JP.md">日本語</a>
   ·
   <strong>English (US)</strong>
 </p>
@@ -86,4 +86,4 @@
 
 ## License
 
-Distributed under the **MIT License**. See [`LICENSE`](https://git.bluesway.org/bluesway/trade-lens/src/branch/master/LICENSE) for details.
+Distributed under the **MIT License**. See [`LICENSE`](/LICENSE) for details.
