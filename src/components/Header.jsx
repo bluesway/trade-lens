@@ -6,12 +6,17 @@ import {
   Database,
   Download,
   Info,
+  Languages,
   Moon,
   RefreshCw,
   Sun,
   Upload
 } from 'lucide-react';
-import { SUPPORTED_LOCALES, normalizeLocale } from '../locales/config';
+import {
+  SUPPORTED_LOCALES,
+  normalizeLocale,
+  syncLocaleToUrl
+} from '../locales/config';
 import {
   formatGregorianReferenceDateTime,
   formatLocalizedDateTime,
@@ -40,7 +45,7 @@ export default function Header({
 
   const handleLocaleChange = (event) => {
     const nextLocale = event.target.value;
-    localStorage.setItem('tr_locale', nextLocale);
+    syncLocaleToUrl(nextLocale);
     void i18n.changeLanguage(nextLocale);
   };
 
@@ -68,13 +73,19 @@ export default function Header({
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <label className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 shadow-sm">
-          <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{t('common.language')}</span>
+        <label
+          className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 shadow-sm"
+          title="Language"
+        >
+          <Languages size={16} className="text-blue-600 dark:text-blue-300" />
+          <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+            Language
+          </span>
           <select
             value={activeLocale}
             onChange={handleLocaleChange}
             className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 outline-none"
-            title={t('header.languageLabel')}
+            title="Language"
           >
             {SUPPORTED_LOCALES.map((locale) => (
               <option key={locale.code} value={locale.code}>

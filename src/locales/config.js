@@ -155,6 +155,38 @@ const FORMATTING_LOCALE_OVERRIDES = {
   'yue-Hant-HK': 'zh-HK'
 };
 
+const URL_LANG_TO_LOCALE = {
+  ar: 'ar-SA',
+  au: 'en-AU',
+  br: 'pt-BR',
+  ca: 'en-CA',
+  cn: 'zh-CN',
+  de: 'de-DE',
+  'en-sg': 'en-SG',
+  'es-es': 'es-ES',
+  'fr-ca': 'fr-CA',
+  fr: 'fr-FR',
+  gb: 'en-GB',
+  hk: 'yue-Hant-HK',
+  id: 'id-ID',
+  in: 'hi-IN',
+  it: 'it-IT',
+  jp: 'ja-JP',
+  kr: 'ko-KR',
+  mx: 'es-MX',
+  my: 'ms-MY',
+  nl: 'nl-NL',
+  pl: 'pl-PL',
+  pt: 'pt-PT',
+  ru: 'ru-RU',
+  th: 'th-TH',
+  tr: 'tr-TR',
+  tw: 'zh-TW',
+  us: 'en-US',
+  vi: 'vi-VN',
+  'zh-sg': 'zh-SG'
+};
+
 const SUPPORTED_LOCALE_CODES = SUPPORTED_LOCALES.map((locale) => locale.code);
 
 export const normalizeLocale = (value) => {
@@ -172,6 +204,36 @@ export const normalizeLocale = (value) => {
 
   const matchedLocale = SUPPORTED_LOCALES.find(({ code }) => lowerValue.startsWith(code.toLowerCase()));
   return matchedLocale?.code || DEFAULT_LOCALE;
+};
+
+export const resolveLocaleFromUrlLang = (value) => {
+  if (!value) return DEFAULT_LOCALE;
+
+  const normalizedValue = String(value).trim().toLowerCase();
+  return URL_LANG_TO_LOCALE[normalizedValue] || normalizeLocale(value);
+};
+
+export const getUrlLangParam = (value) => {
+  const localeCode = normalizeLocale(value);
+  const matchedEntry = Object.entries(URL_LANG_TO_LOCALE)
+    .find(([, locale]) => locale === localeCode);
+
+  return matchedEntry?.[0] || localeCode.toLowerCase();
+};
+
+export const syncLocaleToUrl = (value) => {
+  if (typeof window === 'undefined') return;
+
+  const localeCode = normalizeLocale(value);
+  const url = new URL(window.location.href);
+
+  if (localeCode === DEFAULT_LOCALE) {
+    url.searchParams.delete('lang');
+  } else {
+    url.searchParams.set('lang', getUrlLangParam(localeCode));
+  }
+
+  window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
 };
 
 export const getLocaleMeta = (value) => {
