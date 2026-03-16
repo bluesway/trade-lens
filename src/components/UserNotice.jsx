@@ -37,7 +37,7 @@ export default function UserNotice({ show, onDismiss }) {
               <span>{t('notice.apiKey')}</span>
             </div>
             <a 
-              href="https://git.bluesway.org/bluesway/trade-lens" 
+              href="https://github.com/bluesway/trade-lens/"
               target="_blank" 
               rel="noreferrer"
               className="flex items-center gap-2 text-xs bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg border border-white/20 transition-colors cursor-pointer"

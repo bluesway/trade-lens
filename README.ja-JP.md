@@ -9,13 +9,13 @@
 </p>
 
 <p align="center">
-  <a href="/README.md">繁體中文（台灣）</a>
+  <a href="https://github.com/bluesway/trade-lens">繁體中文（台灣）</a>
   ·
-  <a href="/README.zh-CN.md">简体中文（中国）</a>
+  <a href="https://github.com/bluesway/trade-lens/blob/master/README.zh-CN.md">简体中文（中国）</a>
   ·
   <strong>日本語</strong>
   ·
-  <a href="/README.en-US.md">English (US)</a>
+  <a href="https://github.com/bluesway/trade-lens/blob/master/README.en-US.md">English (US)</a>
 </p>
 
 <p align="center">
@@ -62,7 +62,7 @@
 
 1. リポジトリを取得
    ```bash
-   git clone https://git.bluesway.org/bluesway/trade-lens.git
+   git clone https://github.com/bluesway/trade-lens.git
    cd trade-lens
    ```
 2. 依存関係をインストール
@@ -86,4 +86,4 @@
 
 ## ライセンス
 
-本プロジェクトは **MIT License** の下で提供されています。詳細は [`LICENSE`](/LICENSE) をご確認ください。
+本プロジェクトは **MIT License** の下で提供されています。詳細は [`LICENSE`](https://github.com/bluesway/trade-lens/blob/master/LICENSE) をご確認ください。
