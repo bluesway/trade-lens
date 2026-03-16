@@ -3852,26 +3852,997 @@ const arSA = {
   }
 };
 
+const enCA = {
+  ...enUS,
+  currencies: {
+    ...enUS.currencies,
+    CAD: 'Canadian Dollar (CAD)'
+  },
+  header: {
+    ...enUS.header,
+    demoDescription: 'A trimmed demo dataset is showing right now. Import your full CSV to see the whole book.',
+    recordsLoaded: 'Loaded and analyzed {{count}} trades.',
+    csvRows: {
+      ...enUS.header.csvRows,
+      symbol: 'Symbol (for example: AAPL, 0700.HK)'
+    },
+    csvNote2: '* Note 2: For other markets, add the suffix directly to the symbol (for example: .TW, .HK).'
+  },
+  summary: {
+    ...enUS.summary,
+    holdingCount: 'Open Holdings',
+    holdingUnit: 'holdings'
+  },
+  charts: {
+    ...enUS.charts,
+    realizedTitle: 'Realized P&L by Name (sold too soon / solid exit)'
+  },
+  table: {
+    ...enUS.table,
+    title: 'Trade History by Name',
+    hedgeSuccess: 'Selling earlier turned out to be the better move ({{value}})',
+    soldTooEarly: 'Sold a little too early and left {{value}} on the table'
+  },
+  messages: {
+    ...enUS.messages,
+    updateSuccess: 'Updated {{count}} quotes and FX rates.'
+  }
+};
+
+const enAU = {
+  ...enGB,
+  currencies: {
+    ...enGB.currencies,
+    AUD: 'Australian Dollar (AUD)'
+  },
+  header: {
+    ...enGB.header,
+    demoDescription: 'Right now you are seeing a trimmed demo set. Import the full CSV to see the full picture.',
+    recordsLoaded: 'Loaded and analysed {{count}} trades.',
+    csvRows: {
+      ...enGB.header.csvRows,
+      symbol: 'Symbol (for example: AAPL, 0700.HK)'
+    },
+    forceRefreshTitle: 'Ignore the cache and burn real API quota'
+  },
+  charts: {
+    ...enGB.charts,
+    realizedTitle: 'Realised P&L by Ticker (sold too early / tidy exit)'
+  },
+  table: {
+    ...enGB.table,
+    title: 'Trade History by Ticker',
+    hedgeSuccess: 'Getting out earlier ended up being the better call ({{value}})',
+    soldTooEarly: 'Sold too early and left {{value}} behind'
+  },
+  manager: {
+    ...enGB.manager,
+    placeholders: {
+      ...enGB.manager.placeholders,
+      symbol: 'For example: 0700.HK'
+    }
+  },
+  messages: {
+    ...enGB.messages,
+    cacheFresh: 'Prices and FX rates were refreshed within the last 24 hours, so the app reused the local cache to save quota.'
+  }
+};
+
+const frCA = {
+  ...frFR,
+  currencies: {
+    ...frFR.currencies,
+    CAD: 'Dollar canadien (CAD)'
+  },
+  header: {
+    ...frFR.header,
+    demoDescription: 'Pour le moment, tu vois un jeu de données démo allégé. Importe ton CSV complet pour voir tout le portrait.',
+    recordsLoaded: '{{count}} transactions chargées et analysées',
+    settingsRecords: 'Réglages et transactions',
+    updatePrices: 'Actualiser les cours',
+    updateWithCache: 'Actualiser les cours avec le cache',
+    forceRefreshTitle: 'Ignorer le cache et brûler du quota API',
+    csvRows: {
+      ...frFR.header.csvRows,
+      symbol: 'Symbole (par ex. : AAPL, 0700.HK)'
+    },
+    csvNote2: '* Note 2 : pour les autres marchés, ajoute directement le suffixe au symbole comme .TW ou .HK.'
+  },
+  summary: {
+    ...frFR.summary,
+    totalValue: 'Valeur actuelle des positions (convertie)'
+  },
+  charts: {
+    ...frFR.charts,
+    realizedTitle: 'P/L réalisé par titre (vente trop vite / bonne sortie)'
+  },
+  table: {
+    ...frFR.table,
+    title: 'Historique par titre',
+    subtitle: 'Ouvre une ligne pour voir le détail des achats et ventes. Les montants restent affichés dans la devise d’origine du marché.',
+    hedgeSuccess: 'Sortir plus tôt a finalement mieux payé ({{value}})',
+    soldTooEarly: 'Vendu trop tôt, il manque {{value}}'
+  },
+  manager: {
+    ...frFR.manager,
+    clearAndLoadDemo: 'Effacer et charger les données démo',
+    apiKeyTitle: 'Clé API yfapi.net',
+    getFreeApiKey: 'Obtenir une clé gratuite',
+    saveApiKey: 'Enregistrer la clé',
+    manualRecordTitle: 'Ajouter une transaction manuelle',
+    placeholders: {
+      ...frFR.manager.placeholders,
+      symbol: 'Ex. : 0700.HK'
+    }
+  },
+  notice: {
+    ...frFR.notice,
+    body: 'Trade Lens est un outil open source pour investisseurs qui transforme les CSV de courtier en courbes de coût, vues P/L et graphiques de répartition plus faciles à lire.'
+  }
+};
+
+const esMX = {
+  ...es419,
+  currencies: {
+    ...es419.currencies,
+    MXN: 'Peso mexicano (MXN)'
+  },
+  header: {
+    ...es419.header,
+    demoDescription: 'Ahorita solo se muestra una parte del set demo. Importa tu CSV completo para ver toda la foto.',
+    settingsRecords: 'Configuración y movimientos',
+    updatePrices: 'Actualizar precios',
+    updateWithCache: 'Actualizar precios en vivo con caché',
+    forceRefreshTitle: 'Ignorar caché y gastar cuota real del API',
+    csvRows: {
+      ...es419.header.csvRows,
+      symbol: 'Símbolo (por ejemplo: AAPL, 0700.HK)'
+    }
+  },
+  charts: {
+    ...es419.charts,
+    realizedTitle: 'P&L realizado por emisora (salida temprana / buena toma de ganancia)'
+  },
+  table: {
+    ...es419.table,
+    title: 'Historial por emisora',
+    hedgeSuccess: 'Salir antes terminó saliendo mejor ({{value}})',
+    soldTooEarly: 'Vendiste antes de tiempo y dejaste {{value}} sobre la mesa'
+  },
+  manager: {
+    ...es419.manager,
+    title: 'Configuración y registro de movimientos',
+    placeholders: {
+      ...es419.manager.placeholders,
+      symbol: 'Por ejemplo: 0700.HK'
+    }
+  },
+  messages: {
+    ...es419.messages,
+    needApiKey: 'Pon tu API key de yfapi.net en el panel de configuración antes de actualizar precios.'
+  }
+};
+
+const plPL = {
+  ...enUS,
+  common: {
+    language: 'Język',
+    close: 'Zamknij',
+    cancel: 'Anuluj',
+    save: 'Zapisz',
+    edit: 'Edytuj',
+    delete: 'Usuń',
+    importCsv: 'Importuj CSV',
+    exportCsv: 'Eksportuj CSV'
+  },
+  currencies: {
+    TWD: 'Nowy dolar tajwański (TWD)',
+    CNY: 'Juan chiński (CNY)',
+    HKD: 'Dolar hongkoński (HKD)',
+    USD: 'Dolar amerykański (USD)',
+    JPY: 'Jen japoński (JPY)',
+    PLN: 'Polski złoty (PLN)'
+  },
+  markets: {
+    all: 'Wszystko',
+    chinaA: 'Chińskie akcje A',
+    hongKong: 'Hongkong',
+    taiwan: 'Tajwan',
+    japan: 'Japonia',
+    us: 'USA',
+    other: 'Inne',
+    unknown: 'Nieznane'
+  },
+  tradeTypes: {
+    buy: 'Kupno',
+    sell: 'Sprzedaż'
+  },
+  timeRanges: {
+    oneWeek: '1 tydz.',
+    oneMonth: '1 mies.',
+    threeMonths: '3 mies.',
+    halfYear: '6 mies.',
+    ytd: 'YTD',
+    oneYear: '1 rok',
+    fiveYears: '5 lat',
+    all: 'Wszystko'
+  },
+  app: {
+    loadingLocalData: 'Ładowanie lokalnych danych z IndexedDB...',
+    generatingImage: 'Generowanie obrazu...',
+    imageExportSuccess: 'Obraz został wyeksportowany.',
+    imageExportFail: 'Eksport obrazu nie powiódł się.',
+    noDataToExport: 'Brak danych do eksportu.',
+    exportFilenamePrefix: 'trade_records'
+  },
+  header: {
+    title: 'Globalny dashboard portfela',
+    demoDescription: 'Teraz widzisz tylko przycięty zestaw demo. Zaimportuj pełny CSV, żeby zobaczyć cały obraz.',
+    recordsLoaded: 'Wczytano i przeanalizowano {{count}} transakcji.',
+    lastUpdated: 'Ostatnia aktualizacja: {{value}}',
+    switchToLight: 'Przełącz na jasny motyw',
+    switchToDark: 'Przełącz na ciemny motyw',
+    settingsRecords: 'Ustawienia i transakcje',
+    updatePrices: 'Odśwież kursy',
+    apiKeyRequired: 'Potrzebny API key',
+    updateWithCache: 'Odśwież kursy z użyciem cache',
+    setApiKeyFirst: 'Najpierw ustaw API key',
+    forceRefresh: 'Wymuś odświeżenie',
+    forceRefreshTitle: 'Pomiń cache i zużyj prawdziwy limit API',
+    languageLabel: 'Zmień język',
+    csvTitle: 'Przewodnik po polach CSV',
+    csvIntro: 'Upewnij się, że CSV ma przynajmniej te nagłówki. Kolejność nie ma znaczenia:',
+    csvRows: {
+      date: 'Data (np. 2025/01/01)',
+      type: 'Typ (Kupno / Sprzedaż)',
+      symbol: 'Symbol (np. AAPL, 0700.HK)',
+      market: 'Rynek (opcjonalnie, przydaje się przy ręcznych wpisach)',
+      quantity: 'Ilość',
+      price: 'Cena jednostkowa (waluta oryginalna)',
+      amount: 'Kwota łączna (waluta oryginalna)',
+      pnl: 'P&L (wymagane przy sprzedaży, waluta oryginalna)'
+    },
+    csvNote1: '* Uwaga 1: Sześciocyfrowe symbole zaczynające się od 6 lub 0 są automatycznie rozpoznawane jako chińskie akcje A (.SS / .SZ).',
+    csvNote2: '* Uwaga 2: Dla innych rynków dodaj sufiks bezpośrednio do symbolu, np. .TW albo .HK.',
+    forceRefreshConfirm: 'Wymusić odświeżenie? To zignoruje 24-godzinny cache i zużyje prawdziwy limit API.'
+  },
+  summary: {
+    totalRealized: 'Łączny zrealizowany P&L (po przewalutowaniu)',
+    totalUnrealized: 'Łączny niezrealizowany P&L (po przewalutowaniu)',
+    totalValue: 'Aktualna wartość portfela (po przewalutowaniu)',
+    holdingCount: 'Otwarte pozycje',
+    holdingUnit: 'pozycje'
+  },
+  charts: {
+    trendTitle: 'Skumulowany trend kosztu',
+    saveImage: 'Zapisz wykres jako obraz',
+    noTrend: 'Historia transakcji jest jeszcze za mała, żeby narysować trend.',
+    realizedTitle: 'Zrealizowany P&L wg spółki (sprzedane za wcześnie / dobry timing)',
+    distributionTitle: 'Struktura wartości portfela (top 10)',
+    convertedNote: 'Pokazane po przeliczeniu na {{currency}}',
+    noPnlData: 'Brak danych P&L.',
+    noHoldings: 'Brak otwartych pozycji.',
+    legendConverted: '{{label}} (po przewalutowaniu)',
+    costSeries: 'Skumulowany koszt',
+    realizedSeries: 'Skumulowany zrealizowany P&L',
+    ifSoldSeries: 'Gdyby sprzedać dziś',
+    actualSeries: 'Zrealizowane faktycznie',
+    others: 'Pozostałe'
+  },
+  table: {
+    title: 'Historia transakcji wg symbolu',
+    subtitle: 'Otwórz wiersz, żeby zobaczyć szczegóły kupna i sprzedaży. Kwoty zostają w oryginalnej walucie notowania.',
+    columns: {
+      symbol: 'Symbol / nazwa (rynek · waluta)',
+      holdingQty: 'Aktualna ilość',
+      currentValue: 'Ostatnia cena / wartość rynkowa',
+      unrealized: 'Niezrealizowany P&L',
+      realized: 'Zrealizowany P&L',
+      ifSoldToday: 'Gdyby sprzedać dziś',
+      date: 'Data',
+      type: 'Typ',
+      quantity: 'Ilość',
+      price: 'Cena',
+      amount: 'Kwota',
+      pnl: 'P&L',
+      actions: 'Akcje'
+    },
+    manualBadge: 'Ręcznie',
+    manualUpdatedAt: 'Ręczna korekta: {{value}}',
+    apiUpdatedAt: 'Ostatnie odświeżenie API: {{value}}',
+    notUpdatedYet: 'Jeszcze nie odświeżono',
+    manualNamePlaceholder: 'Nazwa wpisana ręcznie',
+    currentPricePlaceholder: 'Cena',
+    hedgeSuccess: 'Wcześniejsze wyjście wyszło lepiej ({{value}})',
+    soldTooEarly: 'Sprzedane za wcześnie, na stole zostało {{value}}',
+    tradeDetails: 'Szczegóły wykonania',
+    atPrice: '@ {{price}}',
+    quantityAtPrice: '{{quantity}} akcji @ {{price}}',
+    mobileHoldingQty: 'Pozycja',
+    mobileUnrealized: 'Niezrealizowane',
+    mobileRealized: 'Zrealizowane'
+  },
+  manager: {
+    title: 'Ustawienia i dziennik transakcji',
+    clearAndLoadDemo: 'Wyczyść i wczytaj demo',
+    apiKeyTitle: 'API key z yfapi.net',
+    getFreeApiKey: 'Pobierz za darmo',
+    apiKeyPlaceholder: 'Wklej tutaj swój x-api-key (np. A2sD8...)',
+    saveApiKey: 'Zapisz API key',
+    baseCurrencyTitle: 'Waluta bazowa podsumowania',
+    baseCurrencyHelp: '* Każdy zagraniczny składnik portfela jest przeliczany na tę walutę według bieżącego FX, żeby karty podsumowania mogły wszystko sensownie zsumować.',
+    hideZeroHolding: 'Ukryj pozycje całkowicie zamknięte',
+    manualRecordTitle: 'Dodaj transakcję ręcznie',
+    fields: {
+      date: 'Data',
+      type: 'Typ',
+      market: 'Rynek',
+      symbol: 'Symbol',
+      quantity: 'Ilość',
+      price: 'Cena jednostkowa',
+      amount: 'Kwota łączna',
+      pnl: 'Zrealizowany P&L (tylko sprzedaż)'
+    },
+    placeholders: {
+      symbol: 'Np. AAPL',
+      quantity: 'Liczba akcji',
+      price: 'Cena za akcję',
+      amount: 'W walucie tego rynku',
+      pnl: 'Opcjonalnie'
+    },
+    saveChanges: 'Zapisz zmiany',
+    addRecord: 'Dodaj',
+    noRecords: 'Brak historii transakcji.'
+  },
+  notice: {
+    title: 'Witaj w Trade Lens',
+    body: 'Trade Lens to open source’owe narzędzie dla inwestorów, które zamienia CSV od brokera w wykres kosztu, widoki P&L i czytelniejszy obraz portfela.',
+    privacy: 'Prywatność przede wszystkim: wszystko zostaje tylko w Twojej przeglądarce (IndexedDB). Nic nie trafia na nasz serwer.',
+    apiKey: 'API key służy wyłącznie do pobierania cen z yfapi.net i też zostaje lokalnie.',
+    sourceCode: 'Open source: przejrzyj kod i dołóż swoje',
+    dismiss: 'Nie pokazuj ponownie'
+  },
+  messages: {
+    apiKeySaved: 'API key zapisany.',
+    manualStockSaved: '{{symbol}} zaktualizowano ręcznie.',
+    needApiKey: 'Wpisz API key z yfapi.net w panelu ustawień, zanim odświeżysz kursy.',
+    cacheFresh: 'Ceny i kursy FX były odświeżane w ciągu ostatnich 24 godzin, więc aplikacja użyła lokalnego cache, żeby oszczędzić limit.',
+    updateSuccess: 'Zaktualizowano {{count}} kursów i stawek FX.',
+    fetchFailed: 'Pobieranie nie powiodło się: {{message}}',
+    baseCurrencyChanged: 'Waluta bazowa została zmieniona na {{currency}}. Trwa odświeżanie FX...',
+    recordUpdated: 'Transakcja została zaktualizowana.',
+    dataCleared: 'Dane wyczyszczone, wczytano zestaw demo.',
+    clearConfirm: 'Wyczyścić wszystkie dane i ponownie załadować demo? Tego nie da się cofnąć.',
+    backupConfirm: 'Chcesz wyeksportować bieżące dane do CSV przed wyczyszczeniem?'
+  },
+  data: {
+    unknownSymbol: 'Nieznany symbol ({{symbol}})',
+    unknown: 'Nieznane'
+  }
+};
+
+const trTR = {
+  ...enUS,
+  common: {
+    language: 'Dil',
+    close: 'Kapat',
+    cancel: 'İptal',
+    save: 'Kaydet',
+    edit: 'Düzenle',
+    delete: 'Sil',
+    importCsv: 'CSV içe aktar',
+    exportCsv: 'CSV dışa aktar'
+  },
+  currencies: {
+    TWD: 'Yeni Tayvan Doları (TWD)',
+    CNY: 'Çin Yuanı (CNY)',
+    HKD: 'Hong Kong Doları (HKD)',
+    USD: 'ABD Doları (USD)',
+    JPY: 'Japon Yeni (JPY)',
+    TRY: 'Türk Lirası (TRY)'
+  },
+  markets: {
+    all: 'Tümü',
+    chinaA: 'Çin A Hisseleri',
+    hongKong: 'Hong Kong',
+    taiwan: 'Tayvan',
+    japan: 'Japonya',
+    us: 'ABD',
+    other: 'Diğer',
+    unknown: 'Bilinmiyor'
+  },
+  tradeTypes: {
+    buy: 'Alım',
+    sell: 'Satım'
+  },
+  timeRanges: {
+    oneWeek: '1 hf',
+    oneMonth: '1 ay',
+    threeMonths: '3 ay',
+    halfYear: '6 ay',
+    ytd: 'YBB',
+    oneYear: '1 yıl',
+    fiveYears: '5 yıl',
+    all: 'Tümü'
+  },
+  app: {
+    loadingLocalData: 'Yerel IndexedDB verileri yükleniyor...',
+    generatingImage: 'Görsel oluşturuluyor...',
+    imageExportSuccess: 'Görsel başarıyla dışa aktarıldı.',
+    imageExportFail: 'Görsel dışa aktarılamadı.',
+    noDataToExport: 'Şu anda dışa aktarılacak veri yok.',
+    exportFilenamePrefix: 'trade_records'
+  },
+  header: {
+    title: 'Küresel portföy paneli',
+    demoDescription: 'Şu anda kırpılmış bir demo veri seti görüyorsun. Tam resmi görmek için tam CSV’yi içe aktar.',
+    recordsLoaded: '{{count}} işlem yüklendi ve analiz edildi.',
+    lastUpdated: 'Son güncelleme: {{value}}',
+    switchToLight: 'Aydınlık moda geç',
+    switchToDark: 'Karanlık moda geç',
+    settingsRecords: 'Ayarlar ve işlemler',
+    updatePrices: 'Fiyatları yenile',
+    apiKeyRequired: 'API key gerekli',
+    updateWithCache: 'Canlı fiyatları önbellekle yenile',
+    setApiKeyFirst: 'Önce API key gir',
+    forceRefresh: 'Zorla yenile',
+    forceRefreshTitle: 'Önbelleği yok say ve gerçek API kotası harca',
+    languageLabel: 'Dili değiştir',
+    csvTitle: 'CSV alan rehberi',
+    csvIntro: 'CSV dosyanın en azından şu başlıklara sahip olduğundan emin ol. Sıra önemli değil:',
+    csvRows: {
+      date: 'Tarih (ör. 2025/01/01)',
+      type: 'Tür (Alım / Satım)',
+      symbol: 'Sembol (ör. AAPL, 0700.HK)',
+      market: 'Piyasa (opsiyonel, manuel girişte işe yarar)',
+      quantity: 'Miktar',
+      price: 'Birim fiyat (orijinal para birimi)',
+      amount: 'Toplam tutar (orijinal para birimi)',
+      pnl: 'Kâr/Zarar (satışta zorunlu, orijinal para birimi)'
+    },
+    csvNote1: '* Not 1: 6 veya 0 ile başlayan altı haneli semboller otomatik olarak Çin A hissesi (.SS / .SZ) olarak algılanır.',
+    csvNote2: '* Not 2: Diğer piyasalar için sembole doğrudan .TW veya .HK gibi ekleri yaz.',
+    forceRefreshConfirm: 'Zorla yenilensin mi? Bu işlem 24 saatlik önbelleği yok sayar ve gerçek API kotası harcar.'
+  },
+  summary: {
+    totalRealized: 'Toplam gerçekleşen P&L (çevrilmiş)',
+    totalUnrealized: 'Toplam gerçekleşmemiş P&L (çevrilmiş)',
+    totalValue: 'Güncel portföy değeri (çevrilmiş)',
+    holdingCount: 'Açık pozisyon sayısı',
+    holdingUnit: 'pozisyon'
+  },
+  charts: {
+    trendTitle: 'Kümülatif maliyet trendi',
+    saveImage: 'Grafiği görsel olarak kaydet',
+    noTrend: 'Trend çizmek için henüz yeterli işlem geçmişi yok.',
+    realizedTitle: 'Sembole göre gerçekleşen P&L (erken satış / temiz çıkış)',
+    distributionTitle: 'Portföy değer dağılımı (ilk 10)',
+    convertedNote: '{{currency}} cinsine çevrilmiş olarak gösterilir',
+    noPnlData: 'Henüz P&L verisi yok.',
+    noHoldings: 'Şu anda açık pozisyon yok.',
+    legendConverted: '{{label}} (çevrilmiş)',
+    costSeries: 'Kümülatif maliyet',
+    realizedSeries: 'Kümülatif gerçekleşen P&L',
+    ifSoldSeries: 'Bugün satılsaydı',
+    actualSeries: 'Gerçekte gerçekleşen',
+    others: 'Diğer'
+  },
+  table: {
+    title: 'Sembole göre işlem geçmişi',
+    subtitle: 'Bir satırı açıp alım ve satım detaylarını inceleyebilirsin. Tutarlar işlem gördüğü piyasanın kendi para biriminde kalır.',
+    columns: {
+      symbol: 'Sembol / ad (piyasa · para birimi)',
+      holdingQty: 'Güncel miktar',
+      currentValue: 'Son fiyat / piyasa değeri',
+      unrealized: 'Gerçekleşmemiş P&L',
+      realized: 'Gerçekleşen P&L',
+      ifSoldToday: 'Bugün satılsaydı',
+      date: 'Tarih',
+      type: 'Tür',
+      quantity: 'Miktar',
+      price: 'Fiyat',
+      amount: 'Tutar',
+      pnl: 'P&L',
+      actions: 'İşlemler'
+    },
+    manualBadge: 'Manuel',
+    manualUpdatedAt: 'Manuel düzeltme: {{value}}',
+    apiUpdatedAt: 'API son güncelleme: {{value}}',
+    notUpdatedYet: 'Henüz güncellenmedi',
+    manualNamePlaceholder: 'Manuel isim',
+    currentPricePlaceholder: 'Fiyat',
+    hedgeSuccess: 'Erken çıkmak daha iyi iş çıkardı ({{value}})',
+    soldTooEarly: 'Biraz erken sattın, {{value}} masada kaldı',
+    tradeDetails: 'İşlem detayları',
+    atPrice: '@ {{price}}',
+    quantityAtPrice: '{{quantity}} adet @ {{price}}',
+    mobileHoldingQty: 'Pozisyon',
+    mobileUnrealized: 'Gerçekleşmemiş',
+    mobileRealized: 'Gerçekleşen'
+  },
+  manager: {
+    title: 'Ayarlar ve işlem kaydı',
+    clearAndLoadDemo: 'Temizle ve demo verisini yükle',
+    apiKeyTitle: 'yfapi.net API key',
+    getFreeApiKey: 'Ücretsiz al',
+    apiKeyPlaceholder: 'x-api-key değerini buraya yapıştır (ör. A2sD8...)',
+    saveApiKey: 'API key kaydet',
+    baseCurrencyTitle: 'Özet kartı baz para birimi',
+    baseCurrencyHelp: '* Tüm yabancı para varlıkları canlı FX ile bu para birimine çevrilir; böylece üstteki özet kartları her şeyi düzgünce toplayabilir.',
+    hideZeroHolding: 'Tamamen kapatılmış pozisyonları gizle',
+    manualRecordTitle: 'Manuel işlem ekle',
+    fields: {
+      date: 'Tarih',
+      type: 'Tür',
+      market: 'Piyasa',
+      symbol: 'Sembol',
+      quantity: 'Miktar',
+      price: 'Birim fiyat',
+      amount: 'Toplam tutar',
+      pnl: 'Gerçekleşen P&L (sadece satış)'
+    },
+    placeholders: {
+      symbol: 'Örn: AAPL',
+      quantity: 'Adet',
+      price: 'Hisse başı fiyat',
+      amount: 'O piyasanın para biriminde',
+      pnl: 'Opsiyonel'
+    },
+    saveChanges: 'Değişiklikleri kaydet',
+    addRecord: 'Ekle',
+    noRecords: 'Henüz işlem kaydı yok.'
+  },
+  notice: {
+    title: 'Trade Lens’e hoş geldin',
+    body: 'Trade Lens, aracı kurum CSV’lerini maliyet trendlerine, P&L görünümüne ve portföy dağılımına çeviren açık kaynaklı bir yatırımcı aracıdır.',
+    privacy: 'Önce gizlilik: her şey sadece tarayıcında kalır (IndexedDB). Sunucuya hiçbir şey gönderilmez.',
+    apiKey: 'API key sadece yfapi.net fiyat sorguları için kullanılır; o da yerelde kalır.',
+    sourceCode: 'Açık kaynak: koda bak ve katkı ver',
+    dismiss: 'Bir daha gösterme'
+  },
+  messages: {
+    apiKeySaved: 'API key kaydedildi.',
+    manualStockSaved: '{{symbol}} manuel olarak güncellendi.',
+    needApiKey: 'Fiyatları yenilemeden önce ayarlar paneline yfapi.net API key gir.',
+    cacheFresh: 'Fiyatlar ve FX oranları son 24 saatte güncellendiği için uygulama kotayı korumak adına yerel önbelleği kullandı.',
+    updateSuccess: '{{count}} fiyat ve FX oranı güncellendi.',
+    fetchFailed: 'Veri alınamadı: {{message}}',
+    baseCurrencyChanged: 'Baz para birimi {{currency}} olarak değiştirildi. FX oranları yenileniyor...',
+    recordUpdated: 'İşlem kaydı güncellendi.',
+    dataCleared: 'Veriler temizlendi ve demo kayıtları yüklendi.',
+    clearConfirm: 'Tüm veriler silinip demo seti yeniden yüklensin mi? Bu işlem geri alınamaz.',
+    backupConfirm: 'Silmeden önce mevcut verileri CSV yedeği olarak dışa aktarmak ister misin?'
+  },
+  data: {
+    unknownSymbol: 'Bilinmeyen sembol ({{symbol}})',
+    unknown: 'Bilinmiyor'
+  }
+};
+
+const hiIN = {
+  ...enUS,
+  common: {
+    language: 'भाषा',
+    close: 'बंद करें',
+    cancel: 'रद्द करें',
+    save: 'सेव करें',
+    edit: 'एडिट करें',
+    delete: 'हटाएं',
+    importCsv: 'CSV इंपोर्ट करें',
+    exportCsv: 'CSV एक्सपोर्ट करें'
+  },
+  currencies: {
+    TWD: 'न्यू ताइवान डॉलर (TWD)',
+    CNY: 'चीनी युआन (CNY)',
+    HKD: 'हांगकांग डॉलर (HKD)',
+    USD: 'अमेरिकी डॉलर (USD)',
+    JPY: 'जापानी येन (JPY)',
+    INR: 'भारतीय रुपया (INR)'
+  },
+  markets: {
+    all: 'सभी',
+    chinaA: 'चीन A-शेयर',
+    hongKong: 'हांगकांग शेयर',
+    taiwan: 'ताइवान शेयर',
+    japan: 'जापान शेयर',
+    us: 'अमेरिकी शेयर',
+    other: 'अन्य',
+    unknown: 'अज्ञात'
+  },
+  tradeTypes: {
+    buy: 'खरीद',
+    sell: 'बिक्री'
+  },
+  timeRanges: {
+    oneWeek: '1 हफ्ता',
+    oneMonth: '1 महीना',
+    threeMonths: '3 महीने',
+    halfYear: '6 महीने',
+    ytd: 'YTD',
+    oneYear: '1 साल',
+    fiveYears: '5 साल',
+    all: 'सभी'
+  },
+  app: {
+    loadingLocalData: 'लोकल IndexedDB डेटा लोड हो रहा है...',
+    generatingImage: 'इमेज बनाई जा रही है...',
+    imageExportSuccess: 'इमेज सफलतापूर्वक एक्सपोर्ट हो गई।',
+    imageExportFail: 'इमेज एक्सपोर्ट फेल हो गया।',
+    noDataToExport: 'अभी एक्सपोर्ट करने के लिए कोई डेटा नहीं है।',
+    exportFilenamePrefix: 'trade_records'
+  },
+  header: {
+    title: 'ग्लोबल पोर्टफोलियो डैशबोर्ड',
+    demoDescription: 'अभी सिर्फ छोटा डेमो डेटा दिख रहा है। पूरा CSV इंपोर्ट करो, तब पूरी तस्वीर दिखेगी।',
+    recordsLoaded: '{{count}} ट्रेड रिकॉर्ड लोड और एनालाइज़ किए गए।',
+    lastUpdated: 'आखिरी अपडेट: {{value}}',
+    switchToLight: 'लाइट मोड पर जाएं',
+    switchToDark: 'डार्क मोड पर जाएं',
+    settingsRecords: 'सेटिंग्स और ट्रेड्स',
+    updatePrices: 'कोट्स रिफ्रेश करें',
+    apiKeyRequired: 'API key चाहिए',
+    updateWithCache: 'कैश के साथ लाइव कोट्स रिफ्रेश करें',
+    setApiKeyFirst: 'पहले API key सेट करें',
+    forceRefresh: 'फोर्स रिफ्रेश',
+    forceRefreshTitle: 'कैश छोड़ो और असली API quota खर्च करो',
+    languageLabel: 'भाषा बदलें',
+    csvTitle: 'CSV फील्ड गाइड',
+    csvIntro: 'ध्यान रहे कि आपके CSV में कम से कम ये headers हों। क्रम मायने नहीं रखता:',
+    csvRows: {
+      date: 'तारीख (जैसे: 2025/01/01)',
+      type: 'टाइप (खरीद / बिक्री)',
+      symbol: 'सिंबल (जैसे: AAPL, 0700.HK)',
+      market: 'मार्केट (वैकल्पिक, मैनुअल एंट्री में काम आता है)',
+      quantity: 'क्वांटिटी',
+      price: 'यूनिट प्राइस (मूल मुद्रा)',
+      amount: 'कुल अमाउंट (मूल मुद्रा)',
+      pnl: 'P&L (बिक्री पर जरूरी, मूल मुद्रा)'
+    },
+    csvNote1: '* नोट 1: 6 अंकों वाले और 6 या 0 से शुरू होने वाले symbols अपने आप China A-shares (.SS / .SZ) माने जाएंगे।',
+    csvNote2: '* नोट 2: बाकी मार्केट्स के लिए symbol के बाद .TW या .HK जैसा suffix सीधे जोड़ें।',
+    forceRefreshConfirm: 'फोर्स रिफ्रेश करना है? इससे 24 घंटे वाला cache ignore होगा और असली API quota खर्च होगा।'
+  },
+  summary: {
+    totalRealized: 'कुल Realized P&L (कन्वर्टेड)',
+    totalUnrealized: 'कुल Unrealized P&L (कन्वर्टेड)',
+    totalValue: 'मौजूदा Holdings Value (कन्वर्टेड)',
+    holdingCount: 'ओपन होल्डिंग्स',
+    holdingUnit: 'होल्डिंग्स'
+  },
+  charts: {
+    trendTitle: 'क्यूम्युलेटिव कॉस्ट ट्रेंड',
+    saveImage: 'चार्ट को इमेज के रूप में सेव करें',
+    noTrend: 'अभी ट्रेंड दिखाने लायक ट्रेड हिस्ट्री नहीं है।',
+    realizedTitle: 'सिंबल के हिसाब से Realized P&L (जल्दी बेच दिया / सही समय पर निकले)',
+    distributionTitle: 'होल्डिंग वैल्यू मिक्स (टॉप 10)',
+    convertedNote: '{{currency}} में कन्वर्ट करके दिखाया गया है',
+    noPnlData: 'अभी P&L डेटा नहीं है।',
+    noHoldings: 'अभी कोई ओपन होल्डिंग नहीं है।',
+    legendConverted: '{{label}} (कन्वर्टेड)',
+    costSeries: 'क्यूम्युलेटिव कॉस्ट बेसिस',
+    realizedSeries: 'क्यूम्युलेटिव Realized P&L',
+    ifSoldSeries: 'अगर आज बेचते',
+    actualSeries: 'असल में Realized',
+    others: 'बाकी'
+  },
+  table: {
+    title: 'सिंबल के हिसाब से ट्रेड हिस्ट्री',
+    subtitle: 'किसी row को खोलकर buy और sell lots देखो। अमाउंट उसी listing currency में रहते हैं।',
+    columns: {
+      symbol: 'सिंबल / नाम (मार्केट · करेंसी)',
+      holdingQty: 'मौजूदा शेयर',
+      currentValue: 'लास्ट प्राइस / मार्केट वैल्यू',
+      unrealized: 'Unrealized P&L',
+      realized: 'Realized P&L',
+      ifSoldToday: 'अगर आज बेचते',
+      date: 'तारीख',
+      type: 'टाइप',
+      quantity: 'क्वांटिटी',
+      price: 'प्राइस',
+      amount: 'अमाउंट',
+      pnl: 'P&L',
+      actions: 'एक्शन'
+    },
+    manualBadge: 'मैनुअल',
+    manualUpdatedAt: 'मैनुअल ओवरराइड: {{value}}',
+    apiUpdatedAt: 'API रिफ्रेश: {{value}}',
+    notUpdatedYet: 'अभी तक रिफ्रेश नहीं हुआ',
+    manualNamePlaceholder: 'मैनुअल नाम',
+    currentPricePlaceholder: 'प्राइस',
+    hedgeSuccess: 'पहले निकलना इस बार सही पड़ा ({{value}})',
+    soldTooEarly: 'थोड़ा जल्दी बेच दिया, {{value}} छूट गया',
+    tradeDetails: 'एक्जीक्यूशन डिटेल्स',
+    atPrice: '@ {{price}}',
+    quantityAtPrice: '{{quantity}} शेयर @ {{price}}',
+    mobileHoldingQty: 'होल्डिंग',
+    mobileUnrealized: 'अनरियलाइज़्ड',
+    mobileRealized: 'रियलाइज़्ड'
+  },
+  manager: {
+    title: 'सेटिंग्स और ट्रेड लॉग',
+    clearAndLoadDemo: 'डेटा साफ करें और डेमो लोड करें',
+    apiKeyTitle: 'yfapi.net API key',
+    getFreeApiKey: 'फ्री में लें',
+    apiKeyPlaceholder: 'अपना x-api-key यहां पेस्ट करें (जैसे: A2sD8...)',
+    saveApiKey: 'API key सेव करें',
+    baseCurrencyTitle: 'समरी बेस करेंसी',
+    baseCurrencyHelp: '* सभी विदेशी एसेट्स लाइव FX के जरिए इस बेस करेंसी में बदले जाते हैं, ताकि ऊपर वाली summary cards में कुल जोड़ साफ-साफ दिखे।',
+    hideZeroHolding: 'पूरी तरह exit हो चुकी holdings छिपाएं',
+    manualRecordTitle: 'मैनुअल ट्रेड जोड़ें',
+    fields: {
+      date: 'तारीख',
+      type: 'टाइप',
+      market: 'मार्केट',
+      symbol: 'सिंबल',
+      quantity: 'क्वांटिटी',
+      price: 'यूनिट प्राइस',
+      amount: 'कुल अमाउंट',
+      pnl: 'Realized P&L (सिर्फ sell)'
+    },
+    placeholders: {
+      symbol: 'जैसे: AAPL',
+      quantity: 'शेयर',
+      price: 'प्रति शेयर कीमत',
+      amount: 'उस मार्केट की करेंसी में',
+      pnl: 'वैकल्पिक'
+    },
+    saveChanges: 'बदलाव सेव करें',
+    addRecord: 'जोड़ें',
+    noRecords: 'अभी कोई ट्रेड रिकॉर्ड नहीं है।'
+  },
+  notice: {
+    title: 'Trade Lens में स्वागत है',
+    body: 'Trade Lens एक open-source टूल है जो broker CSV को cost trends, P&L views और allocation charts में बदल देता है।',
+    privacy: 'प्राइवेसी पहले: सब कुछ सिर्फ आपके ब्राउज़र (IndexedDB) में रहता है। हमारे सर्वर पर कुछ नहीं जाता।',
+    apiKey: 'API key सिर्फ yfapi.net से price lookup के लिए है, और वह भी लोकल में ही रहता है।',
+    sourceCode: 'ओपन सोर्स: कोड देखें और योगदान दें',
+    dismiss: 'फिर मत दिखाना'
+  },
+  messages: {
+    apiKeySaved: 'API key सेव हो गई।',
+    manualStockSaved: '{{symbol}} को मैनुअली अपडेट कर दिया गया।',
+    needApiKey: 'कोट्स रिफ्रेश करने से पहले settings panel में अपना yfapi.net API key डालें।',
+    cacheFresh: 'पिछले 24 घंटों में prices और FX rates अपडेट हो चुके थे, इसलिए app ने quota बचाने के लिए local cache इस्तेमाल किया।',
+    updateSuccess: '{{count}} quotes और FX rates अपडेट हो गए।',
+    fetchFailed: 'Fetch फेल हुआ: {{message}}',
+    baseCurrencyChanged: 'Base currency अब {{currency}} है। FX rates रिफ्रेश हो रहे हैं...',
+    recordUpdated: 'ट्रेड रिकॉर्ड अपडेट हो गया।',
+    dataCleared: 'डेटा साफ कर दिया गया और demo records लोड कर दिए गए।',
+    clearConfirm: 'सारा डेटा साफ करके demo set फिर से लोड करना है? यह वापस नहीं होगा।',
+    backupConfirm: 'साफ करने से पहले क्या मौजूदा डेटा को CSV backup के रूप में एक्सपोर्ट करना है?'
+  },
+  data: {
+    unknownSymbol: 'अज्ञात सिंबल ({{symbol}})',
+    unknown: 'अज्ञात'
+  }
+};
+
+const ruRU = {
+  ...enUS,
+  common: {
+    language: 'Язык',
+    close: 'Закрыть',
+    cancel: 'Отмена',
+    save: 'Сохранить',
+    edit: 'Редактировать',
+    delete: 'Удалить',
+    importCsv: 'Импорт CSV',
+    exportCsv: 'Экспорт CSV'
+  },
+  currencies: {
+    TWD: 'Новый тайваньский доллар (TWD)',
+    CNY: 'Китайский юань (CNY)',
+    HKD: 'Гонконгский доллар (HKD)',
+    USD: 'Доллар США (USD)',
+    JPY: 'Японская иена (JPY)',
+    RUB: 'Российский рубль (RUB)'
+  },
+  markets: {
+    all: 'Все',
+    chinaA: 'Китайские A-акции',
+    hongKong: 'Гонконг',
+    taiwan: 'Тайвань',
+    japan: 'Япония',
+    us: 'США',
+    other: 'Другое',
+    unknown: 'Неизвестно'
+  },
+  tradeTypes: {
+    buy: 'Покупка',
+    sell: 'Продажа'
+  },
+  timeRanges: {
+    oneWeek: '1 нед.',
+    oneMonth: '1 мес.',
+    threeMonths: '3 мес.',
+    halfYear: '6 мес.',
+    ytd: 'YTD',
+    oneYear: '1 год',
+    fiveYears: '5 лет',
+    all: 'Все'
+  },
+  app: {
+    loadingLocalData: 'Загрузка локальных данных IndexedDB...',
+    generatingImage: 'Генерация изображения...',
+    imageExportSuccess: 'Изображение успешно экспортировано.',
+    imageExportFail: 'Не удалось экспортировать изображение.',
+    noDataToExport: 'Сейчас нечего экспортировать.',
+    exportFilenamePrefix: 'trade_records'
+  },
+  header: {
+    title: 'Глобальная панель портфеля',
+    demoDescription: 'Сейчас показан укороченный демо-набор. Импортируйте полный CSV, чтобы увидеть всю картину.',
+    recordsLoaded: 'Загружено и проанализировано {{count}} сделок.',
+    lastUpdated: 'Последнее обновление: {{value}}',
+    switchToLight: 'Переключить на светлую тему',
+    switchToDark: 'Переключить на тёмную тему',
+    settingsRecords: 'Настройки и сделки',
+    updatePrices: 'Обновить котировки',
+    apiKeyRequired: 'Нужен API key',
+    updateWithCache: 'Обновить котировки с кэшем',
+    setApiKeyFirst: 'Сначала укажите API key',
+    forceRefresh: 'Принудительное обновление',
+    forceRefreshTitle: 'Игнорировать кэш и тратить реальную квоту API',
+    languageLabel: 'Сменить язык',
+    csvTitle: 'Подсказка по CSV',
+    csvIntro: 'Убедитесь, что в CSV есть как минимум эти заголовки. Порядок не важен:',
+    csvRows: {
+      date: 'Дата (например: 2025/01/01)',
+      type: 'Тип (Покупка / Продажа)',
+      symbol: 'Тикер (например: AAPL, 0700.HK)',
+      market: 'Рынок (необязательно, полезно для ручного ввода)',
+      quantity: 'Количество',
+      price: 'Цена за единицу (исходная валюта)',
+      amount: 'Итоговая сумма (исходная валюта)',
+      pnl: 'P&L (обязательно для продажи, исходная валюта)'
+    },
+    csvNote1: '* Примечание 1: шестизначные тикеры, начинающиеся с 6 или 0, автоматически распознаются как китайские A-акции (.SS / .SZ).',
+    csvNote2: '* Примечание 2: для других рынков просто добавьте к тикеру суффикс, например .TW или .HK.',
+    forceRefreshConfirm: 'Выполнить принудительное обновление? 24-часовой кэш будет проигнорирован, а реальная квота API будет потрачена.'
+  },
+  summary: {
+    totalRealized: 'Суммарный реализованный P&L (после конвертации)',
+    totalUnrealized: 'Суммарный нереализованный P&L (после конвертации)',
+    totalValue: 'Текущая стоимость портфеля (после конвертации)',
+    holdingCount: 'Открытые позиции',
+    holdingUnit: 'позиции'
+  },
+  charts: {
+    trendTitle: 'Тренд накопленной себестоимости',
+    saveImage: 'Сохранить график как изображение',
+    noTrend: 'Пока недостаточно истории сделок, чтобы построить график.',
+    realizedTitle: 'Реализованный P&L по тикеру (продали рано / вышли вовремя)',
+    distributionTitle: 'Структура стоимости портфеля (топ 10)',
+    convertedNote: 'Показано после конвертации в {{currency}}',
+    noPnlData: 'Данных по P&L пока нет.',
+    noHoldings: 'Сейчас открытых позиций нет.',
+    legendConverted: '{{label}} (после конвертации)',
+    costSeries: 'Накопленная себестоимость',
+    realizedSeries: 'Накопленный реализованный P&L',
+    ifSoldSeries: 'Если бы продали сегодня',
+    actualSeries: 'Фактически реализовано',
+    others: 'Прочее'
+  },
+  table: {
+    title: 'История сделок по тикеру',
+    subtitle: 'Откройте строку, чтобы посмотреть покупки и продажи по лотам. Суммы остаются в валюте листинга.',
+    columns: {
+      symbol: 'Тикер / название (рынок · валюта)',
+      holdingQty: 'Текущий объём',
+      currentValue: 'Последняя цена / рыночная стоимость',
+      unrealized: 'Нереализованный P&L',
+      realized: 'Реализованный P&L',
+      ifSoldToday: 'Если бы продали сегодня',
+      date: 'Дата',
+      type: 'Тип',
+      quantity: 'Количество',
+      price: 'Цена',
+      amount: 'Сумма',
+      pnl: 'P&L',
+      actions: 'Действия'
+    },
+    manualBadge: 'Вручную',
+    manualUpdatedAt: 'Ручная корректировка: {{value}}',
+    apiUpdatedAt: 'API обновлён: {{value}}',
+    notUpdatedYet: 'Ещё не обновлялось',
+    manualNamePlaceholder: 'Название вручную',
+    currentPricePlaceholder: 'Цена',
+    hedgeSuccess: 'Раньше выйти оказалось выгоднее ({{value}})',
+    soldTooEarly: 'Продали рановато и оставили {{value}} на столе',
+    tradeDetails: 'Детали сделок',
+    atPrice: '@ {{price}}',
+    quantityAtPrice: '{{quantity}} акций @ {{price}}',
+    mobileHoldingQty: 'Позиция',
+    mobileUnrealized: 'Нереализ.',
+    mobileRealized: 'Реализ.'
+  },
+  manager: {
+    title: 'Настройки и журнал сделок',
+    clearAndLoadDemo: 'Очистить и загрузить демо-данные',
+    apiKeyTitle: 'API key от yfapi.net',
+    getFreeApiKey: 'Получить бесплатно',
+    apiKeyPlaceholder: 'Вставьте сюда свой x-api-key (например: A2sD8...)',
+    saveApiKey: 'Сохранить API key',
+    baseCurrencyTitle: 'Базовая валюта сводки',
+    baseCurrencyHelp: '* Все активы в иностранной валюте пересчитываются в эту базовую валюту по актуальному FX, чтобы верхние карточки корректно суммировали общий результат.',
+    hideZeroHolding: 'Скрыть полностью закрытые позиции',
+    manualRecordTitle: 'Добавить сделку вручную',
+    fields: {
+      date: 'Дата',
+      type: 'Тип',
+      market: 'Рынок',
+      symbol: 'Тикер',
+      quantity: 'Количество',
+      price: 'Цена за единицу',
+      amount: 'Итоговая сумма',
+      pnl: 'Реализованный P&L (только продажа)'
+    },
+    placeholders: {
+      symbol: 'Например: AAPL',
+      quantity: 'Акции',
+      price: 'Цена за акцию',
+      amount: 'В валюте этого рынка',
+      pnl: 'Необязательно'
+    },
+    saveChanges: 'Сохранить изменения',
+    addRecord: 'Добавить',
+    noRecords: 'Пока нет ни одной сделки.'
+  },
+  notice: {
+    title: 'Добро пожаловать в Trade Lens',
+    body: 'Trade Lens — это open-source инструмент для инвесторов, который превращает брокерские CSV в понятные графики себестоимости, P&L и структуры портфеля.',
+    privacy: 'Сначала приватность: всё остаётся только в вашем браузере (IndexedDB). На сервер ничего не отправляется.',
+    apiKey: 'API key нужен только для запросов цен к yfapi.net и тоже хранится локально.',
+    sourceCode: 'Open source: смотрите код и подключайтесь',
+    dismiss: 'Больше не показывать'
+  },
+  messages: {
+    apiKeySaved: 'API key сохранён.',
+    manualStockSaved: '{{symbol}} обновлён вручную.',
+    needApiKey: 'Введите API key от yfapi.net в панели настроек, прежде чем обновлять котировки.',
+    cacheFresh: 'Цены и FX уже обновлялись за последние 24 часа, поэтому приложение использовало локальный кэш, чтобы не тратить квоту.',
+    updateSuccess: 'Обновлены {{count}} котировок и FX-ставок.',
+    fetchFailed: 'Ошибка загрузки: {{message}}',
+    baseCurrencyChanged: 'Базовая валюта переключена на {{currency}}. Обновляем FX...',
+    recordUpdated: 'Сделка обновлена.',
+    dataCleared: 'Данные очищены, демо-набор загружен.',
+    clearConfirm: 'Очистить все данные и снова загрузить демо-набор? Это действие нельзя отменить.',
+    backupConfirm: 'Хотите перед очисткой выгрузить текущие данные в CSV как резервную копию?'
+  },
+  data: {
+    unknownSymbol: 'Неизвестный тикер ({{symbol}})',
+    unknown: 'Неизвестно'
+  }
+};
+
 export const resources = {
   'zh-TW': { translation: zhTW },
   'yue-Hant-HK': { translation: yueHantHK },
   'zh-CN': { translation: zhCN },
   'zh-SG': { translation: zhSG },
   'en-US': { translation: enUS },
+  'en-CA': { translation: enCA },
+  'en-AU': { translation: enAU },
   'en-GB': { translation: enGB },
   'en-SG': { translation: enSG },
   'ja-JP': { translation: jaJP },
   'ko-KR': { translation: koKR },
   'id-ID': { translation: idID },
   'fr-FR': { translation: frFR },
+  'fr-CA': { translation: frCA },
   'de-DE': { translation: deDE },
   'it-IT': { translation: itIT },
   'ms-MY': { translation: msMY },
   'nl-NL': { translation: nlNL },
   'es-419': { translation: es419 },
+  'es-MX': { translation: esMX },
   'es-ES': { translation: esES },
   'pt-BR': { translation: ptBR },
   'pt-PT': { translation: ptPT },
+  'pl-PL': { translation: plPL },
+  'tr-TR': { translation: trTR },
+  'hi-IN': { translation: hiIN },
+  'ru-RU': { translation: ruRU },
   'vi-VN': { translation: viVN },
   'th-TH': { translation: thTH },
   'ar-SA': { translation: arSA }
