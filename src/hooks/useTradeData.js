@@ -40,6 +40,16 @@ const DEFAULT_NEW_RECORD = {
 
 const ONE_DAY = 24 * 60 * 60 * 1000;
 const FX_BRIDGE_CURRENCY = 'USD';
+const DEMO_USD_RATES = {
+  USD: 1,
+  TWD: 0.03115,
+  HKD: 0.1282,
+  EUR: 1.088,
+  CAD: 0.726,
+  KRW: 0.000751,
+  CHF: 1.134,
+  JPY: 0.00667
+};
 const TREND_RANGE_MS_MAP = {
   '1週': 7 * ONE_DAY,
   '1月': 30 * ONE_DAY,
@@ -93,6 +103,17 @@ const formatDateForInput = (dateValue) => {
   return `${parsedDate.getFullYear()}-${String(parsedDate.getMonth() + 1).padStart(2, '0')}-${String(parsedDate.getDate()).padStart(2, '0')}`;
 };
 
+const getDemoExchangeRate = (fromCurrency, toCurrency) => {
+  const fromUsdRate = DEMO_USD_RATES[fromCurrency];
+  const toUsdRate = DEMO_USD_RATES[toCurrency];
+
+  if (!fromUsdRate || !toUsdRate) {
+    return 1;
+  }
+
+  return fromUsdRate / toUsdRate;
+};
+
 export function useTradeData(showToast) {
   const { t, i18n } = useTranslation();
   const [isAppLoaded, setIsAppLoaded] = useState(false);
@@ -116,6 +137,9 @@ export function useTradeData(showToast) {
   const [isLoadingPrices, setIsLoadingPrices] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(null);
   const activeLocale = normalizeLocale(i18n.resolvedLanguage || i18n.language);
+  const effectiveExchangeRates = isDemo && Object.keys(exchangeRates).length === 0
+    ? null
+    : exchangeRates;
 
   const persistValue = (key, value) => asyncStorage.set(key, value);
   const persistJson = (key, value) => persistValue(key, JSON.stringify(value));
@@ -197,18 +221,22 @@ export function useTradeData(showToast) {
   const getExchangeRate = (fromCurrency, toCurrency) => {
     if (fromCurrency === toCurrency) return 1;
 
-    const directRate = exchangeRates[`${fromCurrency}${toCurrency}=X`]?.rate;
+    const directRate = effectiveExchangeRates?.[`${fromCurrency}${toCurrency}=X`]?.rate;
     if (Number.isFinite(directRate) && directRate > 0) {
       return directRate;
     }
 
-    const sourceToUsdRate = exchangeRates[`${fromCurrency}${FX_BRIDGE_CURRENCY}=X`]?.rate;
-    const usdToTargetRate = exchangeRates[`${FX_BRIDGE_CURRENCY}${toCurrency}=X`]?.rate;
+    const sourceToUsdRate = effectiveExchangeRates?.[`${fromCurrency}${FX_BRIDGE_CURRENCY}=X`]?.rate;
+    const usdToTargetRate = effectiveExchangeRates?.[`${FX_BRIDGE_CURRENCY}${toCurrency}=X`]?.rate;
     if (
       Number.isFinite(sourceToUsdRate) && sourceToUsdRate > 0
       && Number.isFinite(usdToTargetRate) && usdToTargetRate > 0
     ) {
       return sourceToUsdRate * usdToTargetRate;
+    }
+
+    if (isDemo) {
+      return getDemoExchangeRate(fromCurrency, toCurrency);
     }
 
     return 1;
