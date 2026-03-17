@@ -9,6 +9,7 @@ import {
 } from '../utils/localization';
 import {
   asyncStorage,
+  CSV_IMPORT_PROFILE_OPTIONS,
   formatSymbol,
   getCurrencyBySymbolOrMarket,
   guessMarket,
@@ -22,6 +23,7 @@ import { DEFAULT_CSV, STOCK_MAPPING } from '../utils/constants';
 const STORAGE_KEYS = {
   apiKey: 'yfapi_net_key',
   baseCurrency: 'tr_base_currency',
+  csvImportProfile: 'tr_csv_import_profile',
   dashboardCache: 'tr_dashboard_cache',
   dashboardData: 'tr_dashboard_data',
   exchangeRates: 'tr_exchange_rates',
@@ -66,6 +68,7 @@ const CSV_REQUIRED_FIELD_LABELS = {
   代號: { key: 'manager.fields.symbol', defaultValue: 'Symbol' },
   數量: { key: 'manager.fields.quantity', defaultValue: 'Quantity' }
 };
+const CSV_IMPORT_PROFILE_IDS = new Set(CSV_IMPORT_PROFILE_OPTIONS.map(({ id }) => id));
 
 const getFxRateSymbols = (fromCurrency, toCurrency) => {
   if (!fromCurrency || !toCurrency || fromCurrency === toCurrency) {
@@ -137,6 +140,7 @@ export function useTradeData(showToast) {
   const [trendTimeRange, setTrendTimeRange] = useState('全部');
   const [showManager, setShowManager] = useState(false);
   const [hideZeroHolding, setHideZeroHolding] = useState(false);
+  const [csvImportProfile, setCsvImportProfile] = useState('auto');
   const [lastImportMeta, setLastImportMeta] = useState(null);
   const [expandedStock, setExpandedStock] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null);
@@ -180,6 +184,11 @@ export function useTradeData(showToast) {
 
         const savedCurrency = await asyncStorage.get(STORAGE_KEYS.baseCurrency);
         if (savedCurrency) setBaseCurrency(savedCurrency);
+
+        const savedCsvImportProfile = await asyncStorage.get(STORAGE_KEYS.csvImportProfile);
+        if (CSV_IMPORT_PROFILE_IDS.has(savedCsvImportProfile)) {
+          setCsvImportProfile(savedCsvImportProfile);
+        }
 
         const savedCache = await asyncStorage.get(STORAGE_KEYS.dashboardCache);
         if (savedCache) {
@@ -463,8 +472,28 @@ export function useTradeData(showToast) {
     }, 100);
   };
 
+  const handleSetCsvImportProfile = (profileId) => {
+    const nextProfileId = CSV_IMPORT_PROFILE_IDS.has(profileId) ? profileId : 'auto';
+    setCsvImportProfile(nextProfileId);
+    persistValue(STORAGE_KEYS.csvImportProfile, nextProfileId);
+  };
+
+  const getLocalizedProfileLabel = (profileLabelKey, fallbackLabel) => (
+    profileLabelKey
+      ? t(profileLabelKey, { defaultValue: fallbackLabel })
+      : fallbackLabel
+  );
+
+  const getLocalizedDelimiterLabel = (delimiterLabel) => (
+    delimiterLabel === 'tab'
+      ? t('header.csvDelimiters.tab', { defaultValue: 'tab' })
+      : delimiterLabel
+  );
+
   const importCsvText = (text) => {
-    const { rows, meta } = parseCSVWithMeta(text);
+    const { rows, meta } = parseCSVWithMeta(text, { profileId: csvImportProfile });
+    const localizedProfileLabel = getLocalizedProfileLabel(meta.profileLabelKey, meta.profileLabel);
+    const localizedDelimiterLabel = getLocalizedDelimiterLabel(meta.delimiterLabel);
 
     if (!meta.ok) {
       setLastImportMeta(null);
@@ -476,9 +505,20 @@ export function useTradeData(showToast) {
           .map(({ key, defaultValue }) => t(key, { defaultValue }))
           .join(' / ');
 
-        showToast(t('messages.csvImportFailedHeaders', { fields: missingFieldLabels }));
+        showToast(t('messages.csvImportFailedHeaders', {
+          defaultValue: 'CSV import failed: missing required fields {{fields}}.',
+          fields: missingFieldLabels
+        }));
+      } else if (meta.errorCode === 'rowWidthMismatch') {
+        showToast(t('messages.csvImportFailedRowWidth', {
+          defaultValue: 'CSV import failed: row {{row}} has more columns than the header, usually because a thousands-separated number in a {{delimiter}} file was not quoted properly.',
+          row: formatLocalizedNumber(meta.problematicRowNumbers[0], activeLocale),
+          delimiter: localizedDelimiterLabel
+        }));
       } else {
-        showToast(t('messages.csvImportFailedNoData'));
+        showToast(t('messages.csvImportFailedNoData', {
+          defaultValue: 'CSV import failed: no usable trade rows were found.'
+        }));
       }
 
       return meta;
@@ -488,9 +528,10 @@ export function useTradeData(showToast) {
     setIsDemo(false);
     setLastImportMeta(meta);
     showToast(t('messages.csvImportSuccess', {
+      defaultValue: 'Imported {{count}} trades ({{profile}} · {{delimiter}}).',
       count: formatLocalizedNumber(meta.importedRowCount, activeLocale),
-      profile: meta.profileLabel,
-      delimiter: meta.delimiterLabel
+      profile: localizedProfileLabel,
+      delimiter: localizedDelimiterLabel
     }));
 
     return meta;
@@ -980,6 +1021,7 @@ export function useTradeData(showToast) {
     cancelEditingRecord,
     cancelEditingStock,
     chartData,
+    csvImportProfile,
     displayData,
     editingIndex,
     editingStockSymbol,
@@ -1013,6 +1055,7 @@ export function useTradeData(showToast) {
     rawData,
     requestSort,
     setApiKey,
+    setCsvImportProfile: handleSetCsvImportProfile,
     setExpandedStock,
     setHideZeroHolding,
     setMarketFilter,

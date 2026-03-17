@@ -23,9 +23,11 @@ import {
   formatLocalizedNumber,
   shouldShowGregorianReference
 } from '../utils/localization';
+import { CSV_IMPORT_PROFILE_OPTIONS } from '../utils/helpers';
 
 export default function Header({
   apiKey,
+  csvImportProfile,
   darkMode,
   fetchLivePrices,
   handleExportCSV,
@@ -35,6 +37,7 @@ export default function Header({
   lastImportMeta,
   lastUpdate,
   rawDataCount,
+  setCsvImportProfile,
   setShowManager,
   showManager,
   toggleDarkMode
@@ -49,6 +52,23 @@ export default function Header({
     syncLocaleToUrl(nextLocale);
     void i18n.changeLanguage(nextLocale);
   };
+
+  const getLocalizedProfileLabel = (option) => (
+    t(option.translationKey, { defaultValue: option.label })
+  );
+
+  const getLocalizedImportDelimiterLabel = (delimiterLabel) => (
+    delimiterLabel === 'tab'
+      ? t('header.csvDelimiters.tab', { defaultValue: 'tab' })
+      : delimiterLabel
+  );
+  const getLocalizedImportMetaProfileLabel = (importMeta) => (
+    importMeta?.profileLabelKey
+      ? t(importMeta.profileLabelKey, { defaultValue: importMeta.profileLabel })
+      : importMeta?.profileLabel
+  );
+
+  const importProfileLabel = t('header.importProfileLabel', { defaultValue: 'CSV parser' });
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
@@ -149,6 +169,27 @@ export default function Header({
         </button>
 
         <div className="relative flex items-center gap-2">
+          <label
+            className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 shadow-sm"
+            title={importProfileLabel}
+          >
+            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+              {importProfileLabel}
+            </span>
+            <select
+              value={csvImportProfile}
+              onChange={(event) => setCsvImportProfile(event.target.value)}
+              className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 outline-none max-w-44"
+              title={importProfileLabel}
+            >
+              {CSV_IMPORT_PROFILE_OPTIONS.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {getLocalizedProfileLabel(option)}
+                </option>
+              ))}
+            </select>
+          </label>
+
           <div className="relative group">
             <div className="pointer-events-none absolute right-0 top-14 w-80 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-xl shadow-xl z-50 text-sm text-slate-600 dark:text-slate-300 opacity-0 invisible translate-y-1 transition-all duration-200 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:visible group-focus-within:translate-y-0">
               <h4 className="font-bold text-slate-800 dark:text-slate-100 mb-2 border-b border-slate-200 dark:border-slate-700 pb-1 flex items-center gap-2">
@@ -168,7 +209,9 @@ export default function Header({
                 {t('header.csvNote2')}
               </p>
               <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                {t('header.csvNote3')}
+                {t('header.csvNote3', {
+                  defaultValue: '* Note 3: The app auto-detects common broker CSV layouts plus semicolon and tab-delimited files. After import, the detected layout shows up on the top right.'
+                })}
               </p>
             </div>
 
@@ -195,11 +238,11 @@ export default function Header({
           {lastImportMeta && (
             <div
               className="hidden lg:flex items-center gap-2 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-2 text-xs font-medium text-emerald-700 dark:text-emerald-300"
-              title={`${lastImportMeta.profileLabel} · ${lastImportMeta.delimiterLabel}`}
+              title={`${getLocalizedImportMetaProfileLabel(lastImportMeta)} · ${getLocalizedImportDelimiterLabel(lastImportMeta.delimiterLabel)}`}
             >
-              <span>{lastImportMeta.profileLabel}</span>
+              <span>{getLocalizedImportMetaProfileLabel(lastImportMeta)}</span>
               <span className="text-emerald-400 dark:text-emerald-500">•</span>
-              <span>{lastImportMeta.delimiterLabel}</span>
+              <span>{getLocalizedImportDelimiterLabel(lastImportMeta.delimiterLabel)}</span>
               <span className="text-emerald-400 dark:text-emerald-500">•</span>
               <span>{formatLocalizedNumber(lastImportMeta.importedRowCount, activeLocale)}</span>
             </div>

@@ -74,6 +74,7 @@ const CSV_IMPORT_PROFILES = [
   {
     id: 'trade-lens',
     label: 'Trade Lens',
+    translationKey: 'header.csvProfiles.tradeLens',
     preferredDecimalSeparator: '.',
     signatureHeaders: {
       日期: ['日期'],
@@ -88,6 +89,7 @@ const CSV_IMPORT_PROFILES = [
   {
     id: 'broker-zh',
     label: '中文 CSV',
+    translationKey: 'header.csvProfiles.brokerZh',
     preferredDecimalSeparator: '.',
     signatureHeaders: {
       日期: ['交易日期', '成交日期'],
@@ -101,6 +103,7 @@ const CSV_IMPORT_PROFILES = [
   {
     id: 'broker-en',
     label: 'English CSV',
+    translationKey: 'header.csvProfiles.brokerEn',
     preferredDecimalSeparator: '.',
     signatureHeaders: {
       日期: ['Trade Date', 'Date'],
@@ -115,6 +118,7 @@ const CSV_IMPORT_PROFILES = [
   {
     id: 'broker-ja',
     label: '日本語 CSV',
+    translationKey: 'header.csvProfiles.brokerJa',
     preferredDecimalSeparator: '.',
     signatureHeaders: {
       日期: ['取引日', '日付'],
@@ -129,6 +133,7 @@ const CSV_IMPORT_PROFILES = [
   {
     id: 'broker-ko',
     label: '한국어 CSV',
+    translationKey: 'header.csvProfiles.brokerKo',
     preferredDecimalSeparator: '.',
     signatureHeaders: {
       日期: ['거래일', '체결일', '날짜'],
@@ -143,6 +148,7 @@ const CSV_IMPORT_PROFILES = [
   {
     id: 'broker-th',
     label: 'ไทย CSV',
+    translationKey: 'header.csvProfiles.brokerTh',
     preferredDecimalSeparator: '.',
     signatureHeaders: {
       日期: ['วันที่ซื้อขาย', 'วันที่'],
@@ -157,6 +163,7 @@ const CSV_IMPORT_PROFILES = [
   {
     id: 'broker-ar',
     label: 'العربية CSV',
+    translationKey: 'header.csvProfiles.brokerAr',
     preferredDecimalSeparator: '.',
     signatureHeaders: {
       日期: ['التاريخ'],
@@ -171,6 +178,7 @@ const CSV_IMPORT_PROFILES = [
   {
     id: 'broker-euro',
     label: 'Euro-style CSV',
+    translationKey: 'header.csvProfiles.brokerEuro',
     preferredDecimalSeparator: ',',
     signatureHeaders: {
       日期: ['Date de transaction', 'Date opération', 'Fecha de transacción', 'Fecha de operación', 'Data operação', 'Handelsdatum', 'Data di negoziazione'],
@@ -185,8 +193,8 @@ const CSV_IMPORT_PROFILES = [
 ];
 
 export const CSV_IMPORT_PROFILE_OPTIONS = [
-  { id: 'auto', label: 'Auto detect' },
-  ...CSV_IMPORT_PROFILES.map(({ id, label }) => ({ id, label }))
+  { id: 'auto', label: 'Auto detect', translationKey: 'header.importProfileAuto' },
+  ...CSV_IMPORT_PROFILES.map(({ id, label, translationKey }) => ({ id, label, translationKey }))
 ];
 
 const PROFILE_LOOKUP = new Map(CSV_IMPORT_PROFILES.map((profile) => [profile.id, profile]));
@@ -276,13 +284,21 @@ const detectProfile = (rawHeaders, preferredProfileId = 'auto') => {
     ? PROFILE_LOOKUP.get(preferredProfileId)
     : null;
 
+  if (preferredProfile) {
+    const profileScore = scoreProfileAgainstHeaders(rawHeaders, preferredProfile);
+    return {
+      profile: preferredProfile,
+      score: profileScore.score + 20,
+      matchedFields: profileScore.matchedFields
+    };
+  }
+
   const rankedProfiles = CSV_IMPORT_PROFILES.map((profile) => {
     const profileScore = scoreProfileAgainstHeaders(rawHeaders, profile);
-    const preferredBonus = preferredProfile?.id === profile.id ? 20 : 0;
 
     return {
       profile,
-      score: profileScore.score + preferredBonus,
+      score: profileScore.score,
       matchedFields: profileScore.matchedFields
     };
   }).sort((left, right) => right.score - left.score);
@@ -338,7 +354,8 @@ const inspectHeaderRow = (rawHeaders, preferredProfileId = 'auto') => {
     hasSymbolAndType,
     hasValueField,
     profile: profileDetection.profile,
-    profileLabel: profileDetection.profile?.label || 'Generic CSV'
+    profileLabel: profileDetection.profile?.label || 'Generic CSV',
+    profileLabelKey: profileDetection.profile?.translationKey || ''
   };
 };
 
@@ -374,6 +391,7 @@ const detectLayout = (lines, preferredProfileId = 'auto') => {
   }
 
   return {
+    rawHeaders: splitDelimitedLine(lines[bestCandidate.headerIndex] || '', bestCandidate.delimiter),
     delimiter: bestCandidate.delimiter,
     delimiterLabel: DELIMITER_LABELS[bestCandidate.delimiter] || bestCandidate.delimiter,
     headerIndex: bestCandidate.headerIndex >= 0 ? bestCandidate.headerIndex : 0,
@@ -515,6 +533,7 @@ export const parseCSVWithMeta = (text, options = {}) => {
 
   const layout = detectLayout(lines, options.profileId || 'auto');
   const inspection = layout?.inspection || inspectHeaderRow(splitDelimitedLine(lines[0] || '', ','), options.profileId || 'auto');
+  const rawHeaderCount = layout?.rawHeaders?.length || 0;
   const missingRequiredFields = REQUIRED_STANDARD_FIELDS.filter((field) => inspection.headerMap?.[field] === undefined);
 
   if (missingRequiredFields.length > 0) {
@@ -530,6 +549,7 @@ export const parseCSVWithMeta = (text, options = {}) => {
         headerRowIndex: layout?.headerIndex ?? 0,
         profileId: inspection.profile?.id || 'generic',
         profileLabel: inspection.profileLabel || 'Generic CSV',
+        profileLabelKey: inspection.profileLabelKey || '',
         matchedFields: inspection.matchedFields || [],
         missingRequiredFields
       }
@@ -540,9 +560,19 @@ export const parseCSVWithMeta = (text, options = {}) => {
   const preferredDecimalSeparator = inspection.profile?.preferredDecimalSeparator || '.';
   const result = [];
   let skippedRowCount = 0;
+  const problematicRowNumbers = [];
 
   for (let index = (layout?.headerIndex ?? 0) + 1; index < lines.length; index += 1) {
     const cells = splitDelimitedLine(lines[index], delimiter);
+    while (cells.length > rawHeaderCount && cells[cells.length - 1] === '') {
+      cells.pop();
+    }
+
+    if (rawHeaderCount > 0 && cells.length > rawHeaderCount) {
+      problematicRowNumbers.push(index + 1);
+      continue;
+    }
+
     const rawRow = {};
 
     Object.keys(STANDARD_HEADER_ALIASES).forEach((field) => {
@@ -558,6 +588,27 @@ export const parseCSVWithMeta = (text, options = {}) => {
     }
   }
 
+  if (problematicRowNumbers.length > 0) {
+    return {
+      rows: [],
+      meta: {
+        ok: false,
+        errorCode: 'rowWidthMismatch',
+        importedRowCount: 0,
+        skippedRowCount,
+        delimiter,
+        delimiterLabel: layout?.delimiterLabel || DELIMITER_LABELS[delimiter],
+        headerRowIndex: layout?.headerIndex ?? 0,
+        profileId: inspection.profile?.id || 'generic',
+        profileLabel: inspection.profileLabel || 'Generic CSV',
+        profileLabelKey: inspection.profileLabelKey || '',
+        matchedFields: inspection.matchedFields || [],
+        missingRequiredFields: [],
+        problematicRowNumbers
+      }
+    };
+  }
+
   if (result.length === 0) {
     return {
       rows: [],
@@ -571,6 +622,7 @@ export const parseCSVWithMeta = (text, options = {}) => {
         headerRowIndex: layout?.headerIndex ?? 0,
         profileId: inspection.profile?.id || 'generic',
         profileLabel: inspection.profileLabel || 'Generic CSV',
+        profileLabelKey: inspection.profileLabelKey || '',
         matchedFields: inspection.matchedFields || [],
         missingRequiredFields: []
       }
@@ -588,6 +640,7 @@ export const parseCSVWithMeta = (text, options = {}) => {
       headerRowIndex: layout?.headerIndex ?? 0,
       profileId: inspection.profile?.id || 'generic',
       profileLabel: inspection.profileLabel || 'Generic CSV',
+      profileLabelKey: inspection.profileLabelKey || '',
       matchedFields: inspection.matchedFields || [],
       missingRequiredFields: []
     }

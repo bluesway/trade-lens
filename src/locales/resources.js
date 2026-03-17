@@ -60,6 +60,8 @@ const zhTW = {
     apiKeyRequired: '需先設定金鑰',
     updateWithCache: '手動更新即時行情（使用快取）',
     setApiKeyFirst: '請先設定 API Key',
+    importProfileLabel: 'CSV 版型',
+    importProfileAuto: '自動偵測',
     forceRefresh: '強制刷新',
     forceRefreshTitle: '強制更新並消耗額度',
     languageLabel: '切換語言',
@@ -74,6 +76,19 @@ const zhTW = {
       price: '單價（原幣別）',
       amount: '總金額（原幣別）',
       pnl: '損益（賣出必填，原幣別）'
+    },
+    csvProfiles: {
+      tradeLens: 'Trade Lens 原生',
+      brokerZh: '中文券商 CSV',
+      brokerEn: '英文券商 CSV',
+      brokerJa: '日文券商 CSV',
+      brokerKo: '韓文券商 CSV',
+      brokerTh: '泰文券商 CSV',
+      brokerAr: '阿文券商 CSV',
+      brokerEuro: '歐系券商 CSV'
+    },
+    csvDelimiters: {
+      tab: 'tab'
     },
     csvNote1: '* 註 1：6 位數且以 6 或 0 開頭的代號，系統會自動判定為陸股（.SS / .SZ）。',
     csvNote2: '* 註 2：其他市場請直接在代號後補上後綴（例如：.TW、.HK）。',
@@ -187,6 +202,7 @@ const zhTW = {
     csvImportSuccess: '已匯入 {{count}} 筆交易（{{profile}} · {{delimiter}}）',
     csvImportFailedNoData: 'CSV 匯入失敗：找不到可用的交易資料。',
     csvImportFailedHeaders: 'CSV 匯入失敗：缺少必要欄位 {{fields}}。',
+    csvImportFailedRowWidth: 'CSV 匯入失敗：第 {{row}} 列欄位數爆掉了，通常是 {{delimiter}} 分隔檔裡的數字千分位沒被正確包住。',
     recordUpdated: '交易紀錄已更新！',
     dataCleared: '已清除資料並載入範例資料',
     clearConfirm: '確定要清除所有資料並載入範例資料嗎？此動作無法復原！',
@@ -260,6 +276,8 @@ const yueHantHK = {
     apiKeyRequired: '要先設金鑰',
     updateWithCache: '手動更新即時報價（用快取）',
     setApiKeyFirst: '請先設定 API Key',
+    importProfileLabel: 'CSV 版型',
+    importProfileAuto: '自動偵測',
     forceRefresh: '強制刷新',
     forceRefreshTitle: '強制更新並消耗額度',
     languageLabel: '切換語言',
@@ -274,6 +292,19 @@ const yueHantHK = {
       price: '單價（原幣）',
       amount: '總金額（原幣）',
       pnl: '損益（沽出必填，原幣）'
+    },
+    csvProfiles: {
+      tradeLens: 'Trade Lens 原生',
+      brokerZh: '中文券商 CSV',
+      brokerEn: '英文券商 CSV',
+      brokerJa: '日文券商 CSV',
+      brokerKo: '韓文券商 CSV',
+      brokerTh: '泰文券商 CSV',
+      brokerAr: '阿文券商 CSV',
+      brokerEuro: '歐系券商 CSV'
+    },
+    csvDelimiters: {
+      tab: 'tab'
     },
     csvNote1: '* 註 1：6 位數且以 6 或 0 開頭的代號，系統會自動判做 A 股（.SS / .SZ）。',
     csvNote2: '* 註 2：其他市場請直接喺代號後面加後綴（例如：.TW、.HK）。',
@@ -387,6 +418,7 @@ const yueHantHK = {
     csvImportSuccess: '已匯入 {{count}} 筆交易（{{profile}} · {{delimiter}}）',
     csvImportFailedNoData: 'CSV 匯入失敗：搵唔到可用嘅交易資料。',
     csvImportFailedHeaders: 'CSV 匯入失敗：缺少必要欄位 {{fields}}。',
+    csvImportFailedRowWidth: 'CSV 匯入失敗：第 {{row}} 列欄位數爆咗，通常係 {{delimiter}} 分隔檔入面嘅數字千分位冇包好。',
     recordUpdated: '交易紀錄已更新！',
     dataCleared: '已清除資料並載入示範資料',
     clearConfirm: '確定要清除所有資料並載入示範資料？呢個動作冇得還原！',
@@ -460,6 +492,8 @@ const zhCN = {
     apiKeyRequired: '需先设密钥',
     updateWithCache: '手动更新实时行情（使用缓存）',
     setApiKeyFirst: '请先设置 API Key',
+    importProfileLabel: 'CSV 版型',
+    importProfileAuto: '自动识别',
     forceRefresh: '强制刷新',
     forceRefreshTitle: '强制更新并消耗额度',
     languageLabel: '切换语言',
@@ -474,6 +508,19 @@ const zhCN = {
       price: '单价（原币）',
       amount: '总金额（原币）',
       pnl: '损益（卖出必填，原币）'
+    },
+    csvProfiles: {
+      tradeLens: 'Trade Lens 原生',
+      brokerZh: '中文券商 CSV',
+      brokerEn: '英文券商 CSV',
+      brokerJa: '日文券商 CSV',
+      brokerKo: '韩文券商 CSV',
+      brokerTh: '泰文券商 CSV',
+      brokerAr: '阿拉伯文券商 CSV',
+      brokerEuro: '欧系券商 CSV'
+    },
+    csvDelimiters: {
+      tab: 'tab'
     },
     csvNote1: '* 注 1：6 位数字且以 6 或 0 开头的代码，系统会自动识别为 A 股（.SS / .SZ）。',
     csvNote2: '* 注 2：其他市场请直接在代码后补后缀（例如：.TW、.HK）。',
@@ -587,6 +634,7 @@ const zhCN = {
     csvImportSuccess: '已导入 {{count}} 笔交易（{{profile}} · {{delimiter}}）',
     csvImportFailedNoData: 'CSV 导入失败：找不到可用的交易数据。',
     csvImportFailedHeaders: 'CSV 导入失败：缺少必要字段 {{fields}}。',
+    csvImportFailedRowWidth: 'CSV 导入失败：第 {{row}} 行字段数爆了，通常是 {{delimiter}} 分隔文件里的数字千分位没有正确包起来。',
     recordUpdated: '交易记录已更新！',
     dataCleared: '已清除数据并载入示例数据',
     clearConfirm: '确定要清除所有数据并载入示例数据吗？此操作无法恢复！',
@@ -856,6 +904,8 @@ const enUS = {
     apiKeyRequired: 'API key needed',
     updateWithCache: 'Refresh live quotes with cache',
     setApiKeyFirst: 'Set your API key first',
+    importProfileLabel: 'CSV parser',
+    importProfileAuto: 'Auto detect',
     forceRefresh: 'Force Refresh',
     forceRefreshTitle: 'Force a refresh and spend API quota',
     languageLabel: 'Change language',
@@ -870,6 +920,19 @@ const enUS = {
       price: 'Unit price (original currency)',
       amount: 'Total amount (original currency)',
       pnl: 'P&L (required for sells, original currency)'
+    },
+    csvProfiles: {
+      tradeLens: 'Trade Lens native',
+      brokerZh: 'Chinese broker CSV',
+      brokerEn: 'English broker CSV',
+      brokerJa: 'Japanese broker CSV',
+      brokerKo: 'Korean broker CSV',
+      brokerTh: 'Thai broker CSV',
+      brokerAr: 'Arabic broker CSV',
+      brokerEuro: 'Euro-style broker CSV'
+    },
+    csvDelimiters: {
+      tab: 'tab'
     },
     csvNote1: '* Note 1: Six-digit symbols starting with 6 or 0 are auto-detected as China A-shares (.SS / .SZ).',
     csvNote2: '* Note 2: For other markets, append the suffix directly to the symbol (for example: .TW, .HK).',
@@ -983,6 +1046,7 @@ const enUS = {
     csvImportSuccess: 'Imported {{count}} trades ({{profile}} · {{delimiter}}).',
     csvImportFailedNoData: 'CSV import failed: no usable trade rows were found.',
     csvImportFailedHeaders: 'CSV import failed: missing required fields {{fields}}.',
+    csvImportFailedRowWidth: 'CSV import failed: row {{row}} has more columns than the header, usually because a thousands-separated number in a {{delimiter}} file was not quoted properly.',
     recordUpdated: 'Trade record updated.',
     dataCleared: 'Data cleared and demo records loaded.',
     clearConfirm: 'Clear all data and reload the demo set? This cannot be undone.',
@@ -1056,6 +1120,8 @@ const enGB = {
     apiKeyRequired: 'API key needed',
     updateWithCache: 'Refresh live quotes with cache',
     setApiKeyFirst: 'Set your API key first',
+    importProfileLabel: 'CSV parser',
+    importProfileAuto: 'Auto detect',
     forceRefresh: 'Force Refresh',
     forceRefreshTitle: 'Force a refresh and consume API quota',
     languageLabel: 'Change language',
@@ -1070,6 +1136,19 @@ const enGB = {
       price: 'Unit price (original currency)',
       amount: 'Total amount (original currency)',
       pnl: 'P&L (required for sells, original currency)'
+    },
+    csvProfiles: {
+      tradeLens: 'Trade Lens native',
+      brokerZh: 'Chinese broker CSV',
+      brokerEn: 'English broker CSV',
+      brokerJa: 'Japanese broker CSV',
+      brokerKo: 'Korean broker CSV',
+      brokerTh: 'Thai broker CSV',
+      brokerAr: 'Arabic broker CSV',
+      brokerEuro: 'Euro-style broker CSV'
+    },
+    csvDelimiters: {
+      tab: 'tab'
     },
     csvNote1: '* Note 1: Six-digit symbols beginning with 6 or 0 are auto-detected as China A shares (.SS / .SZ).',
     csvNote2: '* Note 2: For other markets, append the suffix directly to the symbol (for example: .TW, .HK).',
@@ -1183,6 +1262,7 @@ const enGB = {
     csvImportSuccess: 'Imported {{count}} trades ({{profile}} · {{delimiter}}).',
     csvImportFailedNoData: 'CSV import failed: no usable trade rows were found.',
     csvImportFailedHeaders: 'CSV import failed: missing required fields {{fields}}.',
+    csvImportFailedRowWidth: 'CSV import failed: row {{row}} has more columns than the header, usually because a thousands-separated number in a {{delimiter}} file was not quoted properly.',
     recordUpdated: 'Trade record updated.',
     dataCleared: 'Data cleared and demo records loaded.',
     clearConfirm: 'Clear all data and reload the demo set? This cannot be undone.',
@@ -1299,6 +1379,8 @@ const jaJP = {
     apiKeyRequired: 'API キーが必要',
     updateWithCache: 'キャッシュを使って株価を更新',
     setApiKeyFirst: '先に API キーを設定してください',
+    importProfileLabel: 'CSV パーサー',
+    importProfileAuto: '自動判定',
     forceRefresh: '強制更新',
     forceRefreshTitle: 'キャッシュを無視して API 枠を使う',
     languageLabel: '言語を切り替え',
@@ -1313,6 +1395,19 @@ const jaJP = {
       price: '単価（現地通貨）',
       amount: '合計金額（現地通貨）',
       pnl: '損益（売却時は必須、現地通貨）'
+    },
+    csvProfiles: {
+      tradeLens: 'Trade Lens 標準',
+      brokerZh: '中国語ブローカー CSV',
+      brokerEn: '英語ブローカー CSV',
+      brokerJa: '日本語ブローカー CSV',
+      brokerKo: '韓国語ブローカー CSV',
+      brokerTh: 'タイ語ブローカー CSV',
+      brokerAr: 'アラビア語ブローカー CSV',
+      brokerEuro: '欧州系ブローカー CSV'
+    },
+    csvDelimiters: {
+      tab: 'tab'
     },
     csvNote1: '* 注 1: 6 桁で 6 または 0 から始まるコードは、中国 A 株（.SS / .SZ）として自動判定します。',
     csvNote2: '* 注 2: そのほかの市場は、コードの末尾に接尾辞を付けてください（例: .TW、.HK）。',
@@ -1426,6 +1521,7 @@ const jaJP = {
     csvImportSuccess: '{{count}} 件の取引を読み込みました（{{profile}} · {{delimiter}}）。',
     csvImportFailedNoData: 'CSV の読み込みに失敗しました。使える取引データが見つかりません。',
     csvImportFailedHeaders: 'CSV の読み込みに失敗しました。必須項目 {{fields}} が足りません。',
+    csvImportFailedRowWidth: 'CSV の読み込みに失敗しました。第 {{row}} 行の列数がヘッダーより多く、{{delimiter}} 区切りの数値が正しく引用されていない可能性があります。',
     recordUpdated: '取引履歴を更新しました。',
     dataCleared: 'データを削除し、サンプル履歴を読み込みました。',
     clearConfirm: 'すべてのデータを削除してサンプルを読み込みますか？ この操作は元に戻せません。',

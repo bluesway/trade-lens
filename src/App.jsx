@@ -36,6 +36,7 @@ export default function App() {
     cancelEditingRecord,
     cancelEditingStock,
     chartData,
+    csvImportProfile,
     displayData,
     editingIndex,
     editingStockSymbol,
@@ -68,6 +69,7 @@ export default function App() {
     rawData,
     requestSort,
     setApiKey,
+    setCsvImportProfile,
     setExpandedStock,
     setHideZeroHolding,
     setMarketFilter,
@@ -212,11 +214,13 @@ export default function App() {
           fetchLivePrices={fetchLivePrices}
           handleExportCSV={handleExportCSV}
           handleFileUpload={handleFileUpload}
+          csvImportProfile={csvImportProfile}
           isDemo={isDemo}
           isLoadingPrices={isLoadingPrices}
           lastImportMeta={lastImportMeta}
           lastUpdate={lastUpdate}
           rawDataCount={rawData.length}
+          setCsvImportProfile={setCsvImportProfile}
           setShowManager={setShowManager}
           showManager={showManager}
           toggleDarkMode={toggleDarkMode}
