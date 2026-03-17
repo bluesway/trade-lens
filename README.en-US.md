@@ -8,7 +8,11 @@
   Private portfolio analytics for investors who trade across borders.
 </p>
 
+<div align="center">
+
 [繁體中文（台灣）](README.md) · [简体中文（中国）](README.zh-CN.md) · [日本語](README.ja-JP.md) · **English (US)**
+
+</div>
 
 <p align="center">
   <a href="https://react.dev/">

@@ -8,7 +8,11 @@
   隱私優先的全球股票交易儀表板，把券商 CSV 變成看得懂的持股全貌。
 </p>
 
+<div align="center">
+
 **繁體中文（台灣）** · [简体中文（中国）](README.zh-CN.md) · [日本語](README.ja-JP.md) · [English (US)](README.en-US.md)
+
+</div>
 
 <p align="center">
   <a href="https://react.dev/">

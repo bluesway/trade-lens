@@ -8,7 +8,11 @@
   面向全球股票投资者的隐私优先交易面板，把券商 CSV 变成一眼能看懂的持仓全貌。
 </p>
 
+<div align="center">
+
 [繁體中文（台灣）](README.md) · **简体中文（中国）** · [日本語](README.ja-JP.md) · [English (US)](README.en-US.md)
+
+</div>
 
 <p align="center">
   <a href="https://react.dev/">

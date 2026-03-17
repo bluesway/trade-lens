@@ -8,7 +8,11 @@
   グローバル株の売買を、ローカル環境で安全に振り返れるプライバシー重視ダッシュボード。
 </p>
 
+<div align="center">
+
 [繁體中文（台灣）](README.md) · [简体中文（中国）](README.zh-CN.md) · **日本語** · [English (US)](README.en-US.md)
+
+</div>
 
 <p align="center">
   <a href="https://react.dev/">
