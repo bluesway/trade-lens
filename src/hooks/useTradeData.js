@@ -18,7 +18,12 @@ import {
   parseCSV,
   parseCSVWithMeta
 } from '../utils/helpers';
-import { DEFAULT_CSV, STOCK_MAPPING } from '../utils/constants';
+import {
+  DEFAULT_CSV,
+  DEMO_REFERENCE_UPDATED_AT,
+  DEMO_USD_RATES,
+  STOCK_MAPPING
+} from '../utils/constants';
 
 const STORAGE_KEYS = {
   apiKey: 'yfapi_net_key',
@@ -43,16 +48,6 @@ const DEFAULT_NEW_RECORD = {
 
 const ONE_DAY = 24 * 60 * 60 * 1000;
 const FX_BRIDGE_CURRENCY = 'USD';
-const DEMO_USD_RATES = {
-  USD: 1,
-  TWD: 0.03115,
-  HKD: 0.1282,
-  EUR: 1.088,
-  CAD: 0.726,
-  KRW: 0.000751,
-  CHF: 1.134,
-  JPY: 0.00667
-};
 const TREND_RANGE_MS_MAP = {
   '1週': 7 * ONE_DAY,
   '1月': 30 * ONE_DAY,
@@ -125,6 +120,11 @@ const getDemoExchangeRate = (fromCurrency, toCurrency) => {
 
   return fromUsdRate / toUsdRate;
 };
+
+const DEMO_LAST_UPDATE = (() => {
+  const parsedDate = new Date(DEMO_REFERENCE_UPDATED_AT);
+  return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+})();
 
 export function useTradeData(showToast) {
   const { t, i18n } = useTranslation();
@@ -1173,6 +1173,7 @@ export function useTradeData(showToast) {
     isLoadingPrices,
     lastImportMeta,
     lastUpdate,
+    demoLastUpdate: DEMO_LAST_UPDATE,
     liveData,
     marketFilter,
     newRec,

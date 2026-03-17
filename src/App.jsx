@@ -41,6 +41,7 @@ export default function App() {
     chartData,
     csvImportProfile,
     displayData,
+    demoLastUpdate,
     editingIndex,
     editingStockSymbol,
     expandedStock,
@@ -262,6 +263,7 @@ export default function App() {
         <Header
           apiKey={apiKey}
           darkMode={darkMode}
+          demoLastUpdate={demoLastUpdate}
           fetchLivePrices={fetchLivePrices}
           handleExportCSV={handleExportCSV}
           handleFileUpload={handleFileUpload}

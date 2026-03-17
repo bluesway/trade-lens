@@ -32,6 +32,7 @@ export default function Header({
   apiKey,
   csvImportProfile,
   darkMode,
+  demoLastUpdate,
   fetchLivePrices,
   handleExportCSV,
   handleFileUpload,
@@ -122,7 +123,19 @@ export default function Header({
           <p className="text-sm text-slate-500 dark:text-slate-400">
             {isDemo ? t('header.demoDescription') : t('header.recordsLoaded', { count: formatLocalizedNumber(rawDataCount, activeLocale) })}
           </p>
-          {lastUpdate && (
+          {isDemo && demoLastUpdate && (
+            <span
+              className="text-xs bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 px-2.5 py-1 rounded-full flex items-center gap-1.5 w-fit font-medium border border-amber-100 dark:border-amber-800"
+              title={showGregorianReference ? formatGregorianReferenceDateTime(demoLastUpdate) : t('header.demoDescription')}
+            >
+              <Clock size={14} />
+              <span className="rounded-full bg-amber-200/70 dark:bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-900 dark:text-amber-200">
+                Demo
+              </span>
+              {t('header.lastUpdated', { value: formatLocalizedDateTime(demoLastUpdate, activeLocale) })}
+            </span>
+          )}
+          {!isDemo && lastUpdate && (
             <span
               className="text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2.5 py-1 rounded-full flex items-center gap-1.5 w-fit font-medium border border-blue-100 dark:border-blue-800"
               title={showGregorianReference ? formatGregorianReferenceDateTime(lastUpdate) : undefined}
