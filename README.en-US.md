@@ -41,7 +41,7 @@
 
 ### Highlights
 
-- Tracks U.S., Hong Kong, Taiwan, China A-share, and Japan equities from one dashboard.
+- Tracks equities across the Americas, Europe, Asia, the Middle East, and Latin America from one dashboard.
 - Imports brokerage CSVs and also supports manual fills, symbol naming fixes, and current price overrides.
 - Uses `yfapi.net` for live quotes and FX conversion.
 - Includes multilingual UI support, dark mode, and responsive layouts.
