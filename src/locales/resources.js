@@ -144,7 +144,8 @@ const zhTW = {
       futuTransactions: '富途 / moomoo 交易紀錄 CSV',
       monexTransactions: 'Monex 證券交易紀錄 CSV',
       yuantaTwTransactions: '元大台股交易紀錄 CSV',
-      kgiTwTransactions: '凱基台股交易紀錄 CSV'
+      kgiTwTransactions: '凱基台股交易紀錄 CSV',
+      matsuiTransactions: '松井證券交易紀錄 CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -428,7 +429,8 @@ const yueHantHK = {
       futuTransactions: '富途 / moomoo 交易紀錄 CSV',
       monexTransactions: 'Monex 證券交易紀錄 CSV',
       yuantaTwTransactions: '元大台股交易紀錄 CSV',
-      kgiTwTransactions: '凱基台股交易紀錄 CSV'
+      kgiTwTransactions: '凱基台股交易紀錄 CSV',
+      matsuiTransactions: '松井證券交易紀錄 CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -712,7 +714,8 @@ const zhCN = {
       futuTransactions: '富途 / moomoo 交易记录 CSV',
       monexTransactions: 'Monex 证券交易记录 CSV',
       yuantaTwTransactions: '元大台股交易记录 CSV',
-      kgiTwTransactions: '凯基台股交易记录 CSV'
+      kgiTwTransactions: '凯基台股交易记录 CSV',
+      matsuiTransactions: '松井证券交易记录 CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -1192,7 +1195,8 @@ const enUS = {
       futuTransactions: 'Futu / moomoo activity CSV',
       monexTransactions: 'Monex Securities trades CSV',
       yuantaTwTransactions: 'Yuanta Taiwan trades CSV',
-      kgiTwTransactions: 'KGI Taiwan trades CSV'
+      kgiTwTransactions: 'KGI Taiwan trades CSV',
+      matsuiTransactions: 'Matsui Securities trades CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -1476,7 +1480,8 @@ const enGB = {
       futuTransactions: 'Futu / moomoo activity CSV',
       monexTransactions: 'Monex Securities trades CSV',
       yuantaTwTransactions: 'Yuanta Taiwan trades CSV',
-      kgiTwTransactions: 'KGI Taiwan trades CSV'
+      kgiTwTransactions: 'KGI Taiwan trades CSV',
+      matsuiTransactions: 'Matsui Securities trades CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -1803,7 +1808,8 @@ const jaJP = {
       futuTransactions: 'Futu / moomoo 取引履歴 CSV',
       monexTransactions: 'マネックス証券 取引履歴 CSV',
       yuantaTwTransactions: '元大証券 台湾株取引 CSV',
-      kgiTwTransactions: 'KGI証券 台湾株取引 CSV'
+      kgiTwTransactions: 'KGI証券 台湾株取引 CSV',
+      matsuiTransactions: '松井証券 取引履歴 CSV'
     },
     csvDelimiters: {
       tab: 'tab'
