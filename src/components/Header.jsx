@@ -67,8 +67,19 @@ export default function Header({
       ? t(importMeta.profileLabelKey, { defaultValue: importMeta.profileLabel })
       : importMeta?.profileLabel
   );
+  const getLocalizedImportModeLabel = (selectionMode) => (
+    selectionMode === 'manual'
+      ? t('header.importModeManualOverride', { defaultValue: 'Manual preset' })
+      : t('header.importModeAutoDetected', { defaultValue: 'Auto-detected' })
+  );
+  const getLocalizedImportKindLabel = (importKind) => (
+    importKind === 'positions'
+      ? t('header.importKindPositions', { defaultValue: 'Positions snapshot' })
+      : t('header.importKindTrades', { defaultValue: 'Trades' })
+  );
 
   const importProfileLabel = t('header.importProfileLabel', { defaultValue: 'CSV parser' });
+  const hasSkippedImportRows = (lastImportMeta?.skippedRowCount || 0) > 0;
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
@@ -236,15 +247,60 @@ export default function Header({
           </button>
 
           {lastImportMeta && (
-            <div
-              className="hidden lg:flex items-center gap-2 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-2 text-xs font-medium text-emerald-700 dark:text-emerald-300"
-              title={`${getLocalizedImportMetaProfileLabel(lastImportMeta)} · ${getLocalizedImportDelimiterLabel(lastImportMeta.delimiterLabel)}`}
-            >
-              <span>{getLocalizedImportMetaProfileLabel(lastImportMeta)}</span>
-              <span className="text-emerald-400 dark:text-emerald-500">•</span>
-              <span>{getLocalizedImportDelimiterLabel(lastImportMeta.delimiterLabel)}</span>
-              <span className="text-emerald-400 dark:text-emerald-500">•</span>
-              <span>{formatLocalizedNumber(lastImportMeta.importedRowCount, activeLocale)}</span>
+            <div className="relative hidden lg:block group">
+              <div
+                className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium ${
+                  hasSkippedImportRows
+                    ? 'border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300'
+                    : 'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300'
+                }`}
+                title={`${getLocalizedImportMetaProfileLabel(lastImportMeta)} · ${getLocalizedImportDelimiterLabel(lastImportMeta.delimiterLabel)}`}
+              >
+                <span>{getLocalizedImportMetaProfileLabel(lastImportMeta)}</span>
+                <span className={hasSkippedImportRows ? 'text-amber-400 dark:text-amber-500' : 'text-emerald-400 dark:text-emerald-500'}>•</span>
+                <span>{t('header.importBadgeImported', {
+                  defaultValue: '{{count}} imported',
+                  count: formatLocalizedNumber(lastImportMeta.importedRowCount, activeLocale)
+                })}</span>
+                {hasSkippedImportRows && (
+                  <>
+                    <span className="text-amber-400 dark:text-amber-500">•</span>
+                    <span>{t('header.importBadgeSkipped', {
+                      defaultValue: '{{count}} skipped',
+                      count: formatLocalizedNumber(lastImportMeta.skippedRowCount, activeLocale)
+                    })}</span>
+                  </>
+                )}
+              </div>
+
+              <div className="pointer-events-none absolute right-0 top-14 w-80 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-xl shadow-xl z-50 text-sm text-slate-600 dark:text-slate-300 opacity-0 invisible translate-y-1 transition-all duration-200 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:visible group-focus-within:translate-y-0">
+                <h4 className="font-bold text-slate-800 dark:text-slate-100 mb-3 border-b border-slate-200 dark:border-slate-700 pb-2 flex items-center gap-2">
+                  <Info size={14} className="text-blue-500" />
+                  {t('header.importSummaryTitle', { defaultValue: 'Last import' })}
+                </h4>
+
+                <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 text-xs">
+                  <span className="text-slate-500 dark:text-slate-400">{t('header.importSummaryProfile', { defaultValue: 'Profile' })}</span>
+                  <span className="font-medium text-right text-slate-700 dark:text-slate-200">{getLocalizedImportMetaProfileLabel(lastImportMeta)}</span>
+
+                  <span className="text-slate-500 dark:text-slate-400">{t('header.importSummaryMode', { defaultValue: 'Mode' })}</span>
+                  <span className="font-medium text-right text-slate-700 dark:text-slate-200">{getLocalizedImportModeLabel(lastImportMeta.selectionMode)}</span>
+
+                  <span className="text-slate-500 dark:text-slate-400">{t('header.importSummaryKind', { defaultValue: 'Import kind' })}</span>
+                  <span className="font-medium text-right text-slate-700 dark:text-slate-200">{getLocalizedImportKindLabel(lastImportMeta.importKind)}</span>
+
+                  <span className="text-slate-500 dark:text-slate-400">{t('header.importSummaryDelimiter', { defaultValue: 'Delimiter' })}</span>
+                  <span className="font-medium text-right text-slate-700 dark:text-slate-200">{getLocalizedImportDelimiterLabel(lastImportMeta.delimiterLabel)}</span>
+
+                  <span className="text-slate-500 dark:text-slate-400">{t('header.importSummaryImported', { defaultValue: 'Imported rows' })}</span>
+                  <span className="font-medium text-right text-emerald-600 dark:text-emerald-400">{formatLocalizedNumber(lastImportMeta.importedRowCount, activeLocale)}</span>
+
+                  <span className="text-slate-500 dark:text-slate-400">{t('header.importSummarySkipped', { defaultValue: 'Skipped rows' })}</span>
+                  <span className={`font-medium text-right ${hasSkippedImportRows ? 'text-amber-600 dark:text-amber-400' : 'text-slate-700 dark:text-slate-200'}`}>
+                    {formatLocalizedNumber(lastImportMeta.skippedRowCount || 0, activeLocale)}
+                  </span>
+                </div>
+              </div>
             </div>
           )}
         </div>

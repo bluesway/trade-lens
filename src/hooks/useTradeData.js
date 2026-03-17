@@ -492,14 +492,18 @@ export function useTradeData(showToast) {
 
   const importCsvText = (text) => {
     const { rows, meta } = parseCSVWithMeta(text, { profileId: csvImportProfile });
-    const localizedProfileLabel = getLocalizedProfileLabel(meta.profileLabelKey, meta.profileLabel);
-    const localizedDelimiterLabel = getLocalizedDelimiterLabel(meta.delimiterLabel);
+    const importMeta = {
+      ...meta,
+      selectionMode: csvImportProfile === 'auto' ? 'auto' : 'manual'
+    };
+    const localizedProfileLabel = getLocalizedProfileLabel(importMeta.profileLabelKey, importMeta.profileLabel);
+    const localizedDelimiterLabel = getLocalizedDelimiterLabel(importMeta.delimiterLabel);
 
-    if (!meta.ok) {
+    if (!importMeta.ok) {
       setLastImportMeta(null);
 
-      if (meta.errorCode === 'missingRequiredHeaders') {
-        const missingFieldLabels = meta.missingRequiredFields
+      if (importMeta.errorCode === 'missingRequiredHeaders') {
+        const missingFieldLabels = importMeta.missingRequiredFields
           .map((field) => CSV_REQUIRED_FIELD_LABELS[field])
           .filter(Boolean)
           .map(({ key, defaultValue }) => t(key, { defaultValue }))
@@ -509,10 +513,10 @@ export function useTradeData(showToast) {
           defaultValue: 'CSV import failed: missing required fields {{fields}}.',
           fields: missingFieldLabels
         }));
-      } else if (meta.errorCode === 'rowWidthMismatch') {
+      } else if (importMeta.errorCode === 'rowWidthMismatch') {
         showToast(t('messages.csvImportFailedRowWidth', {
           defaultValue: 'CSV import failed: row {{row}} has more columns than the header, usually because a thousands-separated number in a {{delimiter}} file was not quoted properly.',
-          row: formatLocalizedNumber(meta.problematicRowNumbers[0], activeLocale),
+          row: formatLocalizedNumber(importMeta.problematicRowNumbers[0], activeLocale),
           delimiter: localizedDelimiterLabel
         }));
       } else {
@@ -521,27 +525,37 @@ export function useTradeData(showToast) {
         }));
       }
 
-      return meta;
+      return importMeta;
     }
 
     persistRawData(rows);
     setIsDemo(false);
-    setLastImportMeta(meta);
-    const successMessageKey = meta.importKind === 'positions'
-      ? 'messages.csvImportSuccessPositions'
-      : 'messages.csvImportSuccess';
-    const successDefaultValue = meta.importKind === 'positions'
-      ? 'Imported {{count}} positions as synthetic buy rows ({{profile}} · {{delimiter}}).'
-      : 'Imported {{count}} trades ({{profile}} · {{delimiter}}).';
+    setLastImportMeta(importMeta);
+    const hasSkippedRows = importMeta.skippedRowCount > 0;
+    const successMessageKey = importMeta.importKind === 'positions'
+      ? (hasSkippedRows ? 'messages.csvImportSuccessPositionsSkipped' : 'messages.csvImportSuccessPositions')
+      : (hasSkippedRows ? 'messages.csvImportSuccessSkipped' : 'messages.csvImportSuccess');
+    const successDefaultValue = importMeta.importKind === 'positions'
+      ? (
+        hasSkippedRows
+          ? 'Imported {{count}} positions as synthetic buy rows and skipped {{skipped}} unsupported rows ({{profile}} · {{delimiter}}).'
+          : 'Imported {{count}} positions as synthetic buy rows ({{profile}} · {{delimiter}}).'
+      )
+      : (
+        hasSkippedRows
+          ? 'Imported {{count}} trades and skipped {{skipped}} unsupported rows ({{profile}} · {{delimiter}}).'
+          : 'Imported {{count}} trades ({{profile}} · {{delimiter}}).'
+      );
 
     showToast(t(successMessageKey, {
       defaultValue: successDefaultValue,
-      count: formatLocalizedNumber(meta.importedRowCount, activeLocale),
+      count: formatLocalizedNumber(importMeta.importedRowCount, activeLocale),
+      skipped: formatLocalizedNumber(importMeta.skippedRowCount, activeLocale),
       profile: localizedProfileLabel,
       delimiter: localizedDelimiterLabel
     }));
 
-    return meta;
+    return importMeta;
   };
 
   const handleAddRecord = () => {
