@@ -276,16 +276,22 @@ export default function Header({
 
             <div className="grid w-full gap-3 lg:max-w-2xl lg:grid-cols-[minmax(0,1fr)_auto]">
               <label
-                className="flex min-h-[3.25rem] items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 shadow-sm dark:border-slate-700 dark:bg-slate-900"
+                className="relative flex min-h-[3.25rem] items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/80"
                 title={importProfileLabel}
               >
-                <span className="whitespace-nowrap text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
-                  {importProfileLabel}
-                </span>
+                <div className="pointer-events-none flex min-w-0 flex-1 items-center gap-3">
+                  <span className="whitespace-nowrap text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+                    {importProfileLabel}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-700 dark:text-slate-200">
+                    {getLocalizedProfileLabel(selectedImportProfileOption)}
+                  </span>
+                  <ChevronDown size={16} className="shrink-0 text-slate-400 dark:text-slate-500" />
+                </div>
                 <select
                   value={csvImportProfile}
                   onChange={(event) => setCsvImportProfile(event.target.value)}
-                  className="min-w-0 flex-1 bg-transparent text-sm font-medium text-slate-700 outline-none dark:text-slate-200"
+                  className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                   title={importProfileLabel}
                 >
                   {CSV_IMPORT_PROFILE_OPTION_GROUPS.map((group) => (
