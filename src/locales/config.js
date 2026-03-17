@@ -126,7 +126,9 @@ export const MARKET_TRANSLATION_KEYS = {
 
 export const TRADE_TYPE_TRANSLATION_KEYS = {
   買入: 'tradeTypes.buy',
-  賣出: 'tradeTypes.sell'
+  賣出: 'tradeTypes.sell',
+  拆股: 'tradeTypes.split',
+  反向拆股: 'tradeTypes.reverseSplit'
 };
 
 export const TREND_RANGE_TRANSLATION_KEYS = {

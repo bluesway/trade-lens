@@ -44,9 +44,35 @@ const buildVoicePatch = ({
   }
 });
 
+const buildSplitCopyPatch = ({
+  split,
+  reverseSplit,
+  splitQuantityChange,
+  importReviewSkippedHelp
+}) => ({
+  tradeTypes: {
+    split,
+    reverseSplit
+  },
+  table: {
+    splitQuantityChange
+  },
+  app: {
+    importReviewSkippedHelp
+  }
+});
+
 const assignPatch = (patches, locales, patch) => {
   locales.forEach((locale) => {
     patches[locale] = patch;
+  });
+};
+
+const extendPatch = (patches, locales, patch) => {
+  locales.forEach((locale) => {
+    patches[locale] = patches[locale]
+      ? mergeLocale(patches[locale], patch)
+      : patch;
   });
 };
 
@@ -518,6 +544,279 @@ assignPatch(voicePatches, ['ur-PK'], buildVoicePatch({
   body: "Trade Lens ایک open-source سرمایہ کاری tool ہے جو broker CSV کو cost trend, P&L view اور portfolio کی زیادہ صاف تصویر میں بدل دیتا ہے۔",
   privacy: "پرائیویسی پہلے: سارا data صرف آپ کے browser (IndexedDB) میں رہتا ہے، ہمارے server تک نہیں جاتا۔",
   apiKey: "yfapi.net کی API key صرف market data لانے کے لیے استعمال ہوتی ہے، اور وہ بھی local ہی رہتی ہے۔"
+}));
+
+extendPatch(voicePatches, ['zh-TW'], buildSplitCopyPatch({
+  split: '拆股',
+  reverseSplit: '反向拆股',
+  splitQuantityChange: '調整 {{quantity}} 股',
+  importReviewSkippedHelp: '下面先列幾筆這次解析階段就會略過的資料，先看一眼再決定要不要套用。'
+}));
+
+extendPatch(voicePatches, ['yue-Hant-HK'], buildSplitCopyPatch({
+  split: '拆股',
+  reverseSplit: '反向拆股',
+  splitQuantityChange: '調整 {{quantity}} 股',
+  importReviewSkippedHelp: '下面先列幾筆今次解析階段已經會略過嘅資料，睇一眼先再決定套唔套用。'
+}));
+
+extendPatch(voicePatches, ['zh-CN', 'zh-SG'], buildSplitCopyPatch({
+  split: '拆股',
+  reverseSplit: '反向拆股',
+  splitQuantityChange: '调整 {{quantity}} 股',
+  importReviewSkippedHelp: '下面先列几笔这次解析阶段就会跳过的数据，先过一眼再决定要不要应用。'
+}));
+
+extendPatch(voicePatches, ['en-US', 'en-CA', 'en-AU', 'en-GB', 'en-IE', 'en-NZ', 'en-SG', 'en-ZA'], buildSplitCopyPatch({
+  split: 'Stock Split',
+  reverseSplit: 'Reverse Split',
+  splitQuantityChange: '{{quantity}} shares adjusted',
+  importReviewSkippedHelp: 'These are examples of rows the parser is already planning to skip before you apply the import.'
+}));
+
+extendPatch(voicePatches, ['ja-JP'], buildSplitCopyPatch({
+  split: '株式分割',
+  reverseSplit: '株式併合',
+  splitQuantityChange: '{{quantity}} 株を調整',
+  importReviewSkippedHelp: 'ここには、適用前の時点で解析側がスキップ予定の行をいくつか先に表示しています。'
+}));
+
+extendPatch(voicePatches, ['ko-KR'], buildSplitCopyPatch({
+  split: '액면분할',
+  reverseSplit: '역분할',
+  splitQuantityChange: '{{quantity}}주 조정',
+  importReviewSkippedHelp: '여기에는 가져오기를 적용하기 전에 파서가 이미 건너뛸 예정인 행 예시를 먼저 보여줍니다.'
+}));
+
+extendPatch(voicePatches, ['id-ID'], buildSplitCopyPatch({
+  split: 'Stock split',
+  reverseSplit: 'Reverse split',
+  splitQuantityChange: '{{quantity}} saham disesuaikan',
+  importReviewSkippedHelp: 'Ini contoh baris yang dari tahap parsing memang sudah akan dilewati sebelum impor benar-benar diterapkan.'
+}));
+
+extendPatch(voicePatches, ['fr-FR', 'fr-BE', 'fr-CA', 'fr-CH'], buildSplitCopyPatch({
+  split: 'Division d’actions',
+  reverseSplit: 'Regroupement d’actions',
+  splitQuantityChange: '{{quantity}} actions ajustées',
+  importReviewSkippedHelp: 'Voici quelques exemples de lignes que le parseur prévoit déjà d’ignorer avant même d’appliquer l’import.'
+}));
+
+extendPatch(voicePatches, ['de-DE', 'de-AT', 'de-CH'], buildSplitCopyPatch({
+  split: 'Aktiensplit',
+  reverseSplit: 'Aktienzusammenlegung',
+  splitQuantityChange: '{{quantity}} Stück angepasst',
+  importReviewSkippedHelp: 'Hier siehst du ein paar Beispielzeilen, die der Parser schon vor dem eigentlichen Import überspringen würde.'
+}));
+
+extendPatch(voicePatches, ['it-IT', 'it-CH'], buildSplitCopyPatch({
+  split: 'Frazionamento',
+  reverseSplit: 'Raggruppamento',
+  splitQuantityChange: '{{quantity}} azioni rettificate',
+  importReviewSkippedHelp: 'Qui sotto vedi alcuni esempi di righe che il parser salterà già in fase di analisi, prima ancora di applicare l’import.'
+}));
+
+extendPatch(voicePatches, ['ms-MY'], buildSplitCopyPatch({
+  split: 'Pecahan saham',
+  reverseSplit: 'Pecahan songsang',
+  splitQuantityChange: '{{quantity}} saham dilaraskan',
+  importReviewSkippedHelp: 'Di bawah ini ialah beberapa contoh baris yang memang akan dilangkau oleh parser sebelum import benar-benar diterapkan.'
+}));
+
+extendPatch(voicePatches, ['nl-NL', 'nl-BE'], buildSplitCopyPatch({
+  split: 'Aandelensplitsing',
+  reverseSplit: 'Omgekeerde aandelensplitsing',
+  splitQuantityChange: '{{quantity}} aandelen aangepast',
+  importReviewSkippedHelp: 'Hier zie je alvast een paar voorbeeldregels die de parser nog vóór het toepassen van de import zal overslaan.'
+}));
+
+extendPatch(voicePatches, ['fa-IR'], buildSplitCopyPatch({
+  split: 'تقسیم سهام',
+  reverseSplit: 'ادغام سهام',
+  splitQuantityChange: '{{quantity}} سهم تعدیل شد',
+  importReviewSkippedHelp: 'اینجا چند نمونه از ردیف‌هایی را می‌بینی که پارسر قبل از اعمال ایمپورت قرار است ردشان کند.'
+}));
+
+extendPatch(voicePatches, ['he-IL'], buildSplitCopyPatch({
+  split: 'פיצול מניות',
+  reverseSplit: 'איחוד מניות',
+  splitQuantityChange: '{{quantity}} מניות הותאמו',
+  importReviewSkippedHelp: 'כאן מוצגות כמה דוגמאות לשורות שהמפרש כבר מתכנן לדלג עליהן עוד לפני החלת הייבוא.'
+}));
+
+extendPatch(voicePatches, ['es-419', 'es-AR', 'es-CL', 'es-CO', 'es-MX', 'es-PE', 'es-VE'], buildSplitCopyPatch({
+  split: 'Split de acciones',
+  reverseSplit: 'Contrasplit',
+  splitQuantityChange: '{{quantity}} acciones ajustadas',
+  importReviewSkippedHelp: 'Aquí ves algunos ejemplos de filas que el parser ya piensa omitir antes de aplicar la importación.'
+}));
+
+extendPatch(voicePatches, ['es-ES'], buildSplitCopyPatch({
+  split: 'Desdoblamiento',
+  reverseSplit: 'Contrasplit',
+  splitQuantityChange: '{{quantity}} acciones ajustadas',
+  importReviewSkippedHelp: 'Aquí puedes ver algunos ejemplos de filas que el parser ya dejará fuera antes de aplicar la importación.'
+}));
+
+extendPatch(voicePatches, ['pt-BR'], buildSplitCopyPatch({
+  split: 'Desdobramento',
+  reverseSplit: 'Grupamento',
+  splitQuantityChange: '{{quantity}} ações ajustadas',
+  importReviewSkippedHelp: 'Aqui vão alguns exemplos de linhas que o parser já pretende ignorar antes mesmo de aplicar a importação.'
+}));
+
+extendPatch(voicePatches, ['pt-PT'], buildSplitCopyPatch({
+  split: 'Desdobramento',
+  reverseSplit: 'Agrupamento',
+  splitQuantityChange: '{{quantity}} ações ajustadas',
+  importReviewSkippedHelp: 'Aqui vês alguns exemplos de linhas que o parser já tenciona ignorar antes de aplicar a importação.'
+}));
+
+extendPatch(voicePatches, ['pl-PL'], buildSplitCopyPatch({
+  split: 'Split akcji',
+  reverseSplit: 'Scalenie akcji',
+  splitQuantityChange: 'Skorygowano {{quantity}} akcji',
+  importReviewSkippedHelp: 'Tutaj widać kilka przykładowych wierszy, które parser planuje pominąć jeszcze przed zastosowaniem importu.'
+}));
+
+extendPatch(voicePatches, ['tr-TR'], buildSplitCopyPatch({
+  split: 'Hisse bölünmesi',
+  reverseSplit: 'Ters bölünme',
+  splitQuantityChange: '{{quantity}} adet güncellendi',
+  importReviewSkippedHelp: 'Burada, içe aktarmayı uygulamadan önce parserın zaten atlamayı planladığı birkaç satır örneği görünüyor.'
+}));
+
+extendPatch(voicePatches, ['hi-IN'], buildSplitCopyPatch({
+  split: 'स्टॉक स्प्लिट',
+  reverseSplit: 'रिवर्स स्प्लिट',
+  splitQuantityChange: '{{quantity}} शेयर समायोजित',
+  importReviewSkippedHelp: 'यहाँ कुछ उदाहरण पंक्तियाँ दिखाई जा रही हैं जिन्हें इम्पोर्ट लागू करने से पहले ही parser छोड़ने वाला है।'
+}));
+
+extendPatch(voicePatches, ['ru-RU'], buildSplitCopyPatch({
+  split: 'Сплит акций',
+  reverseSplit: 'Обратный сплит',
+  splitQuantityChange: 'Скорректировано {{quantity}} акций',
+  importReviewSkippedHelp: 'Здесь показаны примеры строк, которые парсер уже собирается пропустить ещё до применения импорта.'
+}));
+
+extendPatch(voicePatches, ['sv-SE'], buildSplitCopyPatch({
+  split: 'Aktiesplit',
+  reverseSplit: 'Omvänd split',
+  splitQuantityChange: '{{quantity}} aktier justerade',
+  importReviewSkippedHelp: 'Här ser du några exempelrader som parsern redan tänker hoppa över innan importen faktiskt tillämpas.'
+}));
+
+extendPatch(voicePatches, ['cs-CZ'], buildSplitCopyPatch({
+  split: 'Split akcií',
+  reverseSplit: 'Reverzní split',
+  splitQuantityChange: '{{quantity}} akcií upraveno',
+  importReviewSkippedHelp: 'Tady jsou ukázky řádků, které parser plánuje přeskočit ještě před samotným použitím importu.'
+}));
+
+extendPatch(voicePatches, ['et-EE'], buildSplitCopyPatch({
+  split: 'Aktsiasplit',
+  reverseSplit: 'Pöördsplit',
+  splitQuantityChange: '{{quantity}} aktsiat korrigeeritud',
+  importReviewSkippedHelp: 'Siin on mõned näiteread, mille parser plaanib juba enne importi vahele jätta.'
+}));
+
+extendPatch(voicePatches, ['is-IS'], buildSplitCopyPatch({
+  split: 'Hlutabréfasplit',
+  reverseSplit: 'Öfugt split',
+  splitQuantityChange: '{{quantity}} hlutir leiðréttir',
+  importReviewSkippedHelp: 'Hér sérðu nokkur dæmi um línur sem lesarinn ætlar nú þegar að sleppa áður en innflutningurinn er beittur.'
+}));
+
+extendPatch(voicePatches, ['ro-RO'], buildSplitCopyPatch({
+  split: 'Split de acțiuni',
+  reverseSplit: 'Consolidare acțiuni',
+  splitQuantityChange: '{{quantity}} acțiuni ajustate',
+  importReviewSkippedHelp: 'Aici vezi câteva exemple de rânduri pe care parserul le va sări deja înainte să aplici importul.'
+}));
+
+extendPatch(voicePatches, ['hu-HU'], buildSplitCopyPatch({
+  split: 'Részvényfelosztás',
+  reverseSplit: 'Fordított split',
+  splitQuantityChange: '{{quantity}} részvény igazítva',
+  importReviewSkippedHelp: 'Itt látsz néhány példasort, amelyet az értelmező már az import alkalmazása előtt is át fog ugrani.'
+}));
+
+extendPatch(voicePatches, ['da-DK'], buildSplitCopyPatch({
+  split: 'Aktiesplit',
+  reverseSplit: 'Omvendt split',
+  splitQuantityChange: '{{quantity}} aktier justeret',
+  importReviewSkippedHelp: 'Her ser du nogle eksempelrækker, som parseren allerede planlægger at springe over, før importen bliver anvendt.'
+}));
+
+extendPatch(voicePatches, ['el-GR'], buildSplitCopyPatch({
+  split: 'Split μετοχών',
+  reverseSplit: 'Reverse split',
+  splitQuantityChange: '{{quantity}} μετοχές προσαρμόστηκαν',
+  importReviewSkippedHelp: 'Εδώ βλέπεις μερικά παραδείγματα γραμμών που ο parser σκοπεύει ήδη να προσπεράσει πριν εφαρμοστεί η εισαγωγή.'
+}));
+
+extendPatch(voicePatches, ['lv-LV'], buildSplitCopyPatch({
+  split: 'Akciju sadalīšana',
+  reverseSplit: 'Apgrieztais split',
+  splitQuantityChange: '{{quantity}} akcijas koriģētas',
+  importReviewSkippedHelp: 'Šeit redzami daži piemēra ieraksti, kurus parseris jau plāno izlaist vēl pirms importa piemērošanas.'
+}));
+
+extendPatch(voicePatches, ['lt-LT'], buildSplitCopyPatch({
+  split: 'Akcijų padalijimas',
+  reverseSplit: 'Atvirkštinis splitas',
+  splitQuantityChange: '{{quantity}} akcijos pakoreguotos',
+  importReviewSkippedHelp: 'Čia matai kelis eilučių pavyzdžius, kuriuos parseris jau planuoja praleisti dar prieš pritaikant importą.'
+}));
+
+extendPatch(voicePatches, ['nb-NO'], buildSplitCopyPatch({
+  split: 'Aksjesplitt',
+  reverseSplit: 'Omvendt splitt',
+  splitQuantityChange: '{{quantity}} aksjer justert',
+  importReviewSkippedHelp: 'Her ser du noen eksempelrader som parseren allerede planlegger å hoppe over før importen faktisk brukes.'
+}));
+
+extendPatch(voicePatches, ['fi-FI'], buildSplitCopyPatch({
+  split: 'Osakesplit',
+  reverseSplit: 'Käänteinen split',
+  splitQuantityChange: '{{quantity}} osaketta oikaistu',
+  importReviewSkippedHelp: 'Tässä näkyy muutama esimerkkirivi, jotka parseri aikoo ohittaa jo ennen kuin tuonti otetaan käyttöön.'
+}));
+
+extendPatch(voicePatches, ['fil-PH'], buildSplitCopyPatch({
+  split: 'Stock split',
+  reverseSplit: 'Reverse split',
+  splitQuantityChange: '{{quantity}} shares na-adjust',
+  importReviewSkippedHelp: 'Narito ang ilang halimbawang row na balak nang laktawan ng parser bago pa talaga i-apply ang import.'
+}));
+
+extendPatch(voicePatches, ['vi-VN'], buildSplitCopyPatch({
+  split: 'Tách cổ phiếu',
+  reverseSplit: 'Gộp cổ phiếu',
+  splitQuantityChange: 'Đã điều chỉnh {{quantity}} cổ phiếu',
+  importReviewSkippedHelp: 'Ở đây là vài dòng mẫu mà bộ phân tích đã định bỏ qua ngay từ trước khi bạn áp dụng lần import này.'
+}));
+
+extendPatch(voicePatches, ['th-TH'], buildSplitCopyPatch({
+  split: 'แตกพาร์',
+  reverseSplit: 'รวมพาร์',
+  splitQuantityChange: 'ปรับจำนวน {{quantity}} หุ้น',
+  importReviewSkippedHelp: 'ด้านล่างคือตัวอย่างบางแถวที่ตัว parser ตั้งใจจะข้ามอยู่แล้วก่อนที่คุณจะกดใช้การนำเข้า'
+}));
+
+extendPatch(voicePatches, ['ar-SA', 'ar-EG', 'ar-AE', 'ar-KW', 'ar-QA'], buildSplitCopyPatch({
+  split: 'تجزئة الأسهم',
+  reverseSplit: 'تجميع الأسهم',
+  splitQuantityChange: 'تم تعديل {{quantity}} سهم',
+  importReviewSkippedHelp: 'في الأسفل ترى أمثلة لبعض الصفوف التي يخطط المحلل لتجاوزها مسبقاً قبل تطبيق عملية الاستيراد.'
+}));
+
+extendPatch(voicePatches, ['ur-PK'], buildSplitCopyPatch({
+  split: 'اسٹاک اسپلٹ',
+  reverseSplit: 'ریورس اسپلٹ',
+  splitQuantityChange: '{{quantity}} شیئر ایڈجسٹ ہوئے',
+  importReviewSkippedHelp: 'یہاں چند مثالیں دکھ رہی ہیں جنہیں parser import لاگو ہونے سے پہلے ہی چھوڑنے والا ہے۔'
 }));
 
 export const VOICE_REFINED_LOCALES = Object.freeze(Object.keys(voicePatches));

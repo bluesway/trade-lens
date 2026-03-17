@@ -55,8 +55,43 @@ const SELL_TYPE_TERMS = [
   'بيع'
 ];
 
+const REVERSE_SPLIT_TYPE_TERMS = [
+  'reverse split',
+  'reverse stock split',
+  'stock consolidation',
+  'share consolidation',
+  'reverse stock consolidation',
+  'reverse shares split',
+  '反向拆股',
+  '反向分割',
+  '股票反向分割',
+  '併股',
+  '并股',
+  '合股',
+  '株式併合',
+  '株式併合',
+  '역분할',
+  '주식병합'
+];
+
+const SPLIT_TYPE_TERMS = [
+  'stock split',
+  'share split',
+  'forward split',
+  '股票分割',
+  '拆股',
+  '分股',
+  '拆細',
+  '拆细',
+  '株式分割',
+  '액면분할',
+  '주식분할'
+];
+
 const SORTED_BUY_TYPE_TERMS = [...BUY_TYPE_TERMS].sort((a, b) => b.length - a.length);
 const SORTED_SELL_TYPE_TERMS = [...SELL_TYPE_TERMS].sort((a, b) => b.length - a.length);
+const SORTED_REVERSE_SPLIT_TYPE_TERMS = [...REVERSE_SPLIT_TYPE_TERMS].sort((a, b) => b.length - a.length);
+const SORTED_SPLIT_TYPE_TERMS = [...SPLIT_TYPE_TERMS].sort((a, b) => b.length - a.length);
 
 const STANDARD_HEADER_ALIASES = {
   日期: ['日期', '交易日期', '成交日期', '成交時間', '交易時間', 'Date', 'Date/Time', 'Trade Date', 'Trade Time', 'Execution Time', 'Filled Time', 'Placed Time', 'Run Date', 'Settlement Date', 'Activity Date', 'Transaction Date', 'Timestamp', 'Time', 'Tanggal', 'Tarikh', 'Ngày', 'Ngày giao dịch', 'Date opération', 'Date de transaction', 'Fecha', 'Fecha de operación', 'Fecha de transacción', 'Data', 'Data operação', 'Datum', 'Handelsdatum', 'Buchungsdatum', 'Data di negoziazione', '日付', '取引日', '約定日', '受渡日', 'التاريخ', 'วันที่', 'วันที่ซื้อขาย', '날짜', '거래일', '체결일'],
@@ -933,9 +968,22 @@ const detectLayout = (lines, preferredProfileId = 'auto') => {
 };
 
 const normalizeTradeType = (rawValue) => {
+  const typeTokens = tokenizeHeaderLabel(rawValue);
   const normalizedType = normalizeHeaderLabel(rawValue);
   if (!normalizedType) {
     return '';
+  }
+
+  if (SORTED_REVERSE_SPLIT_TYPE_TERMS.some((term) => normalizedType.includes(normalizeHeaderLabel(term)))) {
+    return '反向拆股';
+  }
+
+  if (SORTED_SPLIT_TYPE_TERMS.some((term) => normalizedType.includes(normalizeHeaderLabel(term)))) {
+    return '拆股';
+  }
+
+  if (typeTokens.includes('split')) {
+    return '拆股';
   }
 
   if (SORTED_SELL_TYPE_TERMS.some((term) => normalizedType.includes(normalizeHeaderLabel(term)))) {
@@ -1142,7 +1190,7 @@ const resolveCrossMarketBroker = (sourceRow, explicitMarket) => {
 
 const getNormalizedTradeTypeOrEmpty = (rawValue) => {
   const normalizedType = normalizeTradeType(rawValue);
-  return normalizedType === '買入' || normalizedType === '賣出'
+  return ['買入', '賣出', '拆股', '反向拆股'].includes(normalizedType)
     ? normalizedType
     : '';
 };
@@ -1222,6 +1270,37 @@ const formatAbsoluteNumber = (value) => (
     : ''
 );
 
+const extractSplitFactorFromText = (rawValue) => {
+  const normalizedText = String(rawValue || '')
+    .replace(/[－–—]/g, '-')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!normalizedText) {
+    return null;
+  }
+
+  const ratioPatterns = [
+    /(\d+(?:\.\d+)?)\s*(?:for|:|\/|to)\s*(\d+(?:\.\d+)?)/i,
+    /(\d+(?:\.\d+)?)\s*-\s*for\s*-\s*(\d+(?:\.\d+)?)/i
+  ];
+
+  for (const pattern of ratioPatterns) {
+    const match = normalizedText.match(pattern);
+    if (!match) {
+      continue;
+    }
+
+    const numerator = Number.parseFloat(match[1]);
+    const denominator = Number.parseFloat(match[2]);
+    if (Number.isFinite(numerator) && Number.isFinite(denominator) && denominator > 0) {
+      return numerator / denominator;
+    }
+  }
+
+  return null;
+};
+
 const resolveTradeType = ({
   rawType,
   description,
@@ -1259,12 +1338,14 @@ const buildNormalizedTradeRow = ({
 }) => ({
   日期: String(rawRow['日期'] || '').trim(),
   類型: type,
+  原始類型: String(rawRow['類型'] || '').trim(),
   代號: String(rawRow['代號'] || '').trim(),
   市場: String(rawRow['市場'] || '').trim(),
   數量: formatAbsoluteNumber(quantityValue),
   單價: Number.isFinite(priceValue) ? formatParsedNumber(priceValue) : '',
   總金額: formatAbsoluteNumber(amountValue),
-  損益: Number.isFinite(pnlValue) ? formatParsedNumber(pnlValue) : ''
+  損益: Number.isFinite(pnlValue) ? formatParsedNumber(pnlValue) : '',
+  說明: String(rawRow['說明'] || '').trim()
 });
 
 const normalizeBrokerTransactionRow = (rawRow, preferredDecimalSeparator, options = {}) => {
@@ -1341,12 +1422,14 @@ const normalizeParsedRow = (rawRow, preferredDecimalSeparator) => {
   const normalizedRow = {
     日期: String(rawRow['日期'] || '').trim(),
     類型: normalizeTradeType(rawRow['類型']),
+    原始類型: String(rawRow['類型'] || '').trim(),
     代號: String(rawRow['代號'] || '').trim(),
     市場: String(rawRow['市場'] || '').trim(),
     數量: normalizeNumericCell(rawRow['數量'], preferredDecimalSeparator),
     單價: normalizeNumericCell(rawRow['單價'], preferredDecimalSeparator),
     總金額: normalizeNumericCell(rawRow['總金額'], preferredDecimalSeparator),
-    損益: normalizeNumericCell(rawRow['損益'], preferredDecimalSeparator)
+    損益: normalizeNumericCell(rawRow['損益'], preferredDecimalSeparator),
+    說明: String(rawRow['說明'] || '').trim()
   };
 
   const quantityValue = Number.parseFloat(normalizedRow['數量']);
@@ -1726,6 +1809,19 @@ const isImportableTradeRow = (row) => {
   const quantityValue = Number.parseFloat(row['數量']);
   const priceValue = Number.parseFloat(row['單價']);
   const amountValue = Number.parseFloat(row['總金額']);
+  const splitFactor = extractSplitFactorFromText(`${row['原始類型'] || ''} ${row['說明'] || ''}`);
+  const isCorporateAction = row['類型'] === '拆股' || row['類型'] === '反向拆股';
+
+  if (isCorporateAction) {
+    return (
+      Boolean(row['日期'])
+      && Boolean(row['代號'])
+      && (
+        (Number.isFinite(quantityValue) && quantityValue > 0)
+        || (Number.isFinite(splitFactor) && splitFactor > 0 && splitFactor !== 1)
+      )
+    );
+  }
 
   return (
     Boolean(row['日期'])

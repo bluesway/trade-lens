@@ -64,9 +64,11 @@ const CSV_REQUIRED_FIELD_LABELS = {
   代號: { key: 'manager.fields.symbol', defaultValue: 'Symbol' },
   數量: { key: 'manager.fields.quantity', defaultValue: 'Quantity' }
 };
-const TRADE_ROW_SIGNATURE_FIELDS = ['日期', '類型', '代號', '市場', '數量', '單價', '總金額', '損益'];
+const TRADE_ROW_SIGNATURE_FIELDS = ['日期', '類型', '代號', '市場', '數量', '單價', '總金額', '損益', '說明'];
 const CSV_IMPORT_PROFILE_IDS = new Set(CSV_IMPORT_PROFILE_OPTIONS.map(({ id }) => id));
 const MAX_IMPORT_SKIP_PREVIEW_ROWS = 5;
+const SPLIT_TRADE_TYPES = new Set(['拆股', '反向拆股']);
+const LEDGER_TRADE_TYPES = new Set(['買入', '賣出', '拆股', '反向拆股']);
 
 const getFxRateSymbols = (fromCurrency, toCurrency) => {
   if (!fromCurrency || !toCurrency || fromCurrency === toCurrency) {
@@ -140,6 +142,73 @@ const calculateOpenPositionMetrics = (openLots) => openLots.reduce(
   }
 );
 
+const normalizeSplitFactor = (factor) => (
+  Number.isFinite(factor)
+  && factor > POSITION_EPSILON
+  && Math.abs(factor - 1) > POSITION_EPSILON
+    ? factor
+    : null
+);
+
+const extractSplitFactorFromText = (rawValue) => {
+  const normalizedText = String(rawValue || '')
+    .replace(/[－–—]/g, '-')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!normalizedText) {
+    return null;
+  }
+
+  const ratioPatterns = [
+    /(\d+(?:\.\d+)?)\s*(?:for|:|\/|to)\s*(\d+(?:\.\d+)?)/i,
+    /(\d+(?:\.\d+)?)\s*-\s*for\s*-\s*(\d+(?:\.\d+)?)/i
+  ];
+
+  for (const pattern of ratioPatterns) {
+    const match = normalizedText.match(pattern);
+    if (!match) {
+      continue;
+    }
+
+    const numerator = Number.parseFloat(match[1]);
+    const denominator = Number.parseFloat(match[2]);
+    if (Number.isFinite(numerator) && Number.isFinite(denominator) && denominator > 0) {
+      return normalizeSplitFactor(numerator / denominator);
+    }
+  }
+
+  return null;
+};
+
+const resolveSplitFactor = (row, openLots) => {
+  const textFactor = extractSplitFactorFromText(`${row['原始類型'] || ''} ${row['說明'] || ''}`);
+  if (textFactor) {
+    return textFactor;
+  }
+
+  const quantityDelta = Math.abs(getNumericValue(row['數量']));
+  if (!hasMeaningfulValue(quantityDelta)) {
+    return null;
+  }
+
+  const { holdingQty } = calculateOpenPositionMetrics(openLots);
+  const currentHoldingAbs = Math.abs(holdingQty);
+  if (!hasMeaningfulValue(currentHoldingAbs)) {
+    return null;
+  }
+
+  const nextHoldingAbs = row['類型'] === '拆股'
+    ? currentHoldingAbs + quantityDelta
+    : currentHoldingAbs - quantityDelta;
+
+  if (!hasMeaningfulValue(nextHoldingAbs)) {
+    return null;
+  }
+
+  return normalizeSplitFactor(nextHoldingAbs / currentHoldingAbs);
+};
+
 const buildFallbackResolvedTradeRow = (row, originalIndex) => ({
   ...row,
   originalIndex,
@@ -172,7 +241,7 @@ const buildResolvedTradeRows = (rows) => {
     const rawCode = String(row['代號'] || '').trim();
     const type = row['類型'];
 
-    if (!rawCode || (type !== '買入' && type !== '賣出')) {
+    if (!rawCode || !LEDGER_TRADE_TYPES.has(type)) {
       const fallbackRow = buildFallbackResolvedTradeRow(row, originalIndex);
       resolvedByOriginalIndex.set(originalIndex, fallbackRow);
       chronologicalResolvedRows.push(fallbackRow);
@@ -225,7 +294,7 @@ const buildResolvedTradeRows = (rows) => {
           unitPrice
         });
       }
-    } else {
+    } else if (type === '賣出') {
       while (remainingQuantity > POSITION_EPSILON && openLots[0]?.side === 1) {
         const longLot = openLots[0];
         const matchedQuantity = Math.min(remainingQuantity, longLot.quantity);
@@ -247,6 +316,14 @@ const buildResolvedTradeRows = (rows) => {
           side: -1,
           quantity: remainingQuantity,
           unitPrice
+        });
+      }
+    } else if (SPLIT_TRADE_TYPES.has(type)) {
+      const splitFactor = resolveSplitFactor(row, openLots);
+      if (splitFactor) {
+        openLots.forEach((lot) => {
+          lot.quantity *= splitFactor;
+          lot.unitPrice /= splitFactor;
         });
       }
     }
@@ -983,7 +1060,16 @@ export function useTradeData(showToast) {
   };
 
   const handleAddRecord = () => {
-    if (!newRec.code || !newRec.qty || !newRec.amount || !newRec.date) return;
+    const isSplitTrade = SPLIT_TRADE_TYPES.has(newRec.type);
+    if (!newRec.code || !newRec.qty || !newRec.date || (!isSplitTrade && !newRec.amount)) return;
+
+    const parsedQuantity = Number.parseFloat(newRec.qty);
+    const parsedAmount = Number.parseFloat(newRec.amount);
+    const derivedPrice = Number.isFinite(parsedQuantity)
+      && Math.abs(parsedQuantity) > POSITION_EPSILON
+      && Number.isFinite(parsedAmount)
+      ? (parsedAmount / parsedQuantity).toFixed(4)
+      : '';
 
     const row = {
       日期: newRec.date,
@@ -991,8 +1077,8 @@ export function useTradeData(showToast) {
       代號: newRec.code.trim(),
       市場: newRec.market,
       數量: newRec.qty,
-      單價: (parseFloat(newRec.amount) / parseFloat(newRec.qty)).toFixed(4),
-      總金額: newRec.amount,
+      單價: newRec.price || (isSplitTrade ? '' : derivedPrice),
+      總金額: isSplitTrade ? (newRec.amount || '') : newRec.amount,
       損益: newRec.pnl || ''
     };
 
@@ -1033,6 +1119,7 @@ export function useTradeData(showToast) {
       code: row['代號'],
       market: resolveMarket(row['代號'], row['市場']),
       qty: row['數量'],
+      price: row['單價'] || '',
       amount: row['總金額'],
       pnl: row['損益'] || ''
     });

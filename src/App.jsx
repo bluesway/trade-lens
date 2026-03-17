@@ -206,16 +206,19 @@ export default function App() {
       return;
     }
 
-    const headers = ['日期', '類型', '代號', '市場', '數量', '單價', '總金額', '損益'];
+    const escapeCsvCell = (value) => {
+      const stringValue = String(value ?? '');
+      if (!/[",\n]/.test(stringValue)) {
+        return stringValue;
+      }
+
+      return `"${stringValue.replace(/"/g, '""')}"`;
+    };
+
+    const headers = ['日期', '類型', '代號', '市場', '數量', '單價', '總金額', '損益', '說明'];
     const csvContent = [
       headers.join(','),
-      ...resolvedTradeRows.map((row) => headers.map((header) => {
-        let value = row[header] || '';
-        if (String(value).includes(',')) {
-          value = `"${value}"`;
-        }
-        return value;
-      }).join(','))
+      ...resolvedTradeRows.map((row) => headers.map((header) => escapeCsvCell(row[header] || '')).join(','))
     ].join('\n');
 
     const blob = new Blob([`\uFEFF${csvContent}`], { type: 'text/csv;charset=utf-8;' });

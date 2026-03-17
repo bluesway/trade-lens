@@ -53,9 +53,15 @@ export default function ManagerPanel({
   const formRef = useRef(null);
   const activeLocale = normalizeLocale(i18n.resolvedLanguage || i18n.language);
   const showGregorianReference = shouldShowGregorianReference(activeLocale);
-  const tradeTypeOptions = ['買入', '賣出'];
+  const tradeTypeOptions = ['買入', '賣出', '拆股', '反向拆股'];
   const marketOptions = MANUAL_MARKET_OPTIONS;
   const symbolPlaceholder = getMarketSymbolPlaceholder(newRec.market) || t('manager.placeholders.symbol');
+  const tradeTypeFallbackLabels = {
+    買入: 'Buy',
+    賣出: 'Sell',
+    拆股: 'Stock Split',
+    反向拆股: 'Reverse Split'
+  };
 
   const getCurrencyOptionLabel = (currency) => {
     const translationKey = `currencies.${currency}`;
@@ -84,6 +90,31 @@ export default function ManagerPanel({
   const parseNumericValue = (value) => {
     const numericValue = Number(String(value || '').replace(/[^0-9.-]+/g, ''));
     return Number.isFinite(numericValue) ? numericValue : null;
+  };
+
+  const getTradeTypeLabel = (tradeType) => {
+    const translationKey = TRADE_TYPE_TRANSLATION_KEYS[tradeType];
+    if (!translationKey) {
+      return tradeType;
+    }
+
+    return t(translationKey, {
+      defaultValue: tradeTypeFallbackLabels[tradeType] || tradeType
+    });
+  };
+
+  const getTradeTypeBadgeClass = (tradeType) => {
+    switch (tradeType) {
+      case '買入':
+        return 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400';
+      case '賣出':
+        return 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400';
+      case '拆股':
+      case '反向拆股':
+        return 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300';
+      default:
+        return 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300';
+    }
   };
 
   useEffect(() => {
@@ -204,7 +235,7 @@ export default function ManagerPanel({
               className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div className="w-[80px]">
+          <div className="w-[150px]">
             <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">{t('manager.fields.type')}</label>
             <select
               value={newRec.type}
@@ -213,7 +244,7 @@ export default function ManagerPanel({
             >
               {tradeTypeOptions.map((tradeType) => (
                 <option key={tradeType} value={tradeType}>
-                  {t(TRADE_TYPE_TRANSLATION_KEYS[tradeType])}
+                  {getTradeTypeLabel(tradeType)}
                 </option>
               ))}
             </select>
@@ -339,13 +370,9 @@ export default function ManagerPanel({
                     <td className="px-4 py-2 text-slate-600 dark:text-slate-400">{renderTradeDate(row['日期'])}</td>
                     <td className="px-4 py-2">
                       <span
-                        className={`px-2 py-0.5 rounded text-xs font-medium ${
-                          row['類型'] === '買入'
-                            ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                            : 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
-                        }`}
+                        className={`px-2 py-0.5 rounded text-xs font-medium ${getTradeTypeBadgeClass(row['類型'])}`}
                       >
-                        {t(TRADE_TYPE_TRANSLATION_KEYS[row['類型']])}
+                        {getTradeTypeLabel(row['類型'])}
                       </span>
                     </td>
                     <td className="px-4 py-2">
