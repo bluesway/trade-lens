@@ -77,6 +77,7 @@ const zhTW = {
     },
     csvNote1: '* 註 1：6 位數且以 6 或 0 開頭的代號，系統會自動判定為陸股（.SS / .SZ）。',
     csvNote2: '* 註 2：其他市場請直接在代號後補上後綴（例如：.TW、.HK）。',
+    csvNote3: '* 註 3：系統會自動偵測常見券商 CSV、分號與 tab 分隔格式，匯入後右上角會顯示吃到哪種版型。',
     forceRefreshConfirm: '確定要強制刷新嗎？這會忽略 24 小時快取並實際消耗 API 額度。'
   },
   summary: {
@@ -183,6 +184,9 @@ const zhTW = {
     updateSuccess: '成功更新 {{count}} 檔股票與匯率資訊！',
     fetchFailed: '抓取失敗：{{message}}',
     baseCurrencyChanged: '基礎計價幣別已切換為 {{currency}}，正在更新匯率...',
+    csvImportSuccess: '已匯入 {{count}} 筆交易（{{profile}} · {{delimiter}}）',
+    csvImportFailedNoData: 'CSV 匯入失敗：找不到可用的交易資料。',
+    csvImportFailedHeaders: 'CSV 匯入失敗：缺少必要欄位 {{fields}}。',
     recordUpdated: '交易紀錄已更新！',
     dataCleared: '已清除資料並載入範例資料',
     clearConfirm: '確定要清除所有資料並載入範例資料嗎？此動作無法復原！',
@@ -273,6 +277,7 @@ const yueHantHK = {
     },
     csvNote1: '* 註 1：6 位數且以 6 或 0 開頭的代號，系統會自動判做 A 股（.SS / .SZ）。',
     csvNote2: '* 註 2：其他市場請直接喺代號後面加後綴（例如：.TW、.HK）。',
+    csvNote3: '* 註 3：系統會自動偵測常見券商 CSV、分號同 tab 分隔格式，匯入後右上角會見到食咗邊種版型。',
     forceRefreshConfirm: '確定要強制刷新？呢個動作會無視 24 小時快取，仲會真係扣 API 額度。'
   },
   summary: {
@@ -379,6 +384,9 @@ const yueHantHK = {
     updateSuccess: '成功更新 {{count}} 隻股票同匯率資訊！',
     fetchFailed: '抓取失敗：{{message}}',
     baseCurrencyChanged: '基礎計價幣別已切換成 {{currency}}，而家更新匯率...',
+    csvImportSuccess: '已匯入 {{count}} 筆交易（{{profile}} · {{delimiter}}）',
+    csvImportFailedNoData: 'CSV 匯入失敗：搵唔到可用嘅交易資料。',
+    csvImportFailedHeaders: 'CSV 匯入失敗：缺少必要欄位 {{fields}}。',
     recordUpdated: '交易紀錄已更新！',
     dataCleared: '已清除資料並載入示範資料',
     clearConfirm: '確定要清除所有資料並載入示範資料？呢個動作冇得還原！',
@@ -469,6 +477,7 @@ const zhCN = {
     },
     csvNote1: '* 注 1：6 位数字且以 6 或 0 开头的代码，系统会自动识别为 A 股（.SS / .SZ）。',
     csvNote2: '* 注 2：其他市场请直接在代码后补后缀（例如：.TW、.HK）。',
+    csvNote3: '* 注 3：系统会自动识别常见券商 CSV、分号和 tab 分隔格式，导入后右上角会显示吃到哪种版型。',
     forceRefreshConfirm: '确定要强制刷新吗？这会忽略 24 小时缓存，并实际消耗 API 配额。'
   },
   summary: {
@@ -575,6 +584,9 @@ const zhCN = {
     updateSuccess: '成功更新 {{count}} 只股票与汇率信息！',
     fetchFailed: '抓取失败：{{message}}',
     baseCurrencyChanged: '基础计价币种已切换为 {{currency}}，正在更新汇率...',
+    csvImportSuccess: '已导入 {{count}} 笔交易（{{profile}} · {{delimiter}}）',
+    csvImportFailedNoData: 'CSV 导入失败：找不到可用的交易数据。',
+    csvImportFailedHeaders: 'CSV 导入失败：缺少必要字段 {{fields}}。',
     recordUpdated: '交易记录已更新！',
     dataCleared: '已清除数据并载入示例数据',
     clearConfirm: '确定要清除所有数据并载入示例数据吗？此操作无法恢复！',
@@ -861,6 +873,7 @@ const enUS = {
     },
     csvNote1: '* Note 1: Six-digit symbols starting with 6 or 0 are auto-detected as China A-shares (.SS / .SZ).',
     csvNote2: '* Note 2: For other markets, append the suffix directly to the symbol (for example: .TW, .HK).',
+    csvNote3: '* Note 3: The app auto-detects common broker CSV layouts plus semicolon and tab-delimited files. After import, the detected layout shows up on the top right.',
     forceRefreshConfirm: 'Force a refresh? This will ignore the 24-hour cache and consume real API quota.'
   },
   summary: {
@@ -967,6 +980,9 @@ const enUS = {
     updateSuccess: 'Updated {{count}} stock quotes and FX rates.',
     fetchFailed: 'Fetch failed: {{message}}',
     baseCurrencyChanged: 'Base currency switched to {{currency}}. Refreshing FX rates...',
+    csvImportSuccess: 'Imported {{count}} trades ({{profile}} · {{delimiter}}).',
+    csvImportFailedNoData: 'CSV import failed: no usable trade rows were found.',
+    csvImportFailedHeaders: 'CSV import failed: missing required fields {{fields}}.',
     recordUpdated: 'Trade record updated.',
     dataCleared: 'Data cleared and demo records loaded.',
     clearConfirm: 'Clear all data and reload the demo set? This cannot be undone.',
@@ -1057,6 +1073,7 @@ const enGB = {
     },
     csvNote1: '* Note 1: Six-digit symbols beginning with 6 or 0 are auto-detected as China A shares (.SS / .SZ).',
     csvNote2: '* Note 2: For other markets, append the suffix directly to the symbol (for example: .TW, .HK).',
+    csvNote3: '* Note 3: The app auto-detects common broker CSV layouts plus semicolon and tab-delimited files. After import, the detected layout shows up on the top right.',
     forceRefreshConfirm: 'Force a refresh? This will ignore the 24-hour cache and use real API allowance.'
   },
   summary: {
@@ -1163,6 +1180,9 @@ const enGB = {
     updateSuccess: 'Updated {{count}} stock quotes and FX rates.',
     fetchFailed: 'Fetch failed: {{message}}',
     baseCurrencyChanged: 'Base currency switched to {{currency}}. Refreshing FX rates...',
+    csvImportSuccess: 'Imported {{count}} trades ({{profile}} · {{delimiter}}).',
+    csvImportFailedNoData: 'CSV import failed: no usable trade rows were found.',
+    csvImportFailedHeaders: 'CSV import failed: missing required fields {{fields}}.',
     recordUpdated: 'Trade record updated.',
     dataCleared: 'Data cleared and demo records loaded.',
     clearConfirm: 'Clear all data and reload the demo set? This cannot be undone.',
@@ -1296,6 +1316,7 @@ const jaJP = {
     },
     csvNote1: '* 注 1: 6 桁で 6 または 0 から始まるコードは、中国 A 株（.SS / .SZ）として自動判定します。',
     csvNote2: '* 注 2: そのほかの市場は、コードの末尾に接尾辞を付けてください（例: .TW、.HK）。',
+    csvNote3: '* 注 3: よくある証券会社 CSV に加えて、セミコロン区切りと tab 区切りも自動判定します。読み込み後は右上に判定結果が出ます。',
     forceRefreshConfirm: '強制更新しますか？ 24 時間キャッシュを無視して API 枠を消費します。'
   },
   summary: {
@@ -1402,6 +1423,9 @@ const jaJP = {
     updateSuccess: '{{count}} 銘柄の株価と為替を更新しました。',
     fetchFailed: '取得に失敗しました: {{message}}',
     baseCurrencyChanged: '基準通貨を {{currency}} に切り替えました。為替を更新しています...',
+    csvImportSuccess: '{{count}} 件の取引を読み込みました（{{profile}} · {{delimiter}}）。',
+    csvImportFailedNoData: 'CSV の読み込みに失敗しました。使える取引データが見つかりません。',
+    csvImportFailedHeaders: 'CSV の読み込みに失敗しました。必須項目 {{fields}} が足りません。',
     recordUpdated: '取引履歴を更新しました。',
     dataCleared: 'データを削除し、サンプル履歴を読み込みました。',
     clearConfirm: 'すべてのデータを削除してサンプルを読み込みますか？ この操作は元に戻せません。',

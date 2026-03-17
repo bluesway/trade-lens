@@ -32,6 +32,7 @@ export default function Header({
   handleFileUpload,
   isDemo,
   isLoadingPrices,
+  lastImportMeta,
   lastUpdate,
   rawDataCount,
   setShowManager,
@@ -166,6 +167,9 @@ export default function Header({
               <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
                 {t('header.csvNote2')}
               </p>
+              <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                {t('header.csvNote3')}
+              </p>
             </div>
 
             <input
@@ -187,6 +191,19 @@ export default function Header({
             <Download size={18} />
             {t('common.exportCsv', { defaultValue: 'Export CSV' })}
           </button>
+
+          {lastImportMeta && (
+            <div
+              className="hidden lg:flex items-center gap-2 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-2 text-xs font-medium text-emerald-700 dark:text-emerald-300"
+              title={`${lastImportMeta.profileLabel} · ${lastImportMeta.delimiterLabel}`}
+            >
+              <span>{lastImportMeta.profileLabel}</span>
+              <span className="text-emerald-400 dark:text-emerald-500">•</span>
+              <span>{lastImportMeta.delimiterLabel}</span>
+              <span className="text-emerald-400 dark:text-emerald-500">•</span>
+              <span>{formatLocalizedNumber(lastImportMeta.importedRowCount, activeLocale)}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -58,6 +58,7 @@ export default function App() {
     isAppLoaded,
     isDemo,
     isLoadingPrices,
+    lastImportMeta,
     lastUpdate,
     liveData,
     marketFilter,
@@ -143,10 +144,12 @@ export default function App() {
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
+    const input = event.target;
 
     const reader = new FileReader();
     reader.onload = (loadEvent) => {
       importCsvText(loadEvent.target.result);
+      input.value = '';
     };
     reader.readAsText(file);
   };
@@ -211,6 +214,7 @@ export default function App() {
           handleFileUpload={handleFileUpload}
           isDemo={isDemo}
           isLoadingPrices={isLoadingPrices}
+          lastImportMeta={lastImportMeta}
           lastUpdate={lastUpdate}
           rawDataCount={rawData.length}
           setShowManager={setShowManager}

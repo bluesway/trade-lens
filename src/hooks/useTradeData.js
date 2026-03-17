@@ -14,7 +14,8 @@ import {
   guessMarket,
   normalizeQuoteCurrencyData,
   normalizeMarket,
-  parseCSV
+  parseCSV,
+  parseCSVWithMeta
 } from '../utils/helpers';
 import { DEFAULT_CSV, STOCK_MAPPING } from '../utils/constants';
 
@@ -57,6 +58,13 @@ const TREND_RANGE_MS_MAP = {
   半年: 180 * ONE_DAY,
   '1年': 365 * ONE_DAY,
   '5年': 5 * 365 * ONE_DAY
+};
+
+const CSV_REQUIRED_FIELD_LABELS = {
+  日期: { key: 'manager.fields.date', defaultValue: 'Date' },
+  類型: { key: 'manager.fields.type', defaultValue: 'Type' },
+  代號: { key: 'manager.fields.symbol', defaultValue: 'Symbol' },
+  數量: { key: 'manager.fields.quantity', defaultValue: 'Quantity' }
 };
 
 const getFxRateSymbols = (fromCurrency, toCurrency) => {
@@ -129,6 +137,7 @@ export function useTradeData(showToast) {
   const [trendTimeRange, setTrendTimeRange] = useState('全部');
   const [showManager, setShowManager] = useState(false);
   const [hideZeroHolding, setHideZeroHolding] = useState(false);
+  const [lastImportMeta, setLastImportMeta] = useState(null);
   const [expandedStock, setExpandedStock] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingStockSymbol, setEditingStockSymbol] = useState(null);
@@ -149,6 +158,7 @@ export function useTradeData(showToast) {
   };
   const resetToDemoData = () => {
     asyncStorage.remove(STORAGE_KEYS.dashboardData);
+    setLastImportMeta(null);
     setRawData(parseCSV(DEFAULT_CSV));
   };
   const persistManualData = (updatedManualStockData) => {
@@ -454,9 +464,36 @@ export function useTradeData(showToast) {
   };
 
   const importCsvText = (text) => {
-    const parsedData = parseCSV(text);
-    persistRawData(parsedData);
+    const { rows, meta } = parseCSVWithMeta(text);
+
+    if (!meta.ok) {
+      setLastImportMeta(null);
+
+      if (meta.errorCode === 'missingRequiredHeaders') {
+        const missingFieldLabels = meta.missingRequiredFields
+          .map((field) => CSV_REQUIRED_FIELD_LABELS[field])
+          .filter(Boolean)
+          .map(({ key, defaultValue }) => t(key, { defaultValue }))
+          .join(' / ');
+
+        showToast(t('messages.csvImportFailedHeaders', { fields: missingFieldLabels }));
+      } else {
+        showToast(t('messages.csvImportFailedNoData'));
+      }
+
+      return meta;
+    }
+
+    persistRawData(rows);
     setIsDemo(false);
+    setLastImportMeta(meta);
+    showToast(t('messages.csvImportSuccess', {
+      count: formatLocalizedNumber(meta.importedRowCount, activeLocale),
+      profile: meta.profileLabel,
+      delimiter: meta.delimiterLabel
+    }));
+
+    return meta;
   };
 
   const handleAddRecord = () => {
@@ -965,6 +1002,7 @@ export function useTradeData(showToast) {
     isAppLoaded,
     isDemo,
     isLoadingPrices,
+    lastImportMeta,
     lastUpdate,
     liveData,
     marketFilter,
