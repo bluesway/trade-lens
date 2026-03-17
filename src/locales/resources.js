@@ -141,7 +141,10 @@ const zhTW = {
       sbiTransactions: 'SBI 證券交易紀錄 CSV',
       sinopacTwTransactions: '永豐台股交易紀錄 CSV',
       fubonTwTransactions: '富邦台股交易紀錄 CSV',
-      futuTransactions: '富途 / moomoo 交易紀錄 CSV'
+      futuTransactions: '富途 / moomoo 交易紀錄 CSV',
+      monexTransactions: 'Monex 證券交易紀錄 CSV',
+      yuantaTwTransactions: '元大台股交易紀錄 CSV',
+      kgiTwTransactions: '凱基台股交易紀錄 CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -422,7 +425,10 @@ const yueHantHK = {
       sbiTransactions: 'SBI 證券交易紀錄 CSV',
       sinopacTwTransactions: '永豐台股交易紀錄 CSV',
       fubonTwTransactions: '富邦台股交易紀錄 CSV',
-      futuTransactions: '富途 / moomoo 交易紀錄 CSV'
+      futuTransactions: '富途 / moomoo 交易紀錄 CSV',
+      monexTransactions: 'Monex 證券交易紀錄 CSV',
+      yuantaTwTransactions: '元大台股交易紀錄 CSV',
+      kgiTwTransactions: '凱基台股交易紀錄 CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -703,7 +709,10 @@ const zhCN = {
       sbiTransactions: 'SBI 证券交易记录 CSV',
       sinopacTwTransactions: '永丰台股交易记录 CSV',
       fubonTwTransactions: '富邦台股交易记录 CSV',
-      futuTransactions: '富途 / moomoo 交易记录 CSV'
+      futuTransactions: '富途 / moomoo 交易记录 CSV',
+      monexTransactions: 'Monex 证券交易记录 CSV',
+      yuantaTwTransactions: '元大台股交易记录 CSV',
+      kgiTwTransactions: '凯基台股交易记录 CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -1180,7 +1189,10 @@ const enUS = {
       sbiTransactions: 'SBI Securities trades CSV',
       sinopacTwTransactions: 'Sinopac Taiwan trades CSV',
       fubonTwTransactions: 'Fubon Taiwan trades CSV',
-      futuTransactions: 'Futu / moomoo activity CSV'
+      futuTransactions: 'Futu / moomoo activity CSV',
+      monexTransactions: 'Monex Securities trades CSV',
+      yuantaTwTransactions: 'Yuanta Taiwan trades CSV',
+      kgiTwTransactions: 'KGI Taiwan trades CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -1461,7 +1473,10 @@ const enGB = {
       sbiTransactions: 'SBI Securities trades CSV',
       sinopacTwTransactions: 'Sinopac Taiwan trades CSV',
       fubonTwTransactions: 'Fubon Taiwan trades CSV',
-      futuTransactions: 'Futu / moomoo activity CSV'
+      futuTransactions: 'Futu / moomoo activity CSV',
+      monexTransactions: 'Monex Securities trades CSV',
+      yuantaTwTransactions: 'Yuanta Taiwan trades CSV',
+      kgiTwTransactions: 'KGI Taiwan trades CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -1785,7 +1800,10 @@ const jaJP = {
       sbiTransactions: 'SBI証券 取引履歴 CSV',
       sinopacTwTransactions: '永豊証券 台湾株取引 CSV',
       fubonTwTransactions: '富邦証券 台湾株取引 CSV',
-      futuTransactions: 'Futu / moomoo 取引履歴 CSV'
+      futuTransactions: 'Futu / moomoo 取引履歴 CSV',
+      monexTransactions: 'マネックス証券 取引履歴 CSV',
+      yuantaTwTransactions: '元大証券 台湾株取引 CSV',
+      kgiTwTransactions: 'KGI証券 台湾株取引 CSV'
     },
     csvDelimiters: {
       tab: 'tab'

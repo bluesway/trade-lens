@@ -17,13 +17,13 @@ const MARKET_DEFINITIONS = {
     translationKey: 'markets.all'
   },
   陸股: {
-    aliases: ['陸股', '中国', '中國', '中国a股', '中國a股', '中國股票', '中国股票', '中国株', '中國A股', '中国A股', 'china', 'chinaa', 'ashare', 'sse', 'szse', 'shanghai', 'shenzhen'],
+    aliases: ['陸股', '中国', '中國', '中国a股', '中國a股', '中國股票', '中国股票', '中国株', '中国株式', '中國A股', '中国A股', 'china', 'chinaa', 'ashare', 'sse', 'szse', 'shanghai', 'shenzhen'],
     currency: 'CNY',
     suffixes: ['.SS', '.SZ'],
     translationKey: 'markets.chinaA'
   },
   港股: {
-    aliases: ['港股', '香港', '香港股票', '香港株', 'hongkong', 'hk', 'hkex'],
+    aliases: ['港股', '香港', '香港股票', '香港株', '香港株式', 'hongkong', 'hk', 'hkex'],
     currency: 'HKD',
     defaultSuffix: '.HK',
     suffixes: ['.HK'],
@@ -37,7 +37,7 @@ const MARKET_DEFINITIONS = {
     translationKey: 'markets.taiwan'
   },
   日股: {
-    aliases: ['日股', '日本', '日本株', '日本株式', '国内株', '国内株式', 'japan', 'jp', 'tse', 'tokyo'],
+    aliases: ['日股', '日本', '日本股票', '日本株', '日本株式', '国内株', '国内株式', 'japan', 'jp', 'tse', 'tokyo'],
     currency: 'JPY',
     defaultSuffix: '.T',
     suffixes: ['.T'],
