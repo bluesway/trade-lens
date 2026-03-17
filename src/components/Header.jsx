@@ -111,181 +111,152 @@ export default function Header({
           defaultValue: 'Leave this on auto detect unless a specific broker export keeps getting guessed wrong. For most files, auto is the safest first shot.'
         })
   );
+  const liveStatus = isDemo && demoLastUpdate
+    ? {
+      badgeClass: 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-100 dark:border-amber-800',
+      markerClass: 'bg-amber-200/70 dark:bg-amber-500/20 text-amber-900 dark:text-amber-200',
+      label: 'Demo',
+      timestamp: demoLastUpdate,
+      title: showGregorianReference ? formatGregorianReferenceDateTime(demoLastUpdate) : t('header.demoDescription')
+    }
+    : !isDemo && lastUpdate
+      ? {
+        badgeClass: 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-800',
+        markerClass: 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-200',
+        label: 'Live',
+        timestamp: lastUpdate,
+        title: showGregorianReference ? formatGregorianReferenceDateTime(lastUpdate) : undefined
+      }
+      : null;
 
   return (
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <Activity className="text-blue-600" />
-          {t('header.title')}
-        </h1>
-        <div className="flex flex-col gap-2 md:flex-row md:items-center mt-2">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+    <div className="grid gap-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 xl:grid-cols-[minmax(0,1fr)_minmax(520px,1.08fr)]">
+      <div className="flex flex-col justify-between gap-5">
+        <div className="space-y-3">
+          <h1 className="flex items-start gap-3 text-2xl font-bold text-slate-900 dark:text-white xl:text-[2rem] xl:leading-tight">
+            <Activity className="mt-1 shrink-0 text-blue-600" />
+            <span>{t('header.title')}</span>
+          </h1>
+          <p className="max-w-2xl text-base leading-8 text-slate-500 dark:text-slate-400">
             {isDemo ? t('header.demoDescription') : t('header.recordsLoaded', { count: formatLocalizedNumber(rawDataCount, activeLocale) })}
           </p>
-          {isDemo && demoLastUpdate && (
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {liveStatus && (
             <span
-              className="text-xs bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 px-2.5 py-1 rounded-full flex items-center gap-1.5 w-fit font-medium border border-amber-100 dark:border-amber-800"
-              title={showGregorianReference ? formatGregorianReferenceDateTime(demoLastUpdate) : t('header.demoDescription')}
+              className={`inline-flex w-fit items-center gap-2 rounded-2xl border px-3 py-2 text-xs font-medium ${liveStatus.badgeClass}`}
+              title={liveStatus.title}
             >
               <Clock size={14} />
-              <span className="rounded-full bg-amber-200/70 dark:bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-900 dark:text-amber-200">
-                Demo
+              <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] ${liveStatus.markerClass}`}>
+                {liveStatus.label}
               </span>
-              {t('header.lastUpdated', { value: formatLocalizedDateTime(demoLastUpdate, activeLocale) })}
-            </span>
-          )}
-          {!isDemo && lastUpdate && (
-            <span
-              className="text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2.5 py-1 rounded-full flex items-center gap-1.5 w-fit font-medium border border-blue-100 dark:border-blue-800"
-              title={showGregorianReference ? formatGregorianReferenceDateTime(lastUpdate) : undefined}
-            >
-              <Clock size={14} />
-              {t('header.lastUpdated', { value: formatLocalizedDateTime(lastUpdate, activeLocale) })}
+              <span className="leading-5">
+                {t('header.lastUpdated', { value: formatLocalizedDateTime(liveStatus.timestamp, activeLocale) })}
+              </span>
             </span>
           )}
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <label
-          className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 shadow-sm"
-          title="Language"
-        >
-          <Languages size={16} className="text-blue-600 dark:text-blue-300" />
-          <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
-            Language
-          </span>
-          <select
-            value={activeLocale}
-            onChange={handleLocaleChange}
-            className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 outline-none"
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-center gap-3 xl:justify-end">
+          <label
+            className="flex min-w-[17rem] flex-1 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-800 xl:max-w-md xl:flex-none"
             title="Language"
           >
-            {SUPPORTED_LOCALES.map((locale) => (
-              <option key={locale.code} value={locale.code}>
-                {locale.nativeLabel}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <button
-          onClick={toggleDarkMode}
-          className="p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm"
-          title={darkMode ? t('header.switchToLight') : t('header.switchToDark')}
-        >
-          {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-        </button>
-
-        <button
-          onClick={() => setShowManager(!showManager)}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors shadow-sm ${
-            showManager
-              ? 'bg-slate-800 text-white'
-              : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
-          }`}
-        >
-          <Database size={18} />
-          <span className="hidden md:inline">{t('header.settingsRecords')}</span>
-        </button>
-
-        <button
-          onClick={() => fetchLivePrices(false)}
-          disabled={isLoadingPrices || rawDataCount === 0}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 ${
-            apiKey
-              ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
-              : 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40'
-          }`}
-          title={apiKey ? t('header.updateWithCache') : t('header.setApiKeyFirst')}
-        >
-          <RefreshCw size={18} className={isLoadingPrices ? 'animate-spin' : ''} />
-          <span className="hidden md:inline">{apiKey ? t('header.updatePrices') : t('header.apiKeyRequired')}</span>
-        </button>
-
-        <button
-          onClick={() => {
-            if (window.confirm(t('header.forceRefreshConfirm'))) {
-              fetchLivePrices(true);
-            }
-          }}
-          disabled={isLoadingPrices || rawDataCount === 0}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 ${
-            apiKey
-              ? 'bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-400'
-              : 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40'
-          }`}
-          title={apiKey ? t('header.forceRefreshTitle') : t('header.setApiKeyFirst')}
-        >
-          <Activity size={18} className={isLoadingPrices ? 'animate-pulse' : ''} />
-          <span className="hidden md:inline">{t('header.forceRefresh')}</span>
-        </button>
-
-        <div className="relative flex items-center gap-2">
-          <div className="flex flex-col gap-1">
-            <label
-              className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 shadow-sm"
-              title={importProfileLabel}
+            <Languages size={16} className="shrink-0 text-blue-600 dark:text-blue-300" />
+            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+              Language
+            </span>
+            <select
+              value={activeLocale}
+              onChange={handleLocaleChange}
+              className="min-w-0 flex-1 bg-transparent text-sm font-medium text-slate-700 outline-none dark:text-slate-200"
+              title="Language"
             >
-              <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
-                {importProfileLabel}
-              </span>
-              <select
-                value={csvImportProfile}
-                onChange={(event) => setCsvImportProfile(event.target.value)}
-                className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 outline-none max-w-52"
-                title={importProfileLabel}
-              >
-                {CSV_IMPORT_PROFILE_OPTION_GROUPS.map((group) => (
-                  <optgroup key={group.id} label={getLocalizedImportGroupLabel(group)}>
-                    {group.options.map((option) => (
-                      <option key={option.id} value={option.id}>
-                        {getLocalizedProfileLabel(option)}
-                      </option>
-                    ))}
-                  </optgroup>
-                ))}
-              </select>
-            </label>
+              {SUPPORTED_LOCALES.map((locale) => (
+                <option key={locale.code} value={locale.code}>
+                  {locale.nativeLabel}
+                </option>
+              ))}
+            </select>
+          </label>
 
-            <div className="hidden xl:flex items-center gap-2 pl-1">
-              {selectedImportProfileGroup && (
-                <span className="inline-flex items-center rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
-                  {getLocalizedImportGroupLabel(selectedImportProfileGroup)}
-                </span>
-              )}
-              {selectedImportProfileOption.presetKind !== 'auto' && (
-                <span className="inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-blue-600 dark:text-blue-300">
-                  {getLocalizedImportKindLabel(selectedImportProfileOption.importKind)}
-                </span>
-              )}
-            </div>
+          <button
+            onClick={toggleDarkMode}
+            className="rounded-xl border border-slate-200 bg-white p-2.5 text-slate-700 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+            title={darkMode ? t('header.switchToLight') : t('header.switchToDark')}
+          >
+            {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
 
-            <p className="hidden xl:block max-w-80 pl-1 text-[11px] leading-5 text-slate-500 dark:text-slate-400">
-              {importProfileHelperText}
-            </p>
-          </div>
+          <button
+            onClick={() => setShowManager(!showManager)}
+            className={`flex min-h-[3rem] items-center gap-2 rounded-xl px-4 py-2.5 font-medium transition-colors shadow-sm ${
+              showManager
+                ? 'bg-slate-800 text-white'
+                : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+            }`}
+          >
+            <Database size={18} />
+            <span>{t('header.settingsRecords')}</span>
+          </button>
+        </div>
 
-          <div className="relative group">
-            <div className="pointer-events-none absolute right-0 top-14 w-80 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-xl shadow-xl z-50 text-sm text-slate-600 dark:text-slate-300 opacity-0 invisible translate-y-1 transition-all duration-200 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:visible group-focus-within:translate-y-0">
-              <h4 className="font-bold text-slate-800 dark:text-slate-100 mb-2 border-b border-slate-200 dark:border-slate-700 pb-1 flex items-center gap-2">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <button
+            onClick={() => fetchLivePrices(false)}
+            disabled={isLoadingPrices || rawDataCount === 0}
+            className={`flex min-h-[3.25rem] items-center justify-center gap-2 rounded-xl px-4 py-3 font-medium transition-colors disabled:opacity-50 ${
+              apiKey
+                ? 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+                : 'bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:hover:bg-rose-900/40'
+            }`}
+            title={apiKey ? t('header.updateWithCache') : t('header.setApiKeyFirst')}
+          >
+            <RefreshCw size={18} className={isLoadingPrices ? 'animate-spin' : ''} />
+            <span>{apiKey ? t('header.updatePrices') : t('header.apiKeyRequired')}</span>
+          </button>
+
+          <button
+            onClick={() => {
+              if (window.confirm(t('header.forceRefreshConfirm'))) {
+                fetchLivePrices(true);
+              }
+            }}
+            disabled={isLoadingPrices || rawDataCount === 0}
+            className={`flex min-h-[3.25rem] items-center justify-center gap-2 rounded-xl px-4 py-3 font-medium transition-colors disabled:opacity-50 ${
+              apiKey
+                ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-900/50'
+                : 'bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:hover:bg-rose-900/40'
+            }`}
+            title={apiKey ? t('header.forceRefreshTitle') : t('header.setApiKeyFirst')}
+          >
+            <Activity size={18} className={isLoadingPrices ? 'animate-pulse' : ''} />
+            <span>{t('header.forceRefresh')}</span>
+          </button>
+
+          <div className="relative group sm:col-span-1">
+            <div className="pointer-events-none absolute right-0 top-14 z-50 w-80 translate-y-1 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 opacity-0 invisible shadow-xl transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+              <h4 className="mb-2 flex items-center gap-2 border-b border-slate-200 pb-1 font-bold text-slate-800 dark:border-slate-700 dark:text-slate-100">
                 <Info size={14} className="text-blue-500" />
                 {t('header.csvTitle')}
               </h4>
               <p className="mb-2 text-xs">{t('header.csvIntro')}</p>
-              <ul className="list-disc pl-5 space-y-1 text-xs font-mono bg-slate-50 dark:bg-slate-900/70 p-2 rounded">
+              <ul className="list-disc space-y-1 rounded bg-slate-50 p-2 pl-5 text-xs font-mono dark:bg-slate-900/70">
                 {csvRowKeys.map((rowKey) => (
                   <li key={rowKey}>{t(`header.csvRows.${rowKey}`)}</li>
                 ))}
               </ul>
-              <p className="mt-2 text-xs text-blue-600 dark:text-blue-400 font-medium">
+              <p className="mt-2 text-xs font-medium text-blue-600 dark:text-blue-400">
                 {t('header.csvNote1')}
               </p>
-              <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+              <p className="text-xs font-medium text-blue-600 dark:text-blue-400">
                 {t('header.csvNote2')}
               </p>
-              <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+              <p className="text-xs font-medium text-blue-600 dark:text-blue-400">
                 {t('header.csvNote3', {
                   defaultValue: '* Note 3: The app auto-detects common broker CSV layouts plus semicolon and tab-delimited files. After import, the detected layout shows up on the top right.'
                 })}
@@ -296,9 +267,9 @@ export default function Header({
               type="file"
               accept=".csv"
               onChange={handleFileUpload}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
             />
-            <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap relative">
+            <button className="flex min-h-[3.25rem] w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-medium text-white shadow-sm transition-colors hover:bg-blue-700">
               <Upload size={18} />
               {t('common.importCsv', { defaultValue: 'Import CSV' })}
             </button>
@@ -306,16 +277,59 @@ export default function Header({
 
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap"
+            className="flex min-h-[3.25rem] items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
           >
             <Download size={18} />
             {t('common.exportCsv', { defaultValue: 'Export CSV' })}
           </button>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-700 dark:bg-slate-800/60">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+                  {importProfileLabel}
+                </span>
+                {selectedImportProfileGroup && (
+                  <span className="inline-flex items-center rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500 shadow-sm dark:bg-slate-900 dark:text-slate-400">
+                    {getLocalizedImportGroupLabel(selectedImportProfileGroup)}
+                  </span>
+                )}
+                {selectedImportProfileOption.presetKind !== 'auto' && (
+                  <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-blue-600 dark:bg-blue-900/30 dark:text-blue-300">
+                    {getLocalizedImportKindLabel(selectedImportProfileOption.importKind)}
+                  </span>
+                )}
+              </div>
+
+              <p className="max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400">
+                {importProfileHelperText}
+              </p>
+            </div>
+
+            <select
+              value={csvImportProfile}
+              onChange={(event) => setCsvImportProfile(event.target.value)}
+              className="min-h-[2.875rem] w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 outline-none shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 lg:max-w-sm"
+              title={importProfileLabel}
+            >
+              {CSV_IMPORT_PROFILE_OPTION_GROUPS.map((group) => (
+                <optgroup key={group.id} label={getLocalizedImportGroupLabel(group)}>
+                  {group.options.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {getLocalizedProfileLabel(option)}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          </div>
 
           {lastImportMeta && (
-            <div className="relative hidden lg:block group">
+            <div className="relative mt-4 group">
               <div
-                className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium ${
+                className={`flex flex-wrap items-center gap-2 rounded-xl border px-3 py-2 text-xs font-medium ${
                   hasSkippedImportRows
                     ? 'border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300'
                     : 'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300'
@@ -339,8 +353,8 @@ export default function Header({
                 )}
               </div>
 
-              <div className="pointer-events-none absolute right-0 top-14 w-80 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-xl shadow-xl z-50 text-sm text-slate-600 dark:text-slate-300 opacity-0 invisible translate-y-1 transition-all duration-200 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:visible group-focus-within:translate-y-0">
-                <h4 className="font-bold text-slate-800 dark:text-slate-100 mb-3 border-b border-slate-200 dark:border-slate-700 pb-2 flex items-center gap-2">
+              <div className="pointer-events-none absolute left-0 top-[calc(100%+0.75rem)] z-50 w-80 translate-y-1 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 opacity-0 invisible shadow-xl transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 lg:left-auto lg:right-0">
+                <h4 className="mb-3 flex items-center gap-2 border-b border-slate-200 pb-2 font-bold text-slate-800 dark:border-slate-700 dark:text-slate-100">
                   <Info size={14} className="text-blue-500" />
                   {t('header.importSummaryTitle', { defaultValue: 'Last import' })}
                 </h4>
