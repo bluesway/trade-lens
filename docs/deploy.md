@@ -1,15 +1,21 @@
 # Deployment Guide
 
-This project is deployed on `${DEPLOY_USER}@${DEPLOY_HOST}` and served by `nginx` from:
+Fill in these placeholders for your own environment before running the commands below:
 
 ```bash
-${DEPLOY_APP_DIR}/dist
+DEPLOY_USER=<ssh-user>
+DEPLOY_HOST=<server-hostname>
+DEPLOY_APP_DIR=<absolute-path-to-repo>
+PUBLIC_URL=<https://your-domain.example>
 ```
 
-Public URL:
+Example:
 
 ```bash
-${PUBLIC_URL}
+DEPLOY_USER=deploy
+DEPLOY_HOST=app.example.com
+DEPLOY_APP_DIR=/srv/trade-lens
+PUBLIC_URL=https://trade-lens.example.com
 ```
 
 ## Recommended Release Flow
@@ -29,31 +35,31 @@ ${PUBLIC_URL}
 3. Sync the remote repo with a fast-forward pull.
 
    ```bash
-   ssh ${DEPLOY_USER}@${DEPLOY_HOST} 'cd ${DEPLOY_APP_DIR} && git pull --ff-only'
+   ssh "${DEPLOY_USER}@${DEPLOY_HOST}" "cd ${DEPLOY_APP_DIR} && git pull --ff-only"
    ```
 
 4. Reinstall dependencies only when `package.json` or `package-lock.json` changed.
 
    ```bash
-   ssh ${DEPLOY_USER}@${DEPLOY_HOST} 'cd ${DEPLOY_APP_DIR} && npm ci'
+   ssh "${DEPLOY_USER}@${DEPLOY_HOST}" "cd ${DEPLOY_APP_DIR} && npm ci"
    ```
 
 5. Build the production bundle on the server.
 
    ```bash
-   ssh ${DEPLOY_USER}@${DEPLOY_HOST} 'cd ${DEPLOY_APP_DIR} && npm run build'
+   ssh "${DEPLOY_USER}@${DEPLOY_HOST}" "cd ${DEPLOY_APP_DIR} && npm run build"
    ```
 
 6. Reload and verify `nginx`.
 
    ```bash
-   ssh ${DEPLOY_USER}@${DEPLOY_HOST} 'sudo systemctl reload nginx && systemctl status nginx --no-pager --lines=20'
+   ssh "${DEPLOY_USER}@${DEPLOY_HOST}" 'sudo systemctl reload nginx && systemctl status nginx --no-pager --lines=20'
    ```
 
 7. Run a smoke check against the live site.
 
    ```bash
-   ssh ${DEPLOY_USER}@${DEPLOY_HOST} 'curl -I -sS ${PUBLIC_URL} | head -n 5'
+   curl -I -sS "${PUBLIC_URL}" | head -n 5
    ```
 
 ## Zero-Regression Reminders
