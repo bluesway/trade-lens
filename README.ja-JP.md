@@ -8,15 +8,7 @@
   グローバル株の売買を、ローカル環境で安全に振り返れるプライバシー重視ダッシュボード。
 </p>
 
-<p align="center">
-  <a href="https://github.com/bluesway/trade-lens">繁體中文（台灣）</a>
-  ·
-  <a href="https://github.com/bluesway/trade-lens/blob/master/README.zh-CN.md">简体中文（中国）</a>
-  ·
-  <strong>日本語</strong>
-  ·
-  <a href="https://github.com/bluesway/trade-lens/blob/master/README.en-US.md">English (US)</a>
-</p>
+[繁體中文（台灣）](README.md) · [简体中文（中国）](README.zh-CN.md) · **日本語** · [English (US)](README.en-US.md)
 
 <p align="center">
   <a href="https://react.dev/">
@@ -86,4 +78,4 @@
 
 ## ライセンス
 
-本プロジェクトは **MIT License** の下で提供されています。詳細は [`LICENSE`](https://github.com/bluesway/trade-lens/blob/master/LICENSE) をご確認ください。
+本プロジェクトは **MIT License** の下で提供されています。詳細は [`LICENSE`](LICENSE) をご確認ください。

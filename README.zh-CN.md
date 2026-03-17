@@ -8,15 +8,7 @@
   面向全球股票投资者的隐私优先交易面板，把券商 CSV 变成一眼能看懂的持仓全貌。
 </p>
 
-<p align="center">
-  <a href="https://github.com/bluesway/trade-lens">繁體中文（台灣）</a>
-  ·
-  <strong>简体中文（中国）</strong>
-  ·
-  <a href="https://github.com/bluesway/trade-lens/blob/master/README.ja-JP.md">日本語</a>
-  ·
-  <a href="https://github.com/bluesway/trade-lens/blob/master/README.en-US.md">English (US)</a>
-</p>
+[繁體中文（台灣）](README.md) · **简体中文（中国）** · [日本語](README.ja-JP.md) · [English (US)](README.en-US.md)
 
 <p align="center">
   <a href="https://react.dev/">
@@ -86,4 +78,4 @@
 
 ## 许可协议
 
-本项目基于 **MIT License** 发布，详见 [`LICENSE`](https://github.com/bluesway/trade-lens/blob/master/LICENSE)。
+本项目基于 **MIT License** 发布，详见 [`LICENSE`](LICENSE)。

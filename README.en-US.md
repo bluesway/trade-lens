@@ -8,15 +8,7 @@
   Private portfolio analytics for investors who trade across borders.
 </p>
 
-<p align="center">
-  <a href="https://github.com/bluesway/trade-lens">繁體中文（台灣）</a>
-  ·
-  <a href="https://github.com/bluesway/trade-lens/blob/master/README.zh-CN.md">简体中文（中国）</a>
-  ·
-  <a href="https://github.com/bluesway/trade-lens/blob/master/README.ja-JP.md">日本語</a>
-  ·
-  <strong>English (US)</strong>
-</p>
+[繁體中文（台灣）](README.md) · [简体中文（中国）](README.zh-CN.md) · [日本語](README.ja-JP.md) · **English (US)**
 
 <p align="center">
   <a href="https://react.dev/">
@@ -86,4 +78,4 @@
 
 ## License
 
-Distributed under the **MIT License**. See [`LICENSE`](https://github.com/bluesway/trade-lens/blob/master/LICENSE) for details.
+Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.

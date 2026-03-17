@@ -8,15 +8,7 @@
   隱私優先的全球股票交易儀表板，把券商 CSV 變成看得懂的持股全貌。
 </p>
 
-<p align="center">
-  <strong>繁體中文（台灣）</strong>
-  ·
-  <a href="https://github.com/bluesway/trade-lens/blob/master/README.zh-CN.md">简体中文（中国）</a>
-  ·
-  <a href="https://github.com/bluesway/trade-lens/blob/master/README.ja-JP.md">日本語</a>
-  ·
-  <a href="https://github.com/bluesway/trade-lens/blob/master/README.en-US.md">English (US)</a>
-</p>
+**繁體中文（台灣）** · [简体中文（中国）](README.zh-CN.md) · [日本語](README.ja-JP.md) · [English (US)](README.en-US.md)
 
 <p align="center">
   <a href="https://react.dev/">
@@ -77,9 +69,9 @@
 
 ### 其他語言文件
 
-- 简体中文（中国）：[`README.zh-CN.md`](https://github.com/bluesway/trade-lens/blob/master/README.zh-CN.md)
-- 日本語：[`README.ja-JP.md`](https://github.com/bluesway/trade-lens/blob/master/README.ja-JP.md)
-- English (US)：[`README.en-US.md`](https://github.com/bluesway/trade-lens/blob/master/README.en-US.md)
+- 简体中文（中国）：[`README.zh-CN.md`](README.zh-CN.md)
+- 日本語：[`README.ja-JP.md`](README.ja-JP.md)
+- English (US)：[`README.en-US.md`](README.en-US.md)
 
 ### 維運文件
 
@@ -96,4 +88,4 @@
 
 ## 授權條款
 
-本專案採 **MIT License** 授權，詳見 [`LICENSE`](https://github.com/bluesway/trade-lens/blob/master/LICENSE)。
+本專案採 **MIT License** 授權，詳見 [`LICENSE`](LICENSE)。
