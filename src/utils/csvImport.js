@@ -56,7 +56,7 @@ const SORTED_BUY_TYPE_TERMS = [...BUY_TYPE_TERMS].sort((a, b) => b.length - a.le
 const SORTED_SELL_TYPE_TERMS = [...SELL_TYPE_TERMS].sort((a, b) => b.length - a.length);
 
 const STANDARD_HEADER_ALIASES = {
-  日期: ['日期', '交易日期', '成交日期', '成交時間', '交易時間', 'Date', 'Date/Time', 'Trade Date', 'Trade Time', 'Execution Time', 'Tanggal', 'Tarikh', 'Ngày', 'Ngày giao dịch', 'Date opération', 'Date de transaction', 'Fecha', 'Fecha de operación', 'Fecha de transacción', 'Data', 'Data operação', 'Datum', 'Handelsdatum', 'Data di negoziazione', '日付', '取引日', '約定日', '受渡日', 'التاريخ', 'วันที่', 'วันที่ซื้อขาย', '날짜', '거래일', '체결일'],
+  日期: ['日期', '交易日期', '成交日期', '成交時間', '交易時間', 'Date', 'Date/Time', 'Trade Date', 'Trade Time', 'Execution Time', 'Filled Time', 'Placed Time', 'Run Date', 'Settlement Date', 'Activity Date', 'Transaction Date', 'Tanggal', 'Tarikh', 'Ngày', 'Ngày giao dịch', 'Date opération', 'Date de transaction', 'Fecha', 'Fecha de operación', 'Fecha de transacción', 'Data', 'Data operação', 'Datum', 'Handelsdatum', 'Data di negoziazione', '日付', '取引日', '約定日', '受渡日', 'التاريخ', 'วันที่', 'วันที่ซื้อขาย', '날짜', '거래일', '체결일'],
   類型: ['類型', '交易類別', '交易類型', '交易方向', '買賣別', '買賣', '交易別', '動作', 'Type', 'Action', 'Transaction', 'Activity', 'Trade Type', 'Side', 'Jenis', 'Loại', 'Giao dịch', 'Type d\'ordre', 'Ordre', 'Tipo', 'Tipo de orden', 'Operación', 'Transacción', 'Tipo de operação', 'Operação', 'Auftragstyp', 'Transaktionstyp', 'Art', 'Ordine', 'Operazione', 'Ordertype', 'Transactie', '区分', '種類', '売買区分', '売買', '取引', '取引区分', 'النوع', 'الإجراء', 'ประเภท', 'ฝั่ง', 'สถานะ', '구분', '유형', '매매구분'],
   代號: ['代號', '股票代號', '代碼', '股號', '商品代號', '證券代號', '證券代碼', '證券編號', '股票編號', '股票代码', '證券コード', 'Symbol', 'Ticker', 'Stock Code', 'Simbol', 'Kode', 'Kod', 'Símbolo', 'Código', 'Código bursátil', 'Mã', 'Mã CK', 'Mã chứng khoán', 'Symbole', 'Code valeur', 'Wertpapier', 'Ticker-Symbol', 'Simbolo', 'Codice', 'Codice titolo', 'Symbool', '銘柄コード', 'コード', 'ティッカー', '銘柄番号', 'الرمز', 'สัญลักษณ์', 'ชื่อย่อ', 'ticker', '종목코드', '종목', '티커'],
   市場: ['市場', '市場別', '市場名稱', '市場名称', '市場區別', '市場区分', '交易所', 'Market', 'Exchange', 'Pasar', 'Pasaran', 'Thị trường', 'Marché', 'Place de marché', 'Mercado', 'Bolsa', 'Markt', 'Börse', 'Mercato', 'Beurs', '取引所', 'السوق', 'البورصة', 'ตลาด', '시장'],
@@ -70,8 +70,9 @@ const STANDARD_HEADER_ALIASES = {
   每股成本: ['Cost per Share', 'Cost/Share', 'Share Cost', 'Share/Contract Cost', 'Cost Price', 'Average Cost'],
   市值: ['Market Value', 'Position Value', 'Value'],
   開倉日: ['Open Date', 'Open'],
-  帳戶類型: ['Account Type', '口座区分', '口座種別'],
-  手續費: ['Comm/Fee', 'Commission', 'Comm/Tax', 'Total Commission', 'Fee', 'Fees', '手續費', '手续费', '佣金', '手数料']
+  帳戶類型: ['Account Type', 'Account', 'Account Name', 'Account Number', 'Portfolio', '口座区分', '口座種別'],
+  手續費: ['Comm/Fee', 'Commission', 'Comm/Tax', 'Total Commission', 'Fee', 'Fees', '手續費', '手续费', '佣金', '手数料'],
+  幣別: ['Currency', 'Trade Currency', 'Settlement Currency', 'Account Currency', '交收貨幣', '幣別', '币别', '通貨']
 };
 
 const REQUIRED_STANDARD_FIELDS = ['日期', '類型', '代號', '數量'];
@@ -467,6 +468,23 @@ const CSV_IMPORT_PROFILES = [
     }
   },
   {
+    id: 'president-tw-transactions',
+    label: 'President Securities Taiwan trades',
+    translationKey: 'header.csvProfiles.presidentTwTransactions',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
+    preferredDecimalSeparator: '.',
+    signatureHeaders: {
+      日期: ['成交日期', '交易日期'],
+      類型: ['買賣別'],
+      代號: ['股票代號', '股號'],
+      數量: ['成交股數', '股數'],
+      單價: ['成交價', '成交價格'],
+      總金額: ['應收付金額', '交割金額', '成交金額'],
+      說明: ['股票名稱', '股名']
+    }
+  },
+  {
     id: 'matsui-transactions',
     label: 'Matsui Securities trades',
     translationKey: 'header.csvProfiles.matsuiTransactions',
@@ -481,6 +499,115 @@ const CSV_IMPORT_PROFILES = [
       單價: ['取得単価', '約定単価', '単価'],
       總金額: ['取得金額', '受渡金額', '約定代金'],
       說明: ['銘柄名']
+    }
+  },
+  {
+    id: 'fidelity-transactions',
+    label: 'Fidelity history',
+    translationKey: 'header.csvProfiles.fidelityTransactions',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
+    preferredDecimalSeparator: '.',
+    signatureHeaders: {
+      日期: ['Run Date', 'Settlement Date'],
+      類型: ['Action'],
+      代號: ['Symbol'],
+      數量: ['Quantity'],
+      單價: ['Price', 'Price ($)'],
+      總金額: ['Amount', 'Amount ($)'],
+      帳戶類型: ['Account'],
+      說明: ['Security Description', 'Description']
+    }
+  },
+  {
+    id: 'webull-transactions',
+    label: 'Webull orders',
+    translationKey: 'header.csvProfiles.webullTransactions',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
+    preferredDecimalSeparator: '.',
+    signatureHeaders: {
+      日期: ['Filled Time', 'Placed Time', 'Date/Time'],
+      類型: ['Side', 'Action'],
+      代號: ['Symbol'],
+      數量: ['Filled Qty', 'Quantity'],
+      單價: ['Avg. Price', 'Avg Price', 'Average Price'],
+      總金額: ['Filled Amount', 'Amount'],
+      說明: ['Ticker Name', 'Description']
+    }
+  },
+  {
+    id: 'wealthsimple-activities',
+    label: 'Wealthsimple activities',
+    translationKey: 'header.csvProfiles.wealthsimpleActivities',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
+    preferredDecimalSeparator: '.',
+    signatureHeaders: {
+      日期: ['Date', 'Activity Date'],
+      類型: ['Activity', 'Action'],
+      代號: ['Symbol', 'Ticker'],
+      數量: ['Quantity', 'Units'],
+      單價: ['Price', 'Price per share'],
+      總金額: ['Amount', 'Value'],
+      帳戶類型: ['Account', 'Account Name'],
+      幣別: ['Currency']
+    }
+  },
+  {
+    id: 'wealthsimple-holdings',
+    label: 'Wealthsimple holdings',
+    translationKey: 'header.csvProfiles.wealthsimpleHoldings',
+    importKind: 'positions',
+    requiredFields: ['代號', '數量'],
+    preferredDecimalSeparator: '.',
+    signatureHeaders: {
+      代號: ['Symbol', 'Ticker'],
+      數量: ['Quantity', 'Units'],
+      單價: ['Current Price', 'Price'],
+      每股成本: ['Average Cost', 'Average cost'],
+      成本基礎: ['Book Value', 'Cost Basis'],
+      市值: ['Market Value', 'Current Value'],
+      帳戶類型: ['Account', 'Account Name'],
+      幣別: ['Currency'],
+      說明: ['Security', 'Holding']
+    }
+  },
+  {
+    id: 'questrade-transactions',
+    label: 'Questrade activity',
+    translationKey: 'header.csvProfiles.questradeTransactions',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
+    preferredDecimalSeparator: '.',
+    signatureHeaders: {
+      日期: ['Transaction Date', 'Settlement Date'],
+      類型: ['Action', 'Activity Type'],
+      代號: ['Symbol', 'Ticker'],
+      數量: ['Quantity'],
+      單價: ['Price', 'Price Per Share'],
+      總金額: ['Net Amount', 'Gross Amount'],
+      手續費: ['Commission'],
+      幣別: ['Currency'],
+      說明: ['Description', 'Security']
+    }
+  },
+  {
+    id: 'hk-statement-transactions',
+    label: 'Hong Kong broker statement',
+    translationKey: 'header.csvProfiles.hkStatementTransactions',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
+    preferredDecimalSeparator: '.',
+    signatureHeaders: {
+      日期: ['交易日期', 'Trade Date'],
+      類型: ['買賣', '交易方向', 'Buy/Sell'],
+      代號: ['股票編號', '證券代碼', 'Stock Code'],
+      數量: ['成交股數', '股數', '成交股數/張數'],
+      單價: ['平均價', '成交均價', 'Average Price'],
+      總金額: ['淨交收金額', '結算金額', 'Net Settlement Amount'],
+      幣別: ['交收貨幣', 'Currency'],
+      說明: ['證券名稱', 'Stock Name']
     }
   }
 ];
@@ -770,6 +897,26 @@ const resolveCanonicalMarket = (rawValue) => {
 const inferSymbolMarket = (rawSymbol) => {
   const normalizedSymbol = String(rawSymbol || '').trim().toUpperCase();
 
+  if (/\.HK$/.test(normalizedSymbol)) {
+    return '港股';
+  }
+
+  if (/\.TWO?$/.test(normalizedSymbol)) {
+    return '台股';
+  }
+
+  if (/\.T$/.test(normalizedSymbol)) {
+    return '日股';
+  }
+
+  if (/\.SS$|\.SZ$/.test(normalizedSymbol)) {
+    return '陸股';
+  }
+
+  if (/\.TO$|\.V$|\.CN$|\.NE$/.test(normalizedSymbol)) {
+    return '加拿大股';
+  }
+
   if (/^\d{6}$/.test(normalizedSymbol) && (normalizedSymbol.startsWith('6') || normalizedSymbol.startsWith('0'))) {
     return '陸股';
   }
@@ -787,6 +934,25 @@ const inferSymbolMarket = (rawSymbol) => {
   }
 
   return '';
+};
+
+const CURRENCY_MARKET_HINTS = {
+  CAD: '加拿大股',
+  CNY: '陸股',
+  CNH: '陸股',
+  HKD: '港股',
+  JPY: '日股',
+  TWD: '台股',
+  USD: '美股'
+};
+
+const inferMarketFromCurrency = (rawCurrency) => {
+  const normalizedCurrency = String(rawCurrency || '')
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z]/g, '');
+
+  return CURRENCY_MARKET_HINTS[normalizedCurrency] || '';
 };
 
 const normalizeBrokerSymbolForMarket = (rawSymbol, market) => {
@@ -1216,9 +1382,101 @@ const normalizeKgiTransactionRow = (rawRow, preferredDecimalSeparator) => normal
   }
 );
 
+const normalizePresidentTransactionRow = (rawRow, preferredDecimalSeparator) => normalizeBrokerTransactionRow(
+  prepareBrokerRow(rawRow, {
+    defaultMarket: '台股'
+  }),
+  preferredDecimalSeparator,
+  {
+    includeFeesInBuyCost: true
+  }
+);
+
 const normalizeMatsuiTransactionRow = (rawRow, preferredDecimalSeparator) => normalizeBrokerTransactionRow(
   prepareBrokerRow(rawRow, {
     resolveMarket: (sourceRow, explicitMarket) => explicitMarket || inferSymbolMarket(sourceRow['代號'])
+  }),
+  preferredDecimalSeparator,
+  {
+    includeFeesInBuyCost: true
+  }
+);
+
+const normalizeFidelityTransactionRow = (rawRow, preferredDecimalSeparator) => normalizeBrokerTransactionRow(
+  prepareBrokerRow(rawRow, {
+    resolveMarket: (sourceRow, explicitMarket) => (
+      explicitMarket
+      || inferMarketFromCurrency(sourceRow['幣別'])
+      || inferSymbolMarket(sourceRow['代號'])
+    )
+  }),
+  preferredDecimalSeparator,
+  {
+    includeFeesInBuyCost: true
+  }
+);
+
+const normalizeWebullTransactionRow = (rawRow, preferredDecimalSeparator) => normalizeBrokerTransactionRow(
+  prepareBrokerRow(rawRow, {
+    resolveMarket: (sourceRow, explicitMarket) => (
+      explicitMarket
+      || inferMarketFromCurrency(sourceRow['幣別'])
+      || inferSymbolMarket(sourceRow['代號'])
+    )
+  }),
+  preferredDecimalSeparator,
+  {
+    includeFeesInBuyCost: true
+  }
+);
+
+const normalizeWealthsimpleActivityRow = (rawRow, preferredDecimalSeparator) => normalizeBrokerTransactionRow(
+  prepareBrokerRow(rawRow, {
+    resolveMarket: (sourceRow, explicitMarket) => (
+      explicitMarket
+      || inferMarketFromCurrency(sourceRow['幣別'])
+      || inferSymbolMarket(sourceRow['代號'])
+    )
+  }),
+  preferredDecimalSeparator,
+  {
+    includeFeesInBuyCost: true
+  }
+);
+
+const normalizeWealthsimpleHoldingRow = (rawRow, preferredDecimalSeparator) => normalizePositionRow(
+  prepareBrokerRow(rawRow, {
+    resolveMarket: (sourceRow, explicitMarket) => (
+      explicitMarket
+      || inferMarketFromCurrency(sourceRow['幣別'])
+      || inferSymbolMarket(sourceRow['代號'])
+    )
+  }),
+  preferredDecimalSeparator
+);
+
+const normalizeQuestradeTransactionRow = (rawRow, preferredDecimalSeparator) => normalizeBrokerTransactionRow(
+  prepareBrokerRow(rawRow, {
+    resolveMarket: (sourceRow, explicitMarket) => (
+      explicitMarket
+      || inferMarketFromCurrency(sourceRow['幣別'])
+      || inferSymbolMarket(sourceRow['代號'])
+    )
+  }),
+  preferredDecimalSeparator,
+  {
+    includeFeesInBuyCost: true
+  }
+);
+
+const normalizeHongKongStatementRow = (rawRow, preferredDecimalSeparator) => normalizeBrokerTransactionRow(
+  prepareBrokerRow(rawRow, {
+    resolveMarket: (sourceRow, explicitMarket) => (
+      explicitMarket
+      || inferMarketFromCurrency(sourceRow['幣別'])
+      || inferSymbolMarket(sourceRow['代號'])
+      || '港股'
+    )
   }),
   preferredDecimalSeparator,
   {
@@ -1250,8 +1508,22 @@ const normalizeRowForProfile = (rawRow, profile, preferredDecimalSeparator) => {
       return normalizeYuantaTransactionRow(rawRow, preferredDecimalSeparator);
     case 'kgi-tw-transactions':
       return normalizeKgiTransactionRow(rawRow, preferredDecimalSeparator);
+    case 'president-tw-transactions':
+      return normalizePresidentTransactionRow(rawRow, preferredDecimalSeparator);
     case 'matsui-transactions':
       return normalizeMatsuiTransactionRow(rawRow, preferredDecimalSeparator);
+    case 'fidelity-transactions':
+      return normalizeFidelityTransactionRow(rawRow, preferredDecimalSeparator);
+    case 'webull-transactions':
+      return normalizeWebullTransactionRow(rawRow, preferredDecimalSeparator);
+    case 'wealthsimple-activities':
+      return normalizeWealthsimpleActivityRow(rawRow, preferredDecimalSeparator);
+    case 'wealthsimple-holdings':
+      return normalizeWealthsimpleHoldingRow(rawRow, preferredDecimalSeparator);
+    case 'questrade-transactions':
+      return normalizeQuestradeTransactionRow(rawRow, preferredDecimalSeparator);
+    case 'hk-statement-transactions':
+      return normalizeHongKongStatementRow(rawRow, preferredDecimalSeparator);
     default:
       return profile?.importKind === 'positions'
         ? normalizePositionRow(rawRow, preferredDecimalSeparator)

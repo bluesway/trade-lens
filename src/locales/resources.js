@@ -145,7 +145,14 @@ const zhTW = {
       monexTransactions: 'Monex 證券交易紀錄 CSV',
       yuantaTwTransactions: '元大台股交易紀錄 CSV',
       kgiTwTransactions: '凱基台股交易紀錄 CSV',
-      matsuiTransactions: '松井證券交易紀錄 CSV'
+      presidentTwTransactions: '統一台股交易紀錄 CSV',
+      matsuiTransactions: '松井證券交易紀錄 CSV',
+      fidelityTransactions: 'Fidelity 歷史紀錄 CSV',
+      webullTransactions: 'Webull 訂單紀錄 CSV',
+      wealthsimpleActivities: 'Wealthsimple 交易活動 CSV',
+      wealthsimpleHoldings: 'Wealthsimple 持倉快照 CSV',
+      questradeTransactions: 'Questrade 交易活動 CSV',
+      hkStatementTransactions: '香港券商交易紀錄 CSV（first-pass）'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -430,7 +437,14 @@ const yueHantHK = {
       monexTransactions: 'Monex 證券交易紀錄 CSV',
       yuantaTwTransactions: '元大台股交易紀錄 CSV',
       kgiTwTransactions: '凱基台股交易紀錄 CSV',
-      matsuiTransactions: '松井證券交易紀錄 CSV'
+      presidentTwTransactions: '統一台股交易紀錄 CSV',
+      matsuiTransactions: '松井證券交易紀錄 CSV',
+      fidelityTransactions: 'Fidelity 歷史紀錄 CSV',
+      webullTransactions: 'Webull 訂單紀錄 CSV',
+      wealthsimpleActivities: 'Wealthsimple 交易活動 CSV',
+      wealthsimpleHoldings: 'Wealthsimple 持倉快照 CSV',
+      questradeTransactions: 'Questrade 交易活動 CSV',
+      hkStatementTransactions: '香港券商交易紀錄 CSV（first-pass）'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -715,7 +729,14 @@ const zhCN = {
       monexTransactions: 'Monex 证券交易记录 CSV',
       yuantaTwTransactions: '元大台股交易记录 CSV',
       kgiTwTransactions: '凯基台股交易记录 CSV',
-      matsuiTransactions: '松井证券交易记录 CSV'
+      presidentTwTransactions: '统一台股交易记录 CSV',
+      matsuiTransactions: '松井证券交易记录 CSV',
+      fidelityTransactions: 'Fidelity 历史记录 CSV',
+      webullTransactions: 'Webull 订单记录 CSV',
+      wealthsimpleActivities: 'Wealthsimple 交易活动 CSV',
+      wealthsimpleHoldings: 'Wealthsimple 持仓快照 CSV',
+      questradeTransactions: 'Questrade 交易活动 CSV',
+      hkStatementTransactions: '香港券商交易记录 CSV（first-pass）'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -1196,7 +1217,14 @@ const enUS = {
       monexTransactions: 'Monex Securities trades CSV',
       yuantaTwTransactions: 'Yuanta Taiwan trades CSV',
       kgiTwTransactions: 'KGI Taiwan trades CSV',
-      matsuiTransactions: 'Matsui Securities trades CSV'
+      presidentTwTransactions: 'President Securities Taiwan trades CSV',
+      matsuiTransactions: 'Matsui Securities trades CSV',
+      fidelityTransactions: 'Fidelity history CSV',
+      webullTransactions: 'Webull orders CSV',
+      wealthsimpleActivities: 'Wealthsimple activities CSV',
+      wealthsimpleHoldings: 'Wealthsimple holdings CSV',
+      questradeTransactions: 'Questrade activity CSV',
+      hkStatementTransactions: 'Hong Kong broker statement CSV (first-pass)'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -1481,7 +1509,14 @@ const enGB = {
       monexTransactions: 'Monex Securities trades CSV',
       yuantaTwTransactions: 'Yuanta Taiwan trades CSV',
       kgiTwTransactions: 'KGI Taiwan trades CSV',
-      matsuiTransactions: 'Matsui Securities trades CSV'
+      presidentTwTransactions: 'President Securities Taiwan trades CSV',
+      matsuiTransactions: 'Matsui Securities trades CSV',
+      fidelityTransactions: 'Fidelity history CSV',
+      webullTransactions: 'Webull orders CSV',
+      wealthsimpleActivities: 'Wealthsimple activities CSV',
+      wealthsimpleHoldings: 'Wealthsimple holdings CSV',
+      questradeTransactions: 'Questrade activity CSV',
+      hkStatementTransactions: 'Hong Kong broker statement CSV (first-pass)'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -1809,7 +1844,14 @@ const jaJP = {
       monexTransactions: 'マネックス証券 取引履歴 CSV',
       yuantaTwTransactions: '元大証券 台湾株取引 CSV',
       kgiTwTransactions: 'KGI証券 台湾株取引 CSV',
-      matsuiTransactions: '松井証券 取引履歴 CSV'
+      presidentTwTransactions: '統一証券 台湾株取引 CSV',
+      matsuiTransactions: '松井証券 取引履歴 CSV',
+      fidelityTransactions: 'Fidelity 取引履歴 CSV',
+      webullTransactions: 'Webull 注文履歴 CSV',
+      wealthsimpleActivities: 'Wealthsimple 取引アクティビティ CSV',
+      wealthsimpleHoldings: 'Wealthsimple 保有残高 CSV',
+      questradeTransactions: 'Questrade 取引アクティビティ CSV',
+      hkStatementTransactions: '香港証券会社 取引CSV（first-pass）'
     },
     csvDelimiters: {
       tab: 'tab'
