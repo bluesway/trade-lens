@@ -48,6 +48,7 @@ const DEFAULT_NEW_RECORD = {
 
 const ONE_DAY = 24 * 60 * 60 * 1000;
 const FX_BRIDGE_CURRENCY = 'USD';
+const POSITION_EPSILON = 0.0000001;
 const TREND_RANGE_MS_MAP = {
   '1週': 7 * ONE_DAY,
   '1月': 30 * ONE_DAY,
@@ -84,6 +85,220 @@ const getFxRateSymbols = (fromCurrency, toCurrency) => {
 };
 
 const getNumericValue = (value) => parseFloat(String(value || '0').replace(/[^0-9.-]+/g, '')) || 0;
+
+const getOptionalNumericValue = (value) => {
+  const sanitizedValue = String(value ?? '')
+    .replace(/[^0-9.-]+/g, '')
+    .trim();
+
+  if (!sanitizedValue || /^-?\.?$/.test(sanitizedValue)) {
+    return null;
+  }
+
+  const parsedValue = Number.parseFloat(sanitizedValue);
+  return Number.isFinite(parsedValue) ? parsedValue : null;
+};
+
+const formatNumericValue = (value, maxFractionDigits = 8) => {
+  if (!Number.isFinite(value)) {
+    return '';
+  }
+
+  return value
+    .toFixed(maxFractionDigits)
+    .replace(/\.?0+$/, '');
+};
+
+const hasMeaningfulValue = (value) => Number.isFinite(value) && Math.abs(value) > POSITION_EPSILON;
+
+const getTradeTimestamp = (dateValue) => {
+  const parsedDate = new Date(dateValue || 0);
+  const timestamp = parsedDate.getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+};
+
+const sortTradeRowsChronologically = (rows) => [...rows].sort((a, b) => {
+  const timestampDifference = getTradeTimestamp(a.row?.['日期']) - getTradeTimestamp(b.row?.['日期']);
+  if (timestampDifference !== 0) {
+    return timestampDifference;
+  }
+
+  return a.originalIndex - b.originalIndex;
+});
+
+const calculateOpenPositionMetrics = (openLots) => openLots.reduce(
+  (accumulator, lot) => ({
+    holdingQty: accumulator.holdingQty + (lot.side * lot.quantity),
+    netCostOriginal: accumulator.netCostOriginal + (lot.side * lot.quantity * lot.unitPrice),
+    holdingCostOriginal: accumulator.holdingCostOriginal + (lot.quantity * lot.unitPrice)
+  }),
+  {
+    holdingQty: 0,
+    netCostOriginal: 0,
+    holdingCostOriginal: 0
+  }
+);
+
+const buildFallbackResolvedTradeRow = (row, originalIndex) => ({
+  ...row,
+  originalIndex,
+  __market: resolveMarket(row['代號'], row['市場']),
+  __symbol: '',
+  __currency: '',
+  __quantityValue: getNumericValue(row['數量']),
+  __priceValue: getNumericValue(row['單價']),
+  __amountValue: getNumericValue(row['總金額']),
+  __computedPnlOriginal: 0,
+  __resolvedPnlOriginal: getOptionalNumericValue(row['損益']) ?? 0,
+  __closedCostOriginal: 0,
+  __closedQuantity: 0,
+  __matchedLongSoldQty: 0,
+  __matchedLongSoldCostOriginal: 0,
+  __holdingQtyAfter: 0,
+  __netOpenCostOriginalAfter: 0,
+  __holdingCostOriginalAfter: 0,
+  __hasDerivedPnl: false,
+  __hasProvidedPnl: getOptionalNumericValue(row['損益']) !== null
+});
+
+const buildResolvedTradeRows = (rows) => {
+  const openLotsBySymbol = new Map();
+  const resolvedByOriginalIndex = new Map();
+  const chronologicalResolvedRows = [];
+  const rowsWithIndex = rows.map((row, originalIndex) => ({ row, originalIndex }));
+
+  sortTradeRowsChronologically(rowsWithIndex).forEach(({ row, originalIndex }) => {
+    const rawCode = String(row['代號'] || '').trim();
+    const type = row['類型'];
+
+    if (!rawCode || (type !== '買入' && type !== '賣出')) {
+      const fallbackRow = buildFallbackResolvedTradeRow(row, originalIndex);
+      resolvedByOriginalIndex.set(originalIndex, fallbackRow);
+      chronologicalResolvedRows.push(fallbackRow);
+      return;
+    }
+
+    const market = resolveMarket(rawCode, row['市場']);
+    const symbol = formatSymbol(rawCode, market);
+    const currency = getCurrencyBySymbolOrMarket(symbol, market);
+    const quantityValue = Math.abs(getNumericValue(row['數量']));
+    const priceFromRow = getNumericValue(row['單價']);
+    const amountFromRow = Math.abs(getNumericValue(row['總金額']));
+    const unitPrice = hasMeaningfulValue(priceFromRow)
+      ? priceFromRow
+      : (hasMeaningfulValue(quantityValue) ? amountFromRow / quantityValue : 0);
+    const amountValue = hasMeaningfulValue(amountFromRow)
+      ? amountFromRow
+      : quantityValue * unitPrice;
+    const rawPnlText = String(row['損益'] ?? '').trim();
+    const parsedProvidedPnl = getOptionalNumericValue(rawPnlText);
+    const hasProvidedPnl = parsedProvidedPnl !== null;
+    const openLots = openLotsBySymbol.get(symbol) || [];
+
+    let remainingQuantity = quantityValue;
+    let computedPnlOriginal = 0;
+    let closedCostOriginal = 0;
+    let closedQuantity = 0;
+    let matchedLongSoldQty = 0;
+    let matchedLongSoldCostOriginal = 0;
+
+    if (type === '買入') {
+      while (remainingQuantity > POSITION_EPSILON && openLots[0]?.side === -1) {
+        const shortLot = openLots[0];
+        const matchedQuantity = Math.min(remainingQuantity, shortLot.quantity);
+        computedPnlOriginal += (shortLot.unitPrice - unitPrice) * matchedQuantity;
+        closedCostOriginal += shortLot.unitPrice * matchedQuantity;
+        closedQuantity += matchedQuantity;
+        shortLot.quantity -= matchedQuantity;
+        remainingQuantity -= matchedQuantity;
+
+        if (shortLot.quantity <= POSITION_EPSILON) {
+          openLots.shift();
+        }
+      }
+
+      if (remainingQuantity > POSITION_EPSILON) {
+        openLots.push({
+          side: 1,
+          quantity: remainingQuantity,
+          unitPrice
+        });
+      }
+    } else {
+      while (remainingQuantity > POSITION_EPSILON && openLots[0]?.side === 1) {
+        const longLot = openLots[0];
+        const matchedQuantity = Math.min(remainingQuantity, longLot.quantity);
+        computedPnlOriginal += (unitPrice - longLot.unitPrice) * matchedQuantity;
+        closedCostOriginal += longLot.unitPrice * matchedQuantity;
+        closedQuantity += matchedQuantity;
+        matchedLongSoldQty += matchedQuantity;
+        matchedLongSoldCostOriginal += longLot.unitPrice * matchedQuantity;
+        longLot.quantity -= matchedQuantity;
+        remainingQuantity -= matchedQuantity;
+
+        if (longLot.quantity <= POSITION_EPSILON) {
+          openLots.shift();
+        }
+      }
+
+      if (remainingQuantity > POSITION_EPSILON) {
+        openLots.push({
+          side: -1,
+          quantity: remainingQuantity,
+          unitPrice
+        });
+      }
+    }
+
+    const normalizedOpenLots = openLots.filter((lot) => lot.quantity > POSITION_EPSILON);
+    openLotsBySymbol.set(symbol, normalizedOpenLots);
+
+    const {
+      holdingQty,
+      netCostOriginal,
+      holdingCostOriginal
+    } = calculateOpenPositionMetrics(normalizedOpenLots);
+    const resolvedPnlOriginal = hasProvidedPnl
+      ? parsedProvidedPnl
+      : (closedQuantity > POSITION_EPSILON ? computedPnlOriginal : 0);
+    const shouldPopulatePnlCell = hasProvidedPnl || closedQuantity > POSITION_EPSILON;
+
+    const resolvedRow = {
+      ...row,
+      originalIndex,
+      損益: shouldPopulatePnlCell
+        ? (hasProvidedPnl ? rawPnlText : formatNumericValue(resolvedPnlOriginal))
+        : '',
+      __market: market,
+      __symbol: symbol,
+      __currency: currency,
+      __quantityValue: quantityValue,
+      __priceValue: unitPrice,
+      __amountValue: amountValue,
+      __computedPnlOriginal: computedPnlOriginal,
+      __resolvedPnlOriginal: resolvedPnlOriginal,
+      __closedCostOriginal: closedCostOriginal,
+      __closedQuantity: closedQuantity,
+      __matchedLongSoldQty: matchedLongSoldQty,
+      __matchedLongSoldCostOriginal: matchedLongSoldCostOriginal,
+      __holdingQtyAfter: hasMeaningfulValue(holdingQty) ? holdingQty : 0,
+      __netOpenCostOriginalAfter: hasMeaningfulValue(netCostOriginal) ? netCostOriginal : 0,
+      __holdingCostOriginalAfter: hasMeaningfulValue(holdingCostOriginal) ? holdingCostOriginal : 0,
+      __hasDerivedPnl: !hasProvidedPnl && closedQuantity > POSITION_EPSILON,
+      __hasProvidedPnl: hasProvidedPnl
+    };
+
+    resolvedByOriginalIndex.set(originalIndex, resolvedRow);
+    chronologicalResolvedRows.push(resolvedRow);
+  });
+
+  return {
+    resolvedTradeRows: rows.map((row, originalIndex) => (
+      resolvedByOriginalIndex.get(originalIndex) || buildFallbackResolvedTradeRow(row, originalIndex)
+    )),
+    resolvedTradeRowsChronological: chronologicalResolvedRows
+  };
+};
 
 const getResetRecord = (currentRecord, clearPrice = true) => ({
   ...currentRecord,
@@ -282,13 +497,16 @@ export function useTradeData(showToast) {
     showToast(t('messages.manualStockSaved', { symbol }));
   };
 
-  const fetchLivePrices = async (isForce = false, targetBaseCurrency = baseCurrency) => {
-    if (!apiKey) {
-      setShowManager(true);
-      showToast(t('messages.needApiKey'));
-      return;
-    }
+  const {
+    resolvedTradeRows,
+    resolvedTradeRowsChronological
+  } = useMemo(
+    () => buildResolvedTradeRows(rawData),
+    [rawData]
+  );
 
+  const buildRefreshPlan = (targetBaseCurrency = baseCurrency, isForce = false) => {
+    const now = Date.now();
     const symbolEntries = rawData
       .map((row) => {
         const code = String(row['代號'] || '').trim();
@@ -304,51 +522,113 @@ export function useTradeData(showToast) {
       .filter((entry) => entry && entry.symbol && entry.symbol !== '000000' && entry.symbol !== '未知');
 
     const uniqueSymbols = Array.from(new Set(symbolEntries.map((entry) => entry.symbol)));
-    if (uniqueSymbols.length === 0) return;
-
     const marketBySymbol = new Map(symbolEntries.map((entry) => [entry.symbol, entry.market]));
+    const missingRateKeys = new Set();
+    const staleRateKeys = new Set();
+
+    let missingQuoteCount = 0;
+    let staleQuoteCount = 0;
+
+    uniqueSymbols.forEach((symbol) => {
+      const cachedQuote = liveData[symbol];
+      if (!cachedQuote) {
+        missingQuoteCount += 1;
+      } else if (!cachedQuote.timestamp || now - cachedQuote.timestamp > ONE_DAY) {
+        staleQuoteCount += 1;
+      }
+
+      const fallbackCurrency = getCurrencyBySymbolOrMarket(symbol, marketBySymbol.get(symbol));
+      const currency = normalizeQuoteCurrencyData(cachedQuote?.currency).currency || fallbackCurrency;
+      if (!currency || currency === targetBaseCurrency) {
+        return;
+      }
+
+      getFxRateSymbols(currency, targetBaseCurrency).forEach((rateKey) => {
+        const cachedRate = exchangeRates[rateKey];
+        if (!cachedRate) {
+          missingRateKeys.add(rateKey);
+          return;
+        }
+
+        if (!cachedRate.timestamp || now - cachedRate.timestamp > ONE_DAY) {
+          staleRateKeys.add(rateKey);
+        }
+      });
+    });
+
+    const codesToFetch = uniqueSymbols.filter((symbol) => {
+      if (isForce) return true;
+      const cachedQuote = liveData[symbol];
+      if (!cachedQuote) return true;
+      if (!cachedQuote.timestamp || now - cachedQuote.timestamp > ONE_DAY) return true;
+      return false;
+    });
+
+    const currenciesToFetch = new Set();
+    uniqueSymbols.forEach((symbol) => {
+      const cachedQuote = liveData[symbol];
+      const fallbackCurrency = getCurrencyBySymbolOrMarket(symbol, marketBySymbol.get(symbol));
+      const currency = normalizeQuoteCurrencyData(cachedQuote?.currency).currency || fallbackCurrency;
+
+      if (currency && currency !== targetBaseCurrency) {
+        getFxRateSymbols(currency, targetBaseCurrency).forEach((rateKey) => {
+          const cachedRate = exchangeRates[rateKey];
+          if (isForce || !cachedRate || !cachedRate.timestamp || now - cachedRate.timestamp > ONE_DAY) {
+            currenciesToFetch.add(rateKey);
+          }
+        });
+      }
+    });
+
+    if (codesToFetch.length > 0) {
+      uniqueSymbols.forEach((symbol) => {
+        const currency = getCurrencyBySymbolOrMarket(symbol, marketBySymbol.get(symbol));
+        if (currency && currency !== targetBaseCurrency) {
+          getFxRateSymbols(currency, targetBaseCurrency).forEach((rateKey) => {
+            currenciesToFetch.add(rateKey);
+          });
+        }
+      });
+    }
+
+    return {
+      now,
+      uniqueSymbols,
+      marketBySymbol,
+      codesToFetch,
+      rateSymbolsToFetch: Array.from(currenciesToFetch),
+      missingQuoteCount,
+      staleQuoteCount,
+      missingRateCount: missingRateKeys.size,
+      staleRateCount: staleRateKeys.size,
+      requiresNetworkRefresh: codesToFetch.length > 0 || currenciesToFetch.size > 0
+    };
+  };
+
+  const refreshPlan = useMemo(
+    () => buildRefreshPlan(baseCurrency, false),
+    [baseCurrency, exchangeRates, liveData, rawData]
+  );
+  const hasStaleMarketData = refreshPlan.requiresNetworkRefresh;
+
+  const fetchLivePrices = async (isForce = false, targetBaseCurrency = baseCurrency) => {
+    if (!apiKey) {
+      setShowManager(true);
+      showToast(t('messages.needApiKey'));
+      return;
+    }
+
+    const refreshTargets = buildRefreshPlan(targetBaseCurrency, isForce);
+    const { codesToFetch, marketBySymbol, rateSymbolsToFetch, uniqueSymbols } = refreshTargets;
+    if (uniqueSymbols.length === 0) return;
 
     setIsLoadingPrices(true);
 
     try {
-      const now = Date.now();
+      const now = refreshTargets.now;
+      const currenciesToFetch = new Set(rateSymbolsToFetch);
 
-      const codesToFetch = uniqueSymbols.filter((symbol) => {
-        if (isForce) return true;
-        const cached = liveData[symbol];
-        if (!cached) return true;
-        if (now - cached.timestamp > ONE_DAY) return true;
-        return false;
-      });
-
-      const currenciesToFetch = new Set();
-      uniqueSymbols.forEach((symbol) => {
-        const cached = liveData[symbol];
-        const fallbackCurrency = getCurrencyBySymbolOrMarket(symbol, marketBySymbol.get(symbol));
-        const currency = normalizeQuoteCurrencyData(cached?.currency).currency || fallbackCurrency;
-
-        if (currency && currency !== targetBaseCurrency) {
-          getFxRateSymbols(currency, targetBaseCurrency).forEach((rateKey) => {
-            const cachedRate = exchangeRates[rateKey];
-            if (isForce || !cachedRate || now - cachedRate.timestamp > ONE_DAY) {
-              currenciesToFetch.add(rateKey);
-            }
-          });
-        }
-      });
-
-      if (codesToFetch.length > 0) {
-        uniqueSymbols.forEach((symbol) => {
-          const currency = getCurrencyBySymbolOrMarket(symbol, marketBySymbol.get(symbol));
-          if (currency && currency !== targetBaseCurrency) {
-            getFxRateSymbols(currency, targetBaseCurrency).forEach((rateKey) => {
-              currenciesToFetch.add(rateKey);
-            });
-          }
-        });
-      }
-
-      if (codesToFetch.length === 0 && currenciesToFetch.size === 0) {
+      if (!refreshTargets.requiresNetworkRefresh) {
         setLastUpdate(new Date());
         setIsLoadingPrices(false);
         showToast(t('messages.cacheFresh'));
@@ -460,6 +740,22 @@ export function useTradeData(showToast) {
       showToast(t('messages.fetchFailed', { message: error.message }));
     } finally {
       setIsLoadingPrices(false);
+    }
+  };
+
+  const handleRefreshPrices = () => {
+    if (!apiKey) {
+      void fetchLivePrices(false);
+      return;
+    }
+
+    if (hasStaleMarketData) {
+      void fetchLivePrices(false);
+      return;
+    }
+
+    if (window.confirm(t('header.forceRefreshConfirm'))) {
+      void fetchLivePrices(true);
     }
   };
 
@@ -800,21 +1096,13 @@ export function useTradeData(showToast) {
     if (!isAppLoaded) return [];
 
     const aggregatedStocks = {};
-    const sortedData = [...rawData].sort(
-      (a, b) => new Date(a['日期'] || 0) - new Date(b['日期'] || 0)
-    );
 
-    sortedData.forEach((row) => {
+    resolvedTradeRowsChronological.forEach((row) => {
+      const symbol = row.__symbol;
+      if (!symbol) return;
+
+      const market = row.__market;
       const rawCode = String(row['代號'] || '').trim();
-      const type = row['類型'];
-      if (!rawCode || !type) return;
-
-      const market = resolveMarket(rawCode, row['市場']);
-
-      const symbol = formatSymbol(rawCode, market);
-      const quantity = parseFloat(row['數量']) || 0;
-      const amount = getNumericValue(row['總金額']);
-      const pnl = getNumericValue(row['損益']);
 
       if (!aggregatedStocks[symbol]) {
         aggregatedStocks[symbol] = {
@@ -823,12 +1111,14 @@ export function useTradeData(showToast) {
           market,
           name: STOCK_MAPPING[symbol]?.name || t('data.unknownSymbol', { symbol }),
           currentPrice: STOCK_MAPPING[symbol]?.price || 0,
-          currency: getCurrencyBySymbolOrMarket(symbol, market),
+          currency: row.__currency || getCurrencyBySymbolOrMarket(symbol, market),
           holdingQty: 0,
+          holdingCostOriginal: 0,
           realizedPnl: 0,
+          realizedCostOriginal: 0,
           totalCost: 0,
-          totalSellRevenue: 0,
           totalSoldQty: 0,
+          totalSoldCostOriginal: 0,
           tradeCount: 0,
           history: []
         };
@@ -836,26 +1126,13 @@ export function useTradeData(showToast) {
 
       aggregatedStocks[symbol].tradeCount += 1;
       aggregatedStocks[symbol].history.push(row);
-
-      if (type === '買入') {
-        aggregatedStocks[symbol].holdingQty += quantity;
-        aggregatedStocks[symbol].totalCost += amount;
-      } else if (type === '賣出') {
-        aggregatedStocks[symbol].realizedPnl += pnl;
-        aggregatedStocks[symbol].totalSellRevenue += amount;
-        aggregatedStocks[symbol].totalSoldQty += quantity;
-
-        if (aggregatedStocks[symbol].holdingQty > 0) {
-          const averageCost = aggregatedStocks[symbol].totalCost / aggregatedStocks[symbol].holdingQty;
-          aggregatedStocks[symbol].totalCost -= averageCost * quantity;
-        }
-
-        aggregatedStocks[symbol].holdingQty -= quantity;
-        if (aggregatedStocks[symbol].holdingQty <= 0.01) {
-          aggregatedStocks[symbol].holdingQty = 0;
-          aggregatedStocks[symbol].totalCost = 0;
-        }
-      }
+      aggregatedStocks[symbol].holdingQty = row.__holdingQtyAfter;
+      aggregatedStocks[symbol].holdingCostOriginal = row.__holdingCostOriginalAfter;
+      aggregatedStocks[symbol].totalCost = row.__netOpenCostOriginalAfter;
+      aggregatedStocks[symbol].realizedPnl += row.__resolvedPnlOriginal;
+      aggregatedStocks[symbol].realizedCostOriginal += row.__closedCostOriginal;
+      aggregatedStocks[symbol].totalSoldQty += row.__matchedLongSoldQty;
+      aggregatedStocks[symbol].totalSoldCostOriginal += row.__matchedLongSoldCostOriginal;
     });
 
     return Object.values(aggregatedStocks)
@@ -872,25 +1149,30 @@ export function useTradeData(showToast) {
         const currency = normalizedApiQuote.currency || getCurrencyBySymbolOrMarket(stock.symbol, stock.market);
         const exchangeRate = getExchangeRate(currency, baseCurrency);
 
-        const currentValueOriginal = stock.holdingQty * currentPrice;
-        const unrealizedPnlOriginal = currentValueOriginal > 0 ? currentValueOriginal - stock.totalCost : 0;
-        const unrealizedPnlPercent = stock.totalCost > 0
-          ? (unrealizedPnlOriginal / stock.totalCost) * 100
+        const hasCurrentPrice = hasMeaningfulValue(currentPrice);
+        const currentValueOriginal = hasCurrentPrice ? stock.holdingQty * currentPrice : 0;
+        const unrealizedPnlOriginal = hasCurrentPrice
+          ? currentValueOriginal - stock.totalCost
           : 0;
-        const realizedCostOriginal = stock.totalSellRevenue - stock.realizedPnl;
-        const realizedPnlPercent = realizedCostOriginal > 0
-          ? (stock.realizedPnl / realizedCostOriginal) * 100
+        const unrealizedPnlPercent = stock.holdingCostOriginal > 0 && hasCurrentPrice
+          ? (unrealizedPnlOriginal / stock.holdingCostOriginal) * 100
           : 0;
-        const ifSoldTodayPnlOriginal = stock.totalSoldQty * currentPrice - realizedCostOriginal;
-        const ifSoldTodayPnlPercent = realizedCostOriginal > 0
-          ? (ifSoldTodayPnlOriginal / realizedCostOriginal) * 100
+        const realizedPnlPercent = stock.realizedCostOriginal > 0
+          ? (stock.realizedPnl / stock.realizedCostOriginal) * 100
+          : 0;
+        const ifSoldTodayPnlOriginal = hasCurrentPrice
+          ? (stock.totalSoldQty * currentPrice) - stock.totalSoldCostOriginal
+          : 0;
+        const ifSoldTodayPnlPercent = stock.totalSoldCostOriginal > 0 && hasCurrentPrice
+          ? (ifSoldTodayPnlOriginal / stock.totalSoldCostOriginal) * 100
           : 0;
 
         const currentValueBase = currentValueOriginal * exchangeRate;
         const totalCostBase = stock.totalCost * exchangeRate;
+        const holdingCostBase = stock.holdingCostOriginal * exchangeRate;
         const unrealizedPnlBase = unrealizedPnlOriginal * exchangeRate;
         const realizedPnlBase = stock.realizedPnl * exchangeRate;
-        const realizedCostBase = realizedCostOriginal * exchangeRate;
+        const realizedCostBase = stock.realizedCostOriginal * exchangeRate;
         const ifSoldTodayPnlBase = ifSoldTodayPnlOriginal * exchangeRate;
 
         return {
@@ -906,12 +1188,13 @@ export function useTradeData(showToast) {
           unrealizedPnlOriginal,
           unrealizedPnlPercent,
           realizedPnlOriginal: stock.realizedPnl,
-          realizedCostOriginal,
+          realizedCostOriginal: stock.realizedCostOriginal,
           realizedPnlPercent,
           ifSoldTodayPnlOriginal,
           ifSoldTodayPnlPercent,
           currentValueBase,
           totalCostBase,
+          holdingCostBase,
           unrealizedPnlBase,
           realizedPnlBase,
           realizedCostBase,
@@ -919,7 +1202,7 @@ export function useTradeData(showToast) {
         };
       })
       .sort((a, b) => b.realizedPnlBase - a.realizedPnlBase);
-  }, [baseCurrency, exchangeRates, isAppLoaded, liveData, manualStockData, rawData, t]);
+  }, [baseCurrency, exchangeRates, isAppLoaded, liveData, manualStockData, resolvedTradeRowsChronological, t]);
 
   const chartData = useMemo(() => {
     let holdingData = [];
@@ -959,7 +1242,7 @@ export function useTradeData(showToast) {
     let filtered = [...processedData];
 
     if (hideZeroHolding) {
-      filtered = filtered.filter((stock) => stock.holdingQty > 0);
+      filtered = filtered.filter((stock) => hasMeaningfulValue(stock.holdingQty));
     }
 
     if (marketFilter !== '全部') {
@@ -1005,7 +1288,7 @@ export function useTradeData(showToast) {
       totalRealizedPnl: accumulator.totalRealizedPnl + currentStock.realizedPnlBase,
       totalRealizedCost: accumulator.totalRealizedCost + currentStock.realizedCostBase,
       totalUnrealizedPnl: accumulator.totalUnrealizedPnl + currentStock.unrealizedPnlBase,
-      totalHoldingCost: accumulator.totalHoldingCost + currentStock.totalCostBase,
+      totalHoldingCost: accumulator.totalHoldingCost + currentStock.holdingCostBase,
       totalValue: accumulator.totalValue + currentStock.currentValueBase
     }),
     {
@@ -1018,67 +1301,42 @@ export function useTradeData(showToast) {
   ), [processedData]);
 
   const trendData = useMemo(() => {
-    if (!isAppLoaded || rawData.length === 0) return [];
-
-    const sortedData = [...rawData].sort(
-      (a, b) => new Date(a['日期'] || 0) - new Date(b['日期'] || 0)
-    );
+    if (!isAppLoaded || resolvedTradeRowsChronological.length === 0) return [];
 
     const stockStates = {};
     const dailySnapshots = [];
-    let runningTotalCostBase = 0;
+    let runningHoldingCostBase = 0;
     let runningRealizedPnlBase = 0;
 
-    sortedData.forEach((row) => {
-      const rawCode = String(row['代號'] || '').trim();
-      const type = row['類型'];
-      if (!rawCode || !type) return;
+    resolvedTradeRowsChronological.forEach((row) => {
+      const symbol = row.__symbol;
+      if (!symbol) return;
 
-      const market = resolveMarket(rawCode, row['市場']);
-
-      const symbol = formatSymbol(rawCode, market);
+      const market = row.__market;
       const date = row['日期'];
       const dateObject = new Date(date);
       if (Number.isNaN(dateObject.getTime())) return;
 
-      const quantity = parseFloat(row['數量']) || 0;
-      const amount = getNumericValue(row['總金額']);
-      const pnl = getNumericValue(row['損益']);
-      const currency = getCurrencyBySymbolOrMarket(symbol, market);
+      const currency = row.__currency || getCurrencyBySymbolOrMarket(symbol, market);
       const exchangeRate = getExchangeRate(currency, baseCurrency);
 
       if (!stockStates[symbol]) {
         stockStates[symbol] = {
-          holdingQty: 0,
-          totalCost: 0
+          holdingCostOriginal: 0
         };
       }
 
-      if (type === '買入') {
-        stockStates[symbol].holdingQty += quantity;
-        stockStates[symbol].totalCost += amount;
-        runningTotalCostBase += amount * exchangeRate;
-      } else if (type === '賣出') {
-        runningRealizedPnlBase += pnl * exchangeRate;
+      const previousHoldingCostOriginal = stockStates[symbol].holdingCostOriginal;
+      const nextHoldingCostOriginal = row.__holdingCostOriginalAfter;
 
-        if (stockStates[symbol].holdingQty > 0) {
-          const averageCost = stockStates[symbol].totalCost / stockStates[symbol].holdingQty;
-          const costOfSold = averageCost * quantity;
-          stockStates[symbol].totalCost -= costOfSold;
-          runningTotalCostBase -= costOfSold * exchangeRate;
-        }
-
-        stockStates[symbol].holdingQty -= quantity;
-        if (stockStates[symbol].holdingQty <= 0.01) {
-          stockStates[symbol].holdingQty = 0;
-          stockStates[symbol].totalCost = 0;
-        }
-      }
+      runningHoldingCostBase += (nextHoldingCostOriginal - previousHoldingCostOriginal) * exchangeRate;
+      runningRealizedPnlBase += row.__resolvedPnlOriginal * exchangeRate;
+      stockStates[symbol].holdingCostOriginal = nextHoldingCostOriginal;
 
       dailySnapshots.push({
         date,
         timestamp: dateObject.getTime(),
-        costBase: runningTotalCostBase,
+        costBase: runningHoldingCostBase,
         realizedPnlBase: runningRealizedPnlBase
       });
     });
@@ -1111,7 +1369,7 @@ export function useTradeData(showToast) {
         day: 'numeric'
       })
     }));
-  }, [activeLocale, baseCurrency, exchangeRates, isAppLoaded, rawData, trendTimeRange]);
+  }, [activeLocale, baseCurrency, exchangeRates, isAppLoaded, resolvedTradeRowsChronological, trendTimeRange]);
 
   const availableMarkets = useMemo(
     () => Array.from(new Set(processedData.map((stock) => stock.market))).filter(Boolean),
@@ -1119,7 +1377,7 @@ export function useTradeData(showToast) {
   );
 
   const holdingCount = useMemo(
-    () => processedData.filter((stock) => stock.holdingQty > 0).length,
+    () => processedData.filter((stock) => hasMeaningfulValue(stock.holdingQty)).length,
     [processedData]
   );
 
@@ -1154,6 +1412,7 @@ export function useTradeData(showToast) {
     editingStockSymbol,
     expandedStock,
     fetchLivePrices,
+    handleRefreshPrices,
     formatBaseCurrency,
     formatOriginalCurrency,
     formatPercent,
@@ -1164,6 +1423,7 @@ export function useTradeData(showToast) {
     handleSaveApiKey,
     handleSaveBaseCurrency,
     handleSaveManualStock,
+    hasStaleMarketData,
     hideZeroHolding,
     historySortConfig,
     holdingCount,
@@ -1182,6 +1442,7 @@ export function useTradeData(showToast) {
     processedData,
     prepareCsvImport,
     rawData,
+    resolvedTradeRows,
     requestSort,
     setApiKey,
     setCsvImportProfile: handleSetCsvImportProfile,

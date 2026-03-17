@@ -1739,6 +1739,45 @@ const isImportableTradeRow = (row) => {
   );
 };
 
+const OPTION_OCC_SYMBOL_REGEX = /^[A-Z]{1,6}\d{6}[CP]\d{8}$/i;
+const OPTION_LOCALIZED_KEYWORD_REGEX = /(選擇權|期權|期货期權|股票期權|股票期权|옵션|오플션|オプション|خيارات|옵ція)/i;
+const OPTION_KEYWORD_REGEX = /\b(call option|put option|equity option|stock option|mini option|covered call|listed option|index option)\b/i;
+const OPTION_GENERIC_KEYWORD_REGEX = /\boption(?:s)?\b/i;
+const OPTION_SIDE_REGEX = /\b(call|put)\b/i;
+const OPTION_EXPIRY_REGEX = /\b(\d{1,2}\/\d{1,2}\/\d{2,4}|\d{4}-\d{2}-\d{2}|jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\b/i;
+const OPTION_STRIKE_REGEX = /\b([CP]\s*\d+(?:\.\d+)?|\d+(?:\.\d+)?\s*[CP])\b/i;
+
+const isLikelyOptionRow = (rawRow, normalizedRow) => {
+  const symbol = String(normalizedRow?.['代號'] || rawRow?.['代號'] || '')
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, '');
+  const description = String(rawRow?.['說明'] || '')
+    .trim()
+    .replace(/\s+/g, ' ');
+  const combinedText = `${symbol} ${description}`.trim();
+
+  if (!combinedText) {
+    return false;
+  }
+
+  if (OPTION_OCC_SYMBOL_REGEX.test(symbol)) {
+    return true;
+  }
+
+  if (OPTION_LOCALIZED_KEYWORD_REGEX.test(combinedText) || OPTION_KEYWORD_REGEX.test(combinedText)) {
+    return true;
+  }
+
+  if (OPTION_GENERIC_KEYWORD_REGEX.test(combinedText) && (OPTION_EXPIRY_REGEX.test(combinedText) || OPTION_STRIKE_REGEX.test(combinedText))) {
+    return true;
+  }
+
+  return OPTION_SIDE_REGEX.test(combinedText)
+    && OPTION_EXPIRY_REGEX.test(combinedText)
+    && OPTION_STRIKE_REGEX.test(combinedText);
+};
+
 export const parseCSVWithMeta = (text, options = {}) => {
   const normalizedText = String(text || '').replace(/\r\n?/g, '\n');
   const lines = normalizedText.split('\n').filter((line) => line.trim() !== '');
@@ -1788,6 +1827,7 @@ export const parseCSVWithMeta = (text, options = {}) => {
   const preferredDecimalSeparator = inspection.profile?.preferredDecimalSeparator || '.';
   const result = [];
   let skippedRowCount = 0;
+  let derivativeSkippedRowCount = 0;
   const problematicRowNumbers = [];
 
   for (let index = (layout?.headerIndex ?? 0) + 1; index < lines.length; index += 1) {
@@ -1809,11 +1849,15 @@ export const parseCSVWithMeta = (text, options = {}) => {
     });
 
     const normalizedRow = normalizeRowForProfile(rawRow, inspection.profile, preferredDecimalSeparator);
+    const isOptionRow = isLikelyOptionRow(rawRow, normalizedRow);
 
-    if (normalizedRow && isImportableTradeRow(normalizedRow)) {
+    if (normalizedRow && isImportableTradeRow(normalizedRow) && !isOptionRow) {
       result.push(normalizedRow);
     } else {
       skippedRowCount += 1;
+      if (isOptionRow) {
+        derivativeSkippedRowCount += 1;
+      }
     }
   }
 
@@ -1834,6 +1878,7 @@ export const parseCSVWithMeta = (text, options = {}) => {
         importKind,
         matchedFields: inspection.matchedFields || [],
         missingRequiredFields: [],
+        derivativeSkippedRowCount,
         problematicRowNumbers
       }
     };
@@ -1855,7 +1900,8 @@ export const parseCSVWithMeta = (text, options = {}) => {
         profileLabelKey: inspection.profileLabelKey || '',
         importKind,
         matchedFields: inspection.matchedFields || [],
-        missingRequiredFields: []
+        missingRequiredFields: [],
+        derivativeSkippedRowCount
       }
     };
   }
@@ -1874,7 +1920,8 @@ export const parseCSVWithMeta = (text, options = {}) => {
       profileLabelKey: inspection.profileLabelKey || '',
       importKind,
       matchedFields: inspection.matchedFields || [],
-      missingRequiredFields: []
+      missingRequiredFields: [],
+      derivativeSkippedRowCount
     }
   };
 };

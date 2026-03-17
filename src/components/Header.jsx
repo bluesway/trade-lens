@@ -4,7 +4,6 @@ import {
   Activity,
   Clock,
   Database,
-  Download,
   Info,
   Languages,
   Moon,
@@ -33,9 +32,9 @@ export default function Header({
   csvImportProfile,
   darkMode,
   demoLastUpdate,
-  fetchLivePrices,
-  handleExportCSV,
   handleFileUpload,
+  handleRefreshPrices,
+  hasStaleMarketData,
   isDemo,
   isLoadingPrices,
   lastImportMeta,
@@ -66,26 +65,31 @@ export default function Header({
       ? t('header.csvDelimiters.tab', { defaultValue: 'tab' })
       : delimiterLabel
   );
+
   const getLocalizedImportMetaProfileLabel = (importMeta) => (
     importMeta?.profileLabelKey
       ? t(importMeta.profileLabelKey, { defaultValue: importMeta.profileLabel })
       : importMeta?.profileLabel
   );
+
   const getLocalizedImportModeLabel = (selectionMode) => (
     selectionMode === 'manual'
       ? t('header.importModeManualOverride', { defaultValue: 'Manual preset' })
       : t('header.importModeAutoDetected', { defaultValue: 'Auto-detected' })
   );
+
   const getLocalizedImportKindLabel = (importKind) => (
     importKind === 'positions'
       ? t('header.importKindPositions', { defaultValue: 'Positions snapshot' })
       : t('header.importKindTrades', { defaultValue: 'Trades' })
   );
+
   const getLocalizedImportApplyModeLabel = (applyMode) => (
     applyMode === 'append'
       ? t('header.importApplyModeAppend', { defaultValue: 'Append to current data' })
       : t('header.importApplyModeReplace', { defaultValue: 'Replace current data' })
   );
+
   const getLocalizedImportGroupLabel = (group) => (
     t(group.translationKey, { defaultValue: group.label })
   );
@@ -111,6 +115,7 @@ export default function Header({
           defaultValue: 'Leave this on auto detect unless a specific broker export keeps getting guessed wrong. For most files, auto is the safest first shot.'
         })
   );
+
   const liveStatus = isDemo && demoLastUpdate
     ? {
       badgeClass: 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-100 dark:border-amber-800',
@@ -128,6 +133,15 @@ export default function Header({
         title: showGregorianReference ? formatGregorianReferenceDateTime(lastUpdate) : undefined
       }
       : null;
+
+  const refreshButtonClasses = apiKey
+    ? hasStaleMarketData
+      ? 'bg-blue-600 text-white hover:bg-blue-700'
+      : 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-900/50'
+    : 'bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:hover:bg-rose-900/40';
+  const refreshButtonTitle = apiKey
+    ? (hasStaleMarketData ? t('header.updateWithCache') : t('header.forceRefreshTitle'))
+    : t('header.setApiKeyFirst');
 
   return (
     <div className="grid gap-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 xl:grid-cols-[minmax(0,1fr)_minmax(520px,1.08fr)]">
@@ -205,91 +219,22 @@ export default function Header({
           </button>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <button
-            onClick={() => fetchLivePrices(false)}
-            disabled={isLoadingPrices || rawDataCount === 0}
-            className={`flex min-h-[3.25rem] items-center justify-center gap-2 rounded-xl px-4 py-3 font-medium transition-colors disabled:opacity-50 ${
-              apiKey
-                ? 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
-                : 'bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:hover:bg-rose-900/40'
-            }`}
-            title={apiKey ? t('header.updateWithCache') : t('header.setApiKeyFirst')}
-          >
-            <RefreshCw size={18} className={isLoadingPrices ? 'animate-spin' : ''} />
-            <span>{apiKey ? t('header.updatePrices') : t('header.apiKeyRequired')}</span>
-          </button>
-
-          <button
-            onClick={() => {
-              if (window.confirm(t('header.forceRefreshConfirm'))) {
-                fetchLivePrices(true);
-              }
-            }}
-            disabled={isLoadingPrices || rawDataCount === 0}
-            className={`flex min-h-[3.25rem] items-center justify-center gap-2 rounded-xl px-4 py-3 font-medium transition-colors disabled:opacity-50 ${
-              apiKey
-                ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-900/50'
-                : 'bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:hover:bg-rose-900/40'
-            }`}
-            title={apiKey ? t('header.forceRefreshTitle') : t('header.setApiKeyFirst')}
-          >
-            <Activity size={18} className={isLoadingPrices ? 'animate-pulse' : ''} />
-            <span>{t('header.forceRefresh')}</span>
-          </button>
-
-          <div className="relative group sm:col-span-1">
-            <div className="pointer-events-none absolute right-0 top-14 z-50 w-80 translate-y-1 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 opacity-0 invisible shadow-xl transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
-              <h4 className="mb-2 flex items-center gap-2 border-b border-slate-200 pb-1 font-bold text-slate-800 dark:border-slate-700 dark:text-slate-100">
-                <Info size={14} className="text-blue-500" />
-                {t('header.csvTitle')}
-              </h4>
-              <p className="mb-2 text-xs">{t('header.csvIntro')}</p>
-              <ul className="list-disc space-y-1 rounded bg-slate-50 p-2 pl-5 text-xs font-mono dark:bg-slate-900/70">
-                {csvRowKeys.map((rowKey) => (
-                  <li key={rowKey}>{t(`header.csvRows.${rowKey}`)}</li>
-                ))}
-              </ul>
-              <p className="mt-2 text-xs font-medium text-blue-600 dark:text-blue-400">
-                {t('header.csvNote1')}
-              </p>
-              <p className="text-xs font-medium text-blue-600 dark:text-blue-400">
-                {t('header.csvNote2')}
-              </p>
-              <p className="text-xs font-medium text-blue-600 dark:text-blue-400">
-                {t('header.csvNote3', {
-                  defaultValue: '* Note 3: The app auto-detects common broker CSV layouts plus semicolon and tab-delimited files. After import, the detected layout shows up on the top right.'
-                })}
-              </p>
-            </div>
-
-            <input
-              type="file"
-              accept=".csv"
-              onChange={handleFileUpload}
-              className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
-            />
-            <button className="flex min-h-[3.25rem] w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-medium text-white shadow-sm transition-colors hover:bg-blue-700">
-              <Upload size={18} />
-              {t('common.importCsv', { defaultValue: 'Import CSV' })}
-            </button>
-          </div>
-
-          <button
-            onClick={handleExportCSV}
-            className="flex min-h-[3.25rem] items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-          >
-            <Download size={18} />
-            {t('common.exportCsv', { defaultValue: 'Export CSV' })}
-          </button>
-        </div>
+        <button
+          onClick={handleRefreshPrices}
+          disabled={isLoadingPrices || rawDataCount === 0}
+          className={`flex min-h-[3.25rem] items-center justify-center gap-2 rounded-xl px-4 py-3 font-medium transition-colors disabled:opacity-50 ${refreshButtonClasses}`}
+          title={refreshButtonTitle}
+        >
+          <RefreshCw size={18} className={isLoadingPrices ? 'animate-spin' : ''} />
+          <span>{apiKey ? t('header.updatePrices') : t('header.apiKeyRequired')}</span>
+        </button>
 
         <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-700 dark:bg-slate-800/60">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
-                  {importProfileLabel}
+                  {t('common.importCsv', { defaultValue: 'Import CSV' })}
                 </span>
                 {selectedImportProfileGroup && (
                   <span className="inline-flex items-center rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500 shadow-sm dark:bg-slate-900 dark:text-slate-400">
@@ -308,22 +253,69 @@ export default function Header({
               </p>
             </div>
 
-            <select
-              value={csvImportProfile}
-              onChange={(event) => setCsvImportProfile(event.target.value)}
-              className="min-h-[2.875rem] w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 outline-none shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 lg:max-w-sm"
-              title={importProfileLabel}
-            >
-              {CSV_IMPORT_PROFILE_OPTION_GROUPS.map((group) => (
-                <optgroup key={group.id} label={getLocalizedImportGroupLabel(group)}>
-                  {group.options.map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {getLocalizedProfileLabel(option)}
-                    </option>
+            <div className="grid w-full gap-3 lg:max-w-2xl lg:grid-cols-[minmax(0,1fr)_auto]">
+              <label
+                className="flex min-h-[3.25rem] items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 shadow-sm dark:border-slate-700 dark:bg-slate-900"
+                title={importProfileLabel}
+              >
+                <span className="whitespace-nowrap text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+                  {importProfileLabel}
+                </span>
+                <select
+                  value={csvImportProfile}
+                  onChange={(event) => setCsvImportProfile(event.target.value)}
+                  className="min-w-0 flex-1 bg-transparent text-sm font-medium text-slate-700 outline-none dark:text-slate-200"
+                  title={importProfileLabel}
+                >
+                  {CSV_IMPORT_PROFILE_OPTION_GROUPS.map((group) => (
+                    <optgroup key={group.id} label={getLocalizedImportGroupLabel(group)}>
+                      {group.options.map((option) => (
+                        <option key={option.id} value={option.id}>
+                          {getLocalizedProfileLabel(option)}
+                        </option>
+                      ))}
+                    </optgroup>
                   ))}
-                </optgroup>
-              ))}
-            </select>
+                </select>
+              </label>
+
+              <div className="relative group">
+                <div className="pointer-events-none absolute right-0 top-[calc(100%+0.75rem)] z-50 w-80 translate-y-1 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 opacity-0 invisible shadow-xl transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                  <h4 className="mb-2 flex items-center gap-2 border-b border-slate-200 pb-1 font-bold text-slate-800 dark:border-slate-700 dark:text-slate-100">
+                    <Info size={14} className="text-blue-500" />
+                    {t('header.csvTitle')}
+                  </h4>
+                  <p className="mb-2 text-xs">{t('header.csvIntro')}</p>
+                  <ul className="list-disc space-y-1 rounded bg-slate-50 p-2 pl-5 text-xs font-mono dark:bg-slate-900/70">
+                    {csvRowKeys.map((rowKey) => (
+                      <li key={rowKey}>{t(`header.csvRows.${rowKey}`)}</li>
+                    ))}
+                  </ul>
+                  <p className="mt-2 text-xs font-medium text-blue-600 dark:text-blue-400">
+                    {t('header.csvNote1')}
+                  </p>
+                  <p className="text-xs font-medium text-blue-600 dark:text-blue-400">
+                    {t('header.csvNote2')}
+                  </p>
+                  <p className="text-xs font-medium text-blue-600 dark:text-blue-400">
+                    {t('header.csvNote3', {
+                      defaultValue: '* Note 3: The app auto-detects common broker CSV layouts plus semicolon and tab-delimited files. After import, the detected layout shows up on the top right.'
+                    })}
+                  </p>
+                </div>
+
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileUpload}
+                  className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
+                />
+                <button className="flex min-h-[3.25rem] w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-medium text-white shadow-sm transition-colors hover:bg-blue-700 lg:min-w-[10rem]">
+                  <Upload size={18} />
+                  {t('common.importCsv', { defaultValue: 'Import CSV' })}
+                </button>
+              </div>
+            </div>
           </div>
 
           {lastImportMeta && (

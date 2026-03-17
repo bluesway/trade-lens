@@ -159,6 +159,8 @@ export default function DataTable({
               const hasSold = stock.totalSoldQty > 0;
               const currencyCode = stock.currency;
               const isExpanded = expandedStock === stock.symbol;
+              const hasOpenPosition = Math.abs(stock.holdingQty) > 0.0001;
+              const hasCurrentValue = Math.abs(stock.currentValueOriginal) > 0.0001;
 
               return (
                 <React.Fragment key={stock.symbol}>
@@ -248,7 +250,7 @@ export default function DataTable({
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="font-medium text-slate-800 dark:text-slate-200">
-                        {stock.currentValueOriginal > 0 ? formatOriginalCurrency(stock.currentValueOriginal, currencyCode) : '-'}
+                        {hasCurrentValue ? formatOriginalCurrency(stock.currentValueOriginal, currencyCode, { signed: stock.currentValueOriginal < 0 }) : '-'}
                       </div>
                       <div
                         className="text-xs text-slate-400 dark:text-slate-500 mt-1 flex items-center justify-end gap-1 group/price relative cursor-help"
@@ -294,7 +296,7 @@ export default function DataTable({
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      {stock.holdingQty > 0 ? (
+                      {hasOpenPosition ? (
                         <div className={`flex flex-col items-end ${
                           stock.unrealizedPnlOriginal > 0
                             ? 'text-blue-600 dark:text-blue-400'
@@ -422,6 +424,8 @@ export default function DataTable({
         {displayData.map((stock) => {
           const currencyCode = stock.currency;
           const isExpanded = expandedStock === stock.symbol;
+          const hasOpenPosition = Math.abs(stock.holdingQty) > 0.0001;
+          const hasCurrentValue = Math.abs(stock.currentValueOriginal) > 0.0001;
 
           return (
             <div key={stock.symbol} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm overflow-hidden">
@@ -441,7 +445,7 @@ export default function DataTable({
                   </div>
                   <div className="text-right">
                     <div className="font-bold text-slate-800 dark:text-slate-200 text-lg">
-                      {stock.currentValueOriginal > 0 ? formatOriginalCurrency(stock.currentValueOriginal, currencyCode) : '-'}
+                      {hasCurrentValue ? formatOriginalCurrency(stock.currentValueOriginal, currencyCode, { signed: stock.currentValueOriginal < 0 }) : '-'}
                     </div>
                     <div className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                       {stock.currentPrice > 0 ? t('table.atPrice', { price: formatOriginalCurrency(stock.currentPrice, currencyCode) }) : '-'}
@@ -456,7 +460,7 @@ export default function DataTable({
                   </div>
                   <div className="flex flex-col items-end">
                     <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider">{t('table.mobileUnrealized')}</span>
-                    {stock.holdingQty > 0 ? (
+                    {hasOpenPosition ? (
                       <div className={`flex flex-col items-end mt-0.5 ${
                         stock.unrealizedPnlOriginal > 0
                           ? 'text-blue-600 dark:text-blue-400'
@@ -532,8 +536,16 @@ export default function DataTable({
                         </div>
                         <div className="flex flex-col items-end gap-1">
                           <span className="font-bold text-slate-700 dark:text-slate-200">{formatOriginalCurrency(historyRow['總金額'], currencyCode)}</span>
-                          {historyRow['類型'] === '賣出' && historyRow['損益'] && (
-                            <span className={`font-medium ${parseFloat(historyRow['損益']) > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                          {historyRow['損益'] && (
+                            <span
+                              className={`font-medium ${
+                                parseFloat(historyRow['損益']) > 0
+                                  ? 'text-emerald-500'
+                                  : parseFloat(historyRow['損益']) < 0
+                                    ? 'text-rose-500'
+                                    : 'text-slate-500 dark:text-slate-400'
+                              }`}
+                            >
                               {formatOriginalCurrency(historyRow['損益'], currencyCode, { signed: true })}
                             </span>
                           )}

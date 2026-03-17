@@ -45,7 +45,6 @@ export default function App() {
     editingIndex,
     editingStockSymbol,
     expandedStock,
-    fetchLivePrices,
     formatBaseCurrency,
     formatOriginalCurrency,
     formatPercent,
@@ -53,9 +52,11 @@ export default function App() {
     handleClearData,
     handleDeleteRecord,
     handleEditRecord,
+    handleRefreshPrices,
     handleSaveApiKey,
     handleSaveBaseCurrency,
     handleSaveManualStock,
+    hasStaleMarketData,
     hideZeroHolding,
     historySortConfig,
     holdingCount,
@@ -72,6 +73,7 @@ export default function App() {
     applyPreparedCsvImport,
     prepareCsvImport,
     rawData,
+    resolvedTradeRows,
     requestSort,
     setApiKey,
     setCsvImportProfile,
@@ -199,7 +201,7 @@ export default function App() {
   };
 
   const handleExportCSV = () => {
-    if (rawData.length === 0) {
+    if (resolvedTradeRows.length === 0) {
       showToast(t('app.noDataToExport'));
       return;
     }
@@ -207,7 +209,7 @@ export default function App() {
     const headers = ['日期', '類型', '代號', '市場', '數量', '單價', '總金額', '損益'];
     const csvContent = [
       headers.join(','),
-      ...rawData.map((row) => headers.map((header) => {
+      ...resolvedTradeRows.map((row) => headers.map((header) => {
         let value = row[header] || '';
         if (String(value).includes(',')) {
           value = `"${value}"`;
@@ -262,12 +264,12 @@ export default function App() {
 
         <Header
           apiKey={apiKey}
+          csvImportProfile={csvImportProfile}
           darkMode={darkMode}
           demoLastUpdate={demoLastUpdate}
-          fetchLivePrices={fetchLivePrices}
-          handleExportCSV={handleExportCSV}
           handleFileUpload={handleFileUpload}
-          csvImportProfile={csvImportProfile}
+          handleRefreshPrices={handleRefreshPrices}
+          hasStaleMarketData={hasStaleMarketData}
           isDemo={isDemo}
           isLoadingPrices={isLoadingPrices}
           lastImportMeta={lastImportMeta}
@@ -289,13 +291,14 @@ export default function App() {
             handleClearData={() => handleClearData(handleExportCSV)}
             handleDeleteRecord={handleDeleteRecord}
             handleEditRecord={handleEditRecord}
+            handleExportCSV={handleExportCSV}
             handleSaveApiKey={handleSaveApiKey}
             handleSaveBaseCurrency={handleSaveBaseCurrency}
             hideZeroHolding={hideZeroHolding}
             liveData={liveData}
             newRec={newRec}
             onClose={() => setShowManager(false)}
-            rawData={rawData}
+            rawData={resolvedTradeRows}
             setApiKey={setApiKey}
             setHideZeroHolding={setHideZeroHolding}
             updateNewRecAmount={updateNewRecAmount}

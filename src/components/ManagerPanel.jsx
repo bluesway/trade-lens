@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Database, DollarSign, Edit2, Info, Key, Plus, Trash2, X } from 'lucide-react';
+import { Database, DollarSign, Download, Edit2, Info, Key, Plus, Trash2, X } from 'lucide-react';
 import {
   BASE_CURRENCY_OPTIONS,
   TRADE_TYPE_TRANSLATION_KEYS,
@@ -34,6 +34,7 @@ export default function ManagerPanel({
   handleClearData,
   handleDeleteRecord,
   handleEditRecord,
+  handleExportCSV,
   handleSaveApiKey,
   handleSaveBaseCurrency,
   hideZeroHolding,
@@ -98,7 +99,14 @@ export default function ManagerPanel({
           <Database className="text-blue-600" />
           {t('manager.title')}
         </h2>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap justify-end gap-2">
+          <button
+            onClick={handleExportCSV}
+            className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+          >
+            <Download size={16} />
+            {t('common.exportCsv', { defaultValue: 'Export CSV' })}
+          </button>
           <button
             onClick={handleClearData}
             className="px-3 py-1.5 text-sm bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40 rounded-md font-medium transition-colors"
