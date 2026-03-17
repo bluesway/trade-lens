@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Activity,
@@ -47,9 +47,45 @@ export default function Header({
   toggleDarkMode
 }) {
   const { t, i18n } = useTranslation();
+  const [isImportSummaryOpen, setIsImportSummaryOpen] = useState(false);
+  const importSummaryRef = useRef(null);
   const activeLocale = normalizeLocale(i18n.resolvedLanguage || i18n.language);
   const showGregorianReference = shouldShowGregorianReference(activeLocale);
   const csvRowKeys = ['date', 'type', 'symbol', 'market', 'quantity', 'price', 'amount', 'pnl'];
+
+  useEffect(() => {
+    if (!lastImportMeta) {
+      setIsImportSummaryOpen(false);
+    }
+  }, [lastImportMeta]);
+
+  useEffect(() => {
+    if (!isImportSummaryOpen) {
+      return undefined;
+    }
+
+    const handlePointerDown = (event) => {
+      if (!importSummaryRef.current?.contains(event.target)) {
+        setIsImportSummaryOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setIsImportSummaryOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('touchstart', handlePointerDown, { passive: true });
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isImportSummaryOpen]);
 
   const handleLocaleChange = (event) => {
     const nextLocale = event.target.value;
@@ -346,13 +382,16 @@ export default function Header({
           </div>
 
           {lastImportMeta && (
-            <details className="relative mt-4 group/details">
-              <summary
+            <div ref={importSummaryRef} className="relative mt-4">
+              <button
+                type="button"
+                onClick={() => setIsImportSummaryOpen((currentValue) => !currentValue)}
+                aria-expanded={isImportSummaryOpen}
                 className={`flex flex-wrap items-center gap-2 rounded-xl border px-3 py-2 text-xs font-medium ${
                   hasSkippedImportRows
                     ? 'border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300'
                     : 'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300'
-                } cursor-pointer list-none [&::-webkit-details-marker]:hidden`}
+                } w-full cursor-pointer text-left transition-colors hover:brightness-[0.98] dark:hover:brightness-110`}
                 title={`${getLocalizedImportMetaProfileLabel(lastImportMeta)} · ${getLocalizedImportDelimiterLabel(lastImportMeta.delimiterLabel)}`}
               >
                 <span>{getLocalizedImportMetaProfileLabel(lastImportMeta)}</span>
@@ -372,11 +411,12 @@ export default function Header({
                 )}
                 <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-current/80">
                   {t('header.importDetailsToggle', { defaultValue: 'Details' })}
-                  <ChevronDown size={14} className="transition-transform group-open/details:rotate-180" />
+                  <ChevronDown size={14} className={`transition-transform ${isImportSummaryOpen ? 'rotate-180' : ''}`} />
                 </span>
-              </summary>
+              </button>
 
-              <div className="absolute left-0 top-[calc(100%+0.75rem)] z-50 w-full max-w-md rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 shadow-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 lg:left-auto lg:right-0">
+              {isImportSummaryOpen && (
+                <div className="absolute left-0 top-[calc(100%+0.75rem)] z-50 w-full max-w-md rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 shadow-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 lg:left-auto lg:right-0">
                 <h4 className="mb-3 flex items-center gap-2 border-b border-slate-200 pb-2 font-bold text-slate-800 dark:border-slate-700 dark:text-slate-100">
                   <Info size={14} className="text-blue-500" />
                   {t('header.importSummaryTitle', { defaultValue: 'Last import' })}
@@ -489,7 +529,8 @@ export default function Header({
                   </div>
                 )}
               </div>
-            </details>
+              )}
+            </div>
           )}
         </div>
       </div>
