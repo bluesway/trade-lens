@@ -87,7 +87,11 @@ const zhTW = {
       brokerAr: '阿文券商 CSV',
       brokerEuro: '歐系券商 CSV',
       schwabTransactions: '嘉信交易紀錄 CSV',
-      schwabPositions: '嘉信持倉快照 CSV'
+      schwabPositions: '嘉信持倉快照 CSV',
+      ibkrTransactions: 'IBKR 交易紀錄 CSV',
+      ibkrPositions: 'IBKR 持倉快照 CSV',
+      firstradeTransactions: 'Firstrade 交易紀錄 CSV',
+      robinhoodTransactions: 'Robinhood 交易紀錄 CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -306,7 +310,11 @@ const yueHantHK = {
       brokerAr: '阿文券商 CSV',
       brokerEuro: '歐系券商 CSV',
       schwabTransactions: '嘉信交易紀錄 CSV',
-      schwabPositions: '嘉信持倉快照 CSV'
+      schwabPositions: '嘉信持倉快照 CSV',
+      ibkrTransactions: 'IBKR 交易紀錄 CSV',
+      ibkrPositions: 'IBKR 持倉快照 CSV',
+      firstradeTransactions: 'Firstrade 交易紀錄 CSV',
+      robinhoodTransactions: 'Robinhood 交易紀錄 CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -525,7 +533,11 @@ const zhCN = {
       brokerAr: '阿拉伯文券商 CSV',
       brokerEuro: '欧系券商 CSV',
       schwabTransactions: '嘉信交易记录 CSV',
-      schwabPositions: '嘉信持仓快照 CSV'
+      schwabPositions: '嘉信持仓快照 CSV',
+      ibkrTransactions: 'IBKR 交易记录 CSV',
+      ibkrPositions: 'IBKR 持仓快照 CSV',
+      firstradeTransactions: 'Firstrade 交易记录 CSV',
+      robinhoodTransactions: 'Robinhood 交易记录 CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -940,7 +952,11 @@ const enUS = {
       brokerAr: 'Arabic broker CSV',
       brokerEuro: 'Euro-style broker CSV',
       schwabTransactions: 'Schwab transactions CSV',
-      schwabPositions: 'Schwab positions CSV'
+      schwabPositions: 'Schwab positions CSV',
+      ibkrTransactions: 'IBKR trades CSV',
+      ibkrPositions: 'IBKR positions CSV',
+      firstradeTransactions: 'Firstrade activity CSV',
+      robinhoodTransactions: 'Robinhood activity CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -1159,7 +1175,11 @@ const enGB = {
       brokerAr: 'Arabic broker CSV',
       brokerEuro: 'Euro-style broker CSV',
       schwabTransactions: 'Schwab transactions CSV',
-      schwabPositions: 'Schwab positions CSV'
+      schwabPositions: 'Schwab positions CSV',
+      ibkrTransactions: 'IBKR trades CSV',
+      ibkrPositions: 'IBKR positions CSV',
+      firstradeTransactions: 'Firstrade activity CSV',
+      robinhoodTransactions: 'Robinhood activity CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -1421,7 +1441,11 @@ const jaJP = {
       brokerAr: 'アラビア語ブローカー CSV',
       brokerEuro: '欧州系ブローカー CSV',
       schwabTransactions: 'Schwab 取引履歴 CSV',
-      schwabPositions: 'Schwab 保有残高 CSV'
+      schwabPositions: 'Schwab 保有残高 CSV',
+      ibkrTransactions: 'IBKR 取引履歴 CSV',
+      ibkrPositions: 'IBKR 保有残高 CSV',
+      firstradeTransactions: 'Firstrade 取引履歴 CSV',
+      robinhoodTransactions: 'Robinhood 取引履歴 CSV'
     },
     csvDelimiters: {
       tab: 'tab'

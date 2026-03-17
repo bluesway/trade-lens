@@ -2,6 +2,7 @@ const BUY_TYPE_TERMS = [
   '買',
   '买',
   'buy',
+  'bought',
   'bot',
   'bid',
   'long',
@@ -28,6 +29,7 @@ const SELL_TYPE_TERMS = [
   '賣',
   '卖',
   'sell',
+  'sold',
   'sld',
   'ask',
   'short',
@@ -54,20 +56,22 @@ const SORTED_BUY_TYPE_TERMS = [...BUY_TYPE_TERMS].sort((a, b) => b.length - a.le
 const SORTED_SELL_TYPE_TERMS = [...SELL_TYPE_TERMS].sort((a, b) => b.length - a.length);
 
 const STANDARD_HEADER_ALIASES = {
-  日期: ['日期', '交易日期', '成交日期', 'Date', 'Trade Date', 'Tanggal', 'Tarikh', 'Ngày', 'Ngày giao dịch', 'Date opération', 'Date de transaction', 'Fecha', 'Fecha de operación', 'Fecha de transacción', 'Data', 'Data operação', 'Datum', 'Handelsdatum', 'Data di negoziazione', '日付', '取引日', 'التاريخ', 'วันที่', 'วันที่ซื้อขาย', '날짜', '거래일', '체결일'],
-  類型: ['類型', '交易類別', '動作', 'Type', 'Action', 'Side', 'Jenis', 'Loại', 'Giao dịch', 'Type d\'ordre', 'Ordre', 'Tipo', 'Tipo de orden', 'Operación', 'Transacción', 'Tipo de operação', 'Operação', 'Auftragstyp', 'Transaktionstyp', 'Art', 'Ordine', 'Operazione', 'Ordertype', 'Transactie', '区分', '種類', '売買区分', 'النوع', 'الإجراء', 'ประเภท', 'ฝั่ง', 'สถานะ', '구분', '유형', '매매구분'],
+  日期: ['日期', '交易日期', '成交日期', 'Date', 'Date/Time', 'Trade Date', 'Tanggal', 'Tarikh', 'Ngày', 'Ngày giao dịch', 'Date opération', 'Date de transaction', 'Fecha', 'Fecha de operación', 'Fecha de transacción', 'Data', 'Data operação', 'Datum', 'Handelsdatum', 'Data di negoziazione', '日付', '取引日', 'التاريخ', 'วันที่', 'วันที่ซื้อขาย', '날짜', '거래일', '체결일'],
+  類型: ['類型', '交易類別', '動作', 'Type', 'Action', 'Transaction', 'Activity', 'Side', 'Jenis', 'Loại', 'Giao dịch', 'Type d\'ordre', 'Ordre', 'Tipo', 'Tipo de orden', 'Operación', 'Transacción', 'Tipo de operação', 'Operação', 'Auftragstyp', 'Transaktionstyp', 'Art', 'Ordine', 'Operazione', 'Ordertype', 'Transactie', '区分', '種類', '売買区分', 'النوع', 'الإجراء', 'ประเภท', 'ฝั่ง', 'สถานะ', '구분', '유형', '매매구분'],
   代號: ['代號', '股票代號', '代碼', 'Symbol', 'Ticker', 'Stock Code', 'Simbol', 'Kode', 'Kod', 'Símbolo', 'Código', 'Código bursátil', 'Mã', 'Mã CK', 'Mã chứng khoán', 'Symbole', 'Code valeur', 'Wertpapier', 'Ticker-Symbol', 'Simbolo', 'Codice', 'Codice titolo', 'Symbool', '銘柄コード', 'コード', 'ティッカー', 'الرمز', 'สัญลักษณ์', 'ชื่อย่อ', 'ticker', '종목코드', '종목', '티커'],
   市場: ['市場', '交易所', 'Market', 'Exchange', 'Pasar', 'Pasaran', 'Thị trường', 'Marché', 'Place de marché', 'Mercado', 'Bolsa', 'Markt', 'Börse', 'Mercato', 'Beurs', '取引所', 'السوق', 'البورصة', 'ตลาด', '시장'],
-  數量: ['數量', '成交股數', '股數', 'Quantity', 'Qty', 'Shares', 'Kuantitas', 'Jumlah saham', 'Kuantiti', 'Bilangan unit', 'Bilangan saham', 'Số lượng', 'Khối lượng', 'Quantité', 'Cantidad', 'Acciones', 'Quantidade', 'Qtd', 'Stückzahl', 'Menge', 'Quantità', 'Aantal', '数量', '株数', 'الكمية', 'عدد الأسهم', 'จำนวน', 'จำนวนหุ้น', '수량', '주수'],
-  單價: ['單價', '成交價', '成交單價', 'Price', 'Execution Price', 'Harga', 'Harga per unit', 'Harga seunit', 'Giá', 'Giá khớp', 'Đơn giá', 'Prix', 'Prix unitaire', 'Precio', 'Precio unitario', 'Preço', 'Preço unitário', 'Preis', 'Kurs', 'Prezzo', 'Prijs', '単価', '価格', '約定価格', 'سعر الوحدة', 'السعر', 'ราคา', 'ราคาต่อหุ้น', 'ราคาต่อหน่วย', '단가', '체결가', '가격'],
-  總金額: ['總金額', '成交金額', '淨額', 'Amount', 'Total Amount', 'Net Amount', 'Nilai', 'Jumlah', 'Jumlah keseluruhan', 'Giá trị', 'Tổng giá trị', 'Montant', 'Montant total', 'Valeur totale', 'Importe', 'Importe total', 'Monto', 'Monto total', 'Valor total', 'Betrag', 'Gesamtbetrag', 'Importo', 'Totale', 'Bedrag', 'Totaalbedrag', '金額', '合計金額', '約定代金', 'إجمالي المبلغ', 'إجمالي القيمة', 'القيمة', 'มูลค่า', 'มูลค่ารวม', 'ยอดรวม', '금액', '총금액', '총액'],
-  損益: ['損益', '實現損益', 'PnL', 'Realized PnL', 'Profit', 'P&L', 'Gain/Loss', 'Gain/Loss $', 'P&L $', 'P&L $ (Unrealized)', 'Untung/Rugi', 'Untung rugi', 'Laba/Rugi', 'Lãi/Lỗ', 'Lãi lỗ', 'Lãi/Lỗ đã chốt', 'Plus/moins-value', 'Plus-value', 'Moins-value', 'Gain/Perte', 'Ganancia/Pérdida', 'Ganancias/Pérdidas', 'Resultado', 'Lucro/Prejuízo', 'Lucro / Prejuízo', 'Gewinn/Verlust', 'G/V', 'Utile/Perdita', 'Profitto/Perdita', 'Winst/Verlies', '実現損益', 'الربح أو الخسارة', 'الربح/الخسارة', 'الأرباح والخسائر', 'กำไรขาดทุน', 'กำไร/ขาดทุน', '손익', '실현손익'],
+  數量: ['數量', '成交股數', '股數', 'Quantity', 'Share Quantity', 'Qty', 'Shares', 'Kuantitas', 'Jumlah saham', 'Kuantiti', 'Bilangan unit', 'Bilangan saham', 'Số lượng', 'Khối lượng', 'Quantité', 'Cantidad', 'Acciones', 'Quantidade', 'Qtd', 'Stückzahl', 'Menge', 'Quantità', 'Aantal', '数量', '株数', 'الكمية', 'عدد الأسهم', 'จำนวน', 'จำนวนหุ้น', '수량', '주수'],
+  單價: ['單價', '成交價', '成交單價', 'Price', 'Share Price', 'Execution Price', 'T. Price', 'Trade Price', 'Average Price', 'Avg Price', 'Harga', 'Harga per unit', 'Harga seunit', 'Giá', 'Giá khớp', 'Đơn giá', 'Prix', 'Prix unitaire', 'Precio', 'Precio unitario', 'Preço', 'Preço unitário', 'Preis', 'Kurs', 'Prezzo', 'Prijs', '単価', '価格', '約定価格', 'سعر الوحدة', 'السعر', 'ราคา', 'ราคาต่อหุ้น', 'ราคาต่อหน่วย', '단가', '체결가', '가격'],
+  總金額: ['總金額', '成交金額', '淨額', 'Amount', 'Proceeds', 'Total Amount', 'Net Amount', 'Nilai', 'Jumlah', 'Jumlah keseluruhan', 'Giá trị', 'Tổng giá trị', 'Montant', 'Montant total', 'Valeur totale', 'Importe', 'Importe total', 'Monto', 'Monto total', 'Valor total', 'Betrag', 'Gesamtbetrag', 'Importo', 'Totale', 'Bedrag', 'Totaalbedrag', '金額', '合計金額', '約定代金', 'إجمالي المبلغ', 'إجمالي القيمة', 'القيمة', 'มูลค่า', 'มูลค่ารวม', 'ยอดรวม', '금액', '총금액', '총액'],
+  損益: ['損益', '實現損益', 'PnL', 'P/L', 'Realized PnL', 'Realized P/L', 'Realized Gain/Loss', 'Profit', 'P&L', 'Gain/Loss', 'Gain/Loss $', 'P&L $', 'P&L $ (Unrealized)', 'Unrealized P/L', 'Untung/Rugi', 'Untung rugi', 'Laba/Rugi', 'Lãi/Lỗ', 'Lãi lỗ', 'Lãi/Lỗ đã chốt', 'Plus/moins-value', 'Plus-value', 'Moins-value', 'Gain/Perte', 'Ganancia/Pérdida', 'Ganancias/Pérdidas', 'Resultado', 'Lucro/Prejuízo', 'Lucro / Prejuízo', 'Gewinn/Verlust', 'G/V', 'Utile/Perdita', 'Profitto/Perdita', 'Winst/Verlies', '実現損益', '含み損益', 'الربح أو الخسارة', 'الربح/الخسارة', 'الأرباح والخسائر', 'กำไรขาดทุน', 'กำไร/ขาดทุน', '손익', '실현손익'],
   說明: ['Description', 'Name', 'Security Name', 'Details'],
   持倉類型: ['Position', 'Position Type'],
-  成本基礎: ['Cost Basis', 'Cost basis', 'Cost Basis $', 'Total Cost'],
-  每股成本: ['Cost per Share', 'Cost/Share', 'Share Cost', 'Share/Contract Cost'],
+  成本基礎: ['Cost Basis', 'Cost basis', 'Cost Basis $', 'Basis', 'Total Cost'],
+  每股成本: ['Cost per Share', 'Cost/Share', 'Share Cost', 'Share/Contract Cost', 'Cost Price', 'Average Cost'],
   市值: ['Market Value', 'Position Value', 'Value'],
-  開倉日: ['Open Date']
+  開倉日: ['Open Date', 'Open'],
+  帳戶類型: ['Account Type'],
+  手續費: ['Comm/Fee', 'Commission', 'Comm/Tax', 'Total Commission', 'Fee', 'Fees']
 };
 
 const REQUIRED_STANDARD_FIELDS = ['日期', '類型', '代號', '數量'];
@@ -248,6 +252,77 @@ const CSV_IMPORT_PROFILES = [
       開倉日: ['Open Date'],
       說明: ['Description'],
       持倉類型: ['Position']
+    }
+  },
+  {
+    id: 'ibkr-transactions',
+    label: 'IBKR trades',
+    translationKey: 'header.csvProfiles.ibkrTransactions',
+    importKind: 'trades',
+    requiredFields: ['日期', '代號', '數量'],
+    preferredDecimalSeparator: '.',
+    signatureHeaders: {
+      日期: ['Date/Time'],
+      代號: ['Symbol'],
+      數量: ['Quantity'],
+      單價: ['T. Price', 'Trade Price'],
+      總金額: ['Proceeds'],
+      成本基礎: ['Basis', 'Cost Basis'],
+      手續費: ['Comm/Fee', 'Total Commission'],
+      損益: ['Realized P/L', 'Realized Gain/Loss']
+    }
+  },
+  {
+    id: 'ibkr-positions',
+    label: 'IBKR positions',
+    translationKey: 'header.csvProfiles.ibkrPositions',
+    importKind: 'positions',
+    requiredFields: ['代號', '數量'],
+    preferredDecimalSeparator: '.',
+    signatureHeaders: {
+      代號: ['Symbol'],
+      數量: ['Quantity'],
+      每股成本: ['Cost Price', 'Average Cost'],
+      成本基礎: ['Cost Basis'],
+      市值: ['Value', 'Market Value'],
+      開倉日: ['Open'],
+      損益: ['Unrealized P/L']
+    }
+  },
+  {
+    id: 'firstrade-transactions',
+    label: 'Firstrade activity',
+    translationKey: 'header.csvProfiles.firstradeTransactions',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
+    preferredDecimalSeparator: '.',
+    signatureHeaders: {
+      日期: ['Date'],
+      類型: ['Transaction'],
+      代號: ['Symbol'],
+      數量: ['Share Quantity', 'Quantity'],
+      單價: ['Price', 'Share Price'],
+      總金額: ['Amount'],
+      帳戶類型: ['Account Type'],
+      說明: ['Description']
+    }
+  },
+  {
+    id: 'robinhood-transactions',
+    label: 'Robinhood activity',
+    translationKey: 'header.csvProfiles.robinhoodTransactions',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
+    preferredDecimalSeparator: '.',
+    signatureHeaders: {
+      日期: ['Date/Time'],
+      類型: ['Type', 'Activity'],
+      代號: ['Symbol'],
+      數量: ['Quantity', 'Share Quantity'],
+      單價: ['Price', 'Average Price'],
+      總金額: ['Amount', 'Total Amount'],
+      手續費: ['Fees', 'Fee'],
+      說明: ['Details', 'Description']
     }
   }
 ];
@@ -483,6 +558,13 @@ const normalizeTradeType = (rawValue) => {
   return rawValue;
 };
 
+const getNormalizedTradeTypeOrEmpty = (rawValue) => {
+  const normalizedType = normalizeTradeType(rawValue);
+  return normalizedType === '買入' || normalizedType === '賣出'
+    ? normalizedType
+    : '';
+};
+
 const formatParsedNumber = (value, maxFractionDigits = 8) => {
   if (!Number.isFinite(value)) {
     return '';
@@ -542,6 +624,135 @@ const normalizeNumericCell = (rawValue, preferredDecimalSeparator = '.') => {
 
   const signedValue = isNegativeByParentheses ? -Math.abs(numericValue) : numericValue;
   return formatParsedNumber(signedValue);
+};
+
+const parseNumericCellValue = (rawValue, preferredDecimalSeparator = '.') => {
+  const normalizedValue = normalizeNumericCell(rawValue, preferredDecimalSeparator);
+  const numericValue = Number.parseFloat(normalizedValue);
+  return Number.isFinite(numericValue)
+    ? numericValue
+    : null;
+};
+
+const formatAbsoluteNumber = (value) => (
+  Number.isFinite(value)
+    ? formatParsedNumber(Math.abs(value))
+    : ''
+);
+
+const resolveTradeType = ({
+  rawType,
+  description,
+  quantityValue,
+  amountDirectionValue
+}) => {
+  const normalizedType = getNormalizedTradeTypeOrEmpty(rawType);
+  if (normalizedType) {
+    return normalizedType;
+  }
+
+  const normalizedDescriptionType = getNormalizedTradeTypeOrEmpty(description);
+  if (normalizedDescriptionType) {
+    return normalizedDescriptionType;
+  }
+
+  if (Number.isFinite(amountDirectionValue) && amountDirectionValue !== 0) {
+    return amountDirectionValue < 0 ? '買入' : '賣出';
+  }
+
+  if (Number.isFinite(quantityValue) && quantityValue !== 0) {
+    return quantityValue < 0 ? '賣出' : '買入';
+  }
+
+  return '';
+};
+
+const buildNormalizedTradeRow = ({
+  rawRow,
+  type,
+  quantityValue,
+  priceValue,
+  amountValue,
+  pnlValue
+}) => ({
+  日期: String(rawRow['日期'] || '').trim(),
+  類型: type,
+  代號: String(rawRow['代號'] || '').trim(),
+  市場: String(rawRow['市場'] || '').trim(),
+  數量: formatAbsoluteNumber(quantityValue),
+  單價: Number.isFinite(priceValue) ? formatParsedNumber(priceValue) : '',
+  總金額: formatAbsoluteNumber(amountValue),
+  損益: Number.isFinite(pnlValue) ? formatParsedNumber(pnlValue) : ''
+});
+
+const normalizeBrokerTransactionRow = (rawRow, preferredDecimalSeparator, options = {}) => {
+  const quantityValue = parseNumericCellValue(rawRow['數量'], preferredDecimalSeparator);
+  const priceValue = parseNumericCellValue(rawRow['單價'], preferredDecimalSeparator);
+  const amountDirectionValue = parseNumericCellValue(rawRow['總金額'], preferredDecimalSeparator);
+  const basisValue = parseNumericCellValue(rawRow['成本基礎'], preferredDecimalSeparator);
+  const feeValue = parseNumericCellValue(rawRow['手續費'], preferredDecimalSeparator);
+  const rawPnlValue = parseNumericCellValue(rawRow['損益'], preferredDecimalSeparator);
+  const type = resolveTradeType({
+    rawType: rawRow['類型'],
+    description: rawRow['說明'],
+    quantityValue,
+    amountDirectionValue
+  });
+
+  if (!type || !Number.isFinite(quantityValue) || quantityValue === 0) {
+    return buildNormalizedTradeRow({
+      rawRow,
+      type,
+      quantityValue,
+      priceValue,
+      amountValue: amountDirectionValue,
+      pnlValue: rawPnlValue
+    });
+  }
+
+  let amountValue = Number.isFinite(amountDirectionValue)
+    ? Math.abs(amountDirectionValue)
+    : null;
+
+  let amountFromBasis = false;
+  if (type === '買入' && options.preferBasisForBuys && Number.isFinite(basisValue) && basisValue > 0) {
+    amountValue = Math.abs(basisValue);
+    amountFromBasis = true;
+  }
+
+  if (!Number.isFinite(amountValue) && Number.isFinite(priceValue)) {
+    amountValue = Math.abs(quantityValue * priceValue);
+  }
+
+  if (
+    type === '買入'
+    && options.includeFeesInBuyCost
+    && !amountFromBasis
+    && Number.isFinite(amountValue)
+    && Number.isFinite(feeValue)
+    && feeValue !== 0
+  ) {
+    amountValue += Math.abs(feeValue);
+  }
+
+  let pnlValue = rawPnlValue;
+  if (
+    type === '賣出'
+    && !Number.isFinite(pnlValue)
+    && Number.isFinite(amountDirectionValue)
+    && Number.isFinite(basisValue)
+  ) {
+    pnlValue = amountDirectionValue - basisValue + (Number.isFinite(feeValue) ? feeValue : 0);
+  }
+
+  return buildNormalizedTradeRow({
+    rawRow,
+    type,
+    quantityValue,
+    priceValue,
+    amountValue,
+    pnlValue
+  });
 };
 
 const normalizeParsedRow = (rawRow, preferredDecimalSeparator) => {
@@ -625,13 +836,63 @@ const normalizePositionRow = (rawRow, preferredDecimalSeparator) => {
   };
 };
 
-const isImportableTradeRow = (row) => (
-  Boolean(row['日期'])
-  && (row['類型'] === '買入' || row['類型'] === '賣出')
-  && Boolean(row['代號'])
-  && Boolean(row['數量'])
-  && (Boolean(row['單價']) || Boolean(row['總金額']))
+const normalizeIbkrTransactionRow = (rawRow, preferredDecimalSeparator) => normalizeBrokerTransactionRow(
+  rawRow,
+  preferredDecimalSeparator,
+  {
+    preferBasisForBuys: true,
+    includeFeesInBuyCost: true
+  }
 );
+
+const normalizeFirstradeTransactionRow = (rawRow, preferredDecimalSeparator) => normalizeBrokerTransactionRow(
+  rawRow,
+  preferredDecimalSeparator,
+  {
+    includeFeesInBuyCost: true
+  }
+);
+
+const normalizeRobinhoodTransactionRow = (rawRow, preferredDecimalSeparator) => normalizeBrokerTransactionRow(
+  rawRow,
+  preferredDecimalSeparator,
+  {
+    includeFeesInBuyCost: true
+  }
+);
+
+const normalizeRowForProfile = (rawRow, profile, preferredDecimalSeparator) => {
+  switch (profile?.id) {
+    case 'ibkr-transactions':
+      return normalizeIbkrTransactionRow(rawRow, preferredDecimalSeparator);
+    case 'firstrade-transactions':
+      return normalizeFirstradeTransactionRow(rawRow, preferredDecimalSeparator);
+    case 'robinhood-transactions':
+      return normalizeRobinhoodTransactionRow(rawRow, preferredDecimalSeparator);
+    default:
+      return profile?.importKind === 'positions'
+        ? normalizePositionRow(rawRow, preferredDecimalSeparator)
+        : normalizeParsedRow(rawRow, preferredDecimalSeparator);
+  }
+};
+
+const isImportableTradeRow = (row) => {
+  const quantityValue = Number.parseFloat(row['數量']);
+  const priceValue = Number.parseFloat(row['單價']);
+  const amountValue = Number.parseFloat(row['總金額']);
+
+  return (
+    Boolean(row['日期'])
+    && (row['類型'] === '買入' || row['類型'] === '賣出')
+    && Boolean(row['代號'])
+    && Number.isFinite(quantityValue)
+    && quantityValue > 0
+    && (
+      (Number.isFinite(priceValue) && priceValue > 0)
+      || (Number.isFinite(amountValue) && amountValue > 0)
+    )
+  );
+};
 
 export const parseCSVWithMeta = (text, options = {}) => {
   const normalizedText = String(text || '').replace(/\r\n?/g, '\n');
@@ -702,9 +963,7 @@ export const parseCSVWithMeta = (text, options = {}) => {
       rawRow[field] = fieldIndex !== undefined ? cells[fieldIndex] || '' : '';
     });
 
-    const normalizedRow = importKind === 'positions'
-      ? normalizePositionRow(rawRow, preferredDecimalSeparator)
-      : normalizeParsedRow(rawRow, preferredDecimalSeparator);
+    const normalizedRow = normalizeRowForProfile(rawRow, inspection.profile, preferredDecimalSeparator);
 
     if (normalizedRow && isImportableTradeRow(normalizedRow)) {
       result.push(normalizedRow);
