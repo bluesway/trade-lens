@@ -104,7 +104,7 @@ const zhTW = {
       genericTemplates: '泛用模板'
     },
     importProfileHelpAuto: '不確定就先留在自動偵測。只有當特定券商匯出一直被猜錯時，再手動切 preset。',
-    importProfileHelpBroker: '券商預設適合已知來源的匯出檔，像 Schwab、IBKR、Firstrade、Robinhood。它會鎖定那家券商常見的欄位語意。',
+    importProfileHelpBroker: '券商預設適合已支援券商的匯出檔。它會鎖定那家券商常見的欄位語意，連市場提示也一起帶進來。',
     importProfileHelpGeneric: '泛用模板適合欄位名稱長得像語言慣例，但不是目前支援的特定券商匯出檔。',
     importProfileAuto: '自動偵測',
     forceRefresh: '強制刷新',
@@ -136,7 +136,12 @@ const zhTW = {
       ibkrTransactions: 'IBKR 交易紀錄 CSV',
       ibkrPositions: 'IBKR 持倉快照 CSV',
       firstradeTransactions: 'Firstrade 交易紀錄 CSV',
-      robinhoodTransactions: 'Robinhood 交易紀錄 CSV'
+      robinhoodTransactions: 'Robinhood 交易紀錄 CSV',
+      rakutenTransactions: '楽天證券交易紀錄 CSV',
+      sbiTransactions: 'SBI 證券交易紀錄 CSV',
+      sinopacTwTransactions: '永豐台股交易紀錄 CSV',
+      fubonTwTransactions: '富邦台股交易紀錄 CSV',
+      futuTransactions: '富途 / moomoo 交易紀錄 CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -380,7 +385,7 @@ const yueHantHK = {
       genericTemplates: '泛用模板'
     },
     importProfileHelpAuto: '唔肯定就先留喺自動偵測。只有當某份券商匯出成日估錯，先再手動揀 preset。',
-    importProfileHelpBroker: '券商預設適合已知來源嘅匯出檔，例如 Schwab、IBKR、Firstrade、Robinhood。佢會鎖定嗰間券商常見欄位語意。',
+    importProfileHelpBroker: '券商預設啱用喺已支援券商匯出檔。佢會鎖定嗰間券商常見欄位語意，連市場提示都會一齊帶埋。',
     importProfileHelpGeneric: '泛用模板適合欄位名睇落似語言慣例，但唔係目前支援嘅指定券商匯出檔。',
     importProfileAuto: '自動偵測',
     forceRefresh: '強制刷新',
@@ -412,7 +417,12 @@ const yueHantHK = {
       ibkrTransactions: 'IBKR 交易紀錄 CSV',
       ibkrPositions: 'IBKR 持倉快照 CSV',
       firstradeTransactions: 'Firstrade 交易紀錄 CSV',
-      robinhoodTransactions: 'Robinhood 交易紀錄 CSV'
+      robinhoodTransactions: 'Robinhood 交易紀錄 CSV',
+      rakutenTransactions: '樂天證券交易紀錄 CSV',
+      sbiTransactions: 'SBI 證券交易紀錄 CSV',
+      sinopacTwTransactions: '永豐台股交易紀錄 CSV',
+      fubonTwTransactions: '富邦台股交易紀錄 CSV',
+      futuTransactions: '富途 / moomoo 交易紀錄 CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -656,7 +666,7 @@ const zhCN = {
       genericTemplates: '通用模板'
     },
     importProfileHelpAuto: '拿不准时先保留自动识别。只有某家券商导出的 CSV 一直猜错，才需要手动切 preset。',
-    importProfileHelpBroker: '券商预设适合已知来源的导出文件，比如 Schwab、IBKR、Firstrade、Robinhood。它会锁定该券商常见的字段语义。',
+    importProfileHelpBroker: '券商预设适合已支持券商的导出文件。它会锁定该券商常见的字段语义，连市场提示也会一起带上。',
     importProfileHelpGeneric: '通用模板适合字段名看起来像语言惯例，但并非当前已支持的特定券商导出文件。',
     importProfileAuto: '自动识别',
     forceRefresh: '强制刷新',
@@ -688,7 +698,12 @@ const zhCN = {
       ibkrTransactions: 'IBKR 交易记录 CSV',
       ibkrPositions: 'IBKR 持仓快照 CSV',
       firstradeTransactions: 'Firstrade 交易记录 CSV',
-      robinhoodTransactions: 'Robinhood 交易记录 CSV'
+      robinhoodTransactions: 'Robinhood 交易记录 CSV',
+      rakutenTransactions: '乐天证券交易记录 CSV',
+      sbiTransactions: 'SBI 证券交易记录 CSV',
+      sinopacTwTransactions: '永丰台股交易记录 CSV',
+      fubonTwTransactions: '富邦台股交易记录 CSV',
+      futuTransactions: '富途 / moomoo 交易记录 CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -1128,7 +1143,7 @@ const enUS = {
       genericTemplates: 'Generic templates'
     },
     importProfileHelpAuto: 'Leave this on auto detect unless a specific broker export keeps getting guessed wrong. For most files, auto is the safest first shot.',
-    importProfileHelpBroker: 'Use a broker preset for known exports from brokers like Schwab, IBKR, Firstrade, or Robinhood. It locks the parser to that broker’s usual column meanings.',
+    importProfileHelpBroker: 'Use a broker preset when the CSV comes from a supported broker export. It locks the parser to that broker’s usual column meanings and market hints.',
     importProfileHelpGeneric: 'Use a generic template when the CSV looks familiar by language, but it does not come from one of the supported broker presets.',
     importProfileAuto: 'Auto detect',
     forceRefresh: 'Force Refresh',
@@ -1160,7 +1175,12 @@ const enUS = {
       ibkrTransactions: 'IBKR trades CSV',
       ibkrPositions: 'IBKR positions CSV',
       firstradeTransactions: 'Firstrade activity CSV',
-      robinhoodTransactions: 'Robinhood activity CSV'
+      robinhoodTransactions: 'Robinhood activity CSV',
+      rakutenTransactions: 'Rakuten Securities trades CSV',
+      sbiTransactions: 'SBI Securities trades CSV',
+      sinopacTwTransactions: 'Sinopac Taiwan trades CSV',
+      fubonTwTransactions: 'Fubon Taiwan trades CSV',
+      futuTransactions: 'Futu / moomoo activity CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -1404,7 +1424,7 @@ const enGB = {
       genericTemplates: 'Generic templates'
     },
     importProfileHelpAuto: 'Leave this on auto detect unless a specific broker export keeps getting guessed wrong. For most files, auto is the safest first shot.',
-    importProfileHelpBroker: 'Use a broker preset for known exports from brokers like Schwab, IBKR, Firstrade, or Robinhood. It locks the parser to that broker’s usual column meanings.',
+    importProfileHelpBroker: 'Use a broker preset when the CSV comes from a supported broker export. It locks the parser to that broker’s usual column meanings and market hints.',
     importProfileHelpGeneric: 'Use a generic template when the CSV looks familiar by language, but it does not come from one of the supported broker presets.',
     importProfileAuto: 'Auto detect',
     forceRefresh: 'Force Refresh',
@@ -1436,7 +1456,12 @@ const enGB = {
       ibkrTransactions: 'IBKR trades CSV',
       ibkrPositions: 'IBKR positions CSV',
       firstradeTransactions: 'Firstrade activity CSV',
-      robinhoodTransactions: 'Robinhood activity CSV'
+      robinhoodTransactions: 'Robinhood activity CSV',
+      rakutenTransactions: 'Rakuten Securities trades CSV',
+      sbiTransactions: 'SBI Securities trades CSV',
+      sinopacTwTransactions: 'Sinopac Taiwan trades CSV',
+      fubonTwTransactions: 'Fubon Taiwan trades CSV',
+      futuTransactions: 'Futu / moomoo activity CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -1723,7 +1748,7 @@ const jaJP = {
       genericTemplates: '汎用テンプレート'
     },
     importProfileHelpAuto: '迷ったらまずは自動判定のままで大丈夫です。特定の証券会社 CSV だけ判定がズレるときに、手動でプリセットを切り替えてください。',
-    importProfileHelpBroker: '証券会社プリセットは、Schwab、IBKR、Firstrade、Robinhood など既知の書き出し形式向けです。その証券会社でよく使われる列の意味に合わせて固定します。',
+    importProfileHelpBroker: '証券会社プリセットは、対応済みの証券会社書き出し形式向けです。その証券会社でよく使われる列の意味と市場ヒントに合わせて固定します。',
     importProfileHelpGeneric: '汎用テンプレートは、列名が言語の定番パターンに近いけれど、対応済みの証券会社 CSV そのものではないファイル向けです。',
     importProfileAuto: '自動判定',
     forceRefresh: '強制更新',
@@ -1755,7 +1780,12 @@ const jaJP = {
       ibkrTransactions: 'IBKR 取引履歴 CSV',
       ibkrPositions: 'IBKR 保有残高 CSV',
       firstradeTransactions: 'Firstrade 取引履歴 CSV',
-      robinhoodTransactions: 'Robinhood 取引履歴 CSV'
+      robinhoodTransactions: 'Robinhood 取引履歴 CSV',
+      rakutenTransactions: '楽天証券 取引履歴 CSV',
+      sbiTransactions: 'SBI証券 取引履歴 CSV',
+      sinopacTwTransactions: '永豊証券 台湾株取引 CSV',
+      fubonTwTransactions: '富邦証券 台湾株取引 CSV',
+      futuTransactions: 'Futu / moomoo 取引履歴 CSV'
     },
     csvDelimiters: {
       tab: 'tab'

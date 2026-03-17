@@ -56,22 +56,22 @@ const SORTED_BUY_TYPE_TERMS = [...BUY_TYPE_TERMS].sort((a, b) => b.length - a.le
 const SORTED_SELL_TYPE_TERMS = [...SELL_TYPE_TERMS].sort((a, b) => b.length - a.length);
 
 const STANDARD_HEADER_ALIASES = {
-  日期: ['日期', '交易日期', '成交日期', 'Date', 'Date/Time', 'Trade Date', 'Tanggal', 'Tarikh', 'Ngày', 'Ngày giao dịch', 'Date opération', 'Date de transaction', 'Fecha', 'Fecha de operación', 'Fecha de transacción', 'Data', 'Data operação', 'Datum', 'Handelsdatum', 'Data di negoziazione', '日付', '取引日', 'التاريخ', 'วันที่', 'วันที่ซื้อขาย', '날짜', '거래일', '체결일'],
-  類型: ['類型', '交易類別', '動作', 'Type', 'Action', 'Transaction', 'Activity', 'Side', 'Jenis', 'Loại', 'Giao dịch', 'Type d\'ordre', 'Ordre', 'Tipo', 'Tipo de orden', 'Operación', 'Transacción', 'Tipo de operação', 'Operação', 'Auftragstyp', 'Transaktionstyp', 'Art', 'Ordine', 'Operazione', 'Ordertype', 'Transactie', '区分', '種類', '売買区分', 'النوع', 'الإجراء', 'ประเภท', 'ฝั่ง', 'สถานะ', '구분', '유형', '매매구분'],
-  代號: ['代號', '股票代號', '代碼', 'Symbol', 'Ticker', 'Stock Code', 'Simbol', 'Kode', 'Kod', 'Símbolo', 'Código', 'Código bursátil', 'Mã', 'Mã CK', 'Mã chứng khoán', 'Symbole', 'Code valeur', 'Wertpapier', 'Ticker-Symbol', 'Simbolo', 'Codice', 'Codice titolo', 'Symbool', '銘柄コード', 'コード', 'ティッカー', 'الرمز', 'สัญลักษณ์', 'ชื่อย่อ', 'ticker', '종목코드', '종목', '티커'],
-  市場: ['市場', '交易所', 'Market', 'Exchange', 'Pasar', 'Pasaran', 'Thị trường', 'Marché', 'Place de marché', 'Mercado', 'Bolsa', 'Markt', 'Börse', 'Mercato', 'Beurs', '取引所', 'السوق', 'البورصة', 'ตลาด', '시장'],
-  數量: ['數量', '成交股數', '股數', 'Quantity', 'Share Quantity', 'Qty', 'Shares', 'Kuantitas', 'Jumlah saham', 'Kuantiti', 'Bilangan unit', 'Bilangan saham', 'Số lượng', 'Khối lượng', 'Quantité', 'Cantidad', 'Acciones', 'Quantidade', 'Qtd', 'Stückzahl', 'Menge', 'Quantità', 'Aantal', '数量', '株数', 'الكمية', 'عدد الأسهم', 'จำนวน', 'จำนวนหุ้น', '수량', '주수'],
-  單價: ['單價', '成交價', '成交單價', 'Price', 'Share Price', 'Execution Price', 'T. Price', 'Trade Price', 'Average Price', 'Avg Price', 'Harga', 'Harga per unit', 'Harga seunit', 'Giá', 'Giá khớp', 'Đơn giá', 'Prix', 'Prix unitaire', 'Precio', 'Precio unitario', 'Preço', 'Preço unitário', 'Preis', 'Kurs', 'Prezzo', 'Prijs', '単価', '価格', '約定価格', 'سعر الوحدة', 'السعر', 'ราคา', 'ราคาต่อหุ้น', 'ราคาต่อหน่วย', '단가', '체결가', '가격'],
-  總金額: ['總金額', '成交金額', '淨額', 'Amount', 'Proceeds', 'Total Amount', 'Net Amount', 'Nilai', 'Jumlah', 'Jumlah keseluruhan', 'Giá trị', 'Tổng giá trị', 'Montant', 'Montant total', 'Valeur totale', 'Importe', 'Importe total', 'Monto', 'Monto total', 'Valor total', 'Betrag', 'Gesamtbetrag', 'Importo', 'Totale', 'Bedrag', 'Totaalbedrag', '金額', '合計金額', '約定代金', 'إجمالي المبلغ', 'إجمالي القيمة', 'القيمة', 'มูลค่า', 'มูลค่ารวม', 'ยอดรวม', '금액', '총금액', '총액'],
+  日期: ['日期', '交易日期', '成交日期', '成交時間', '交易時間', 'Date', 'Date/Time', 'Trade Date', 'Trade Time', 'Execution Time', 'Tanggal', 'Tarikh', 'Ngày', 'Ngày giao dịch', 'Date opération', 'Date de transaction', 'Fecha', 'Fecha de operación', 'Fecha de transacción', 'Data', 'Data operação', 'Datum', 'Handelsdatum', 'Data di negoziazione', '日付', '取引日', '約定日', '受渡日', 'التاريخ', 'วันที่', 'วันที่ซื้อขาย', '날짜', '거래일', '체결일'],
+  類型: ['類型', '交易類別', '交易類型', '交易方向', '買賣別', '交易別', '動作', 'Type', 'Action', 'Transaction', 'Activity', 'Trade Type', 'Side', 'Jenis', 'Loại', 'Giao dịch', 'Type d\'ordre', 'Ordre', 'Tipo', 'Tipo de orden', 'Operación', 'Transacción', 'Tipo de operação', 'Operação', 'Auftragstyp', 'Transaktionstyp', 'Art', 'Ordine', 'Operazione', 'Ordertype', 'Transactie', '区分', '種類', '売買区分', '売買', '取引', 'النوع', 'الإجراء', 'ประเภท', 'ฝั่ง', 'สถานะ', '구분', '유형', '매매구분'],
+  代號: ['代號', '股票代號', '代碼', '證券代號', '證券代碼', '證券編號', '股票代码', '證券コード', 'Symbol', 'Ticker', 'Stock Code', 'Simbol', 'Kode', 'Kod', 'Símbolo', 'Código', 'Código bursátil', 'Mã', 'Mã CK', 'Mã chứng khoán', 'Symbole', 'Code valeur', 'Wertpapier', 'Ticker-Symbol', 'Simbolo', 'Codice', 'Codice titolo', 'Symbool', '銘柄コード', 'コード', 'ティッカー', 'الرمز', 'สัญลักษณ์', 'ชื่อย่อ', 'ticker', '종목코드', '종목', '티커'],
+  市場: ['市場', '市場別', '市場名稱', '市場名称', '市場區別', '市場区分', '交易所', 'Market', 'Exchange', 'Pasar', 'Pasaran', 'Thị trường', 'Marché', 'Place de marché', 'Mercado', 'Bolsa', 'Markt', 'Börse', 'Mercato', 'Beurs', '取引所', 'السوق', 'البورصة', 'ตลาด', '시장'],
+  數量: ['數量', '成交股數', '成交數量', '成交数量', '股數', 'Quantity', 'Share Quantity', 'Qty', 'Shares', 'Filled Qty', 'Kuantitas', 'Jumlah saham', 'Kuantiti', 'Bilangan unit', 'Bilangan saham', 'Số lượng', 'Khối lượng', 'Quantité', 'Cantidad', 'Acciones', 'Quantidade', 'Qtd', 'Stückzahl', 'Menge', 'Quantità', 'Aantal', '数量', '株数', '約定数量', '約定株数', 'الكمية', 'عدد الأسهم', 'จำนวน', 'จำนวนหุ้น', '수량', '주수'],
+  單價: ['單價', '成交價', '成交單價', '成交均價', '成交均价', '均價', '均价', 'Price', 'Share Price', 'Execution Price', 'T. Price', 'Trade Price', 'Average Price', 'Avg Price', 'Avg. Price', 'Filled Avg Price', 'Harga', 'Harga per unit', 'Harga seunit', 'Giá', 'Giá khớp', 'Đơn giá', 'Prix', 'Prix unitaire', 'Precio', 'Precio unitario', 'Preço', 'Preço unitário', 'Preis', 'Kurs', 'Prezzo', 'Prijs', '単価', '価格', '約定価格', '約定単価', 'سعر الوحدة', 'السعر', 'ราคา', 'ราคาต่อหุ้น', 'ราคาต่อหน่วย', '단가', '체결가', '가격'],
+  總金額: ['總金額', '成交金額', '成交金额', '成交價金', '成交价金', '淨額', 'Amount', 'Proceeds', 'Total Amount', 'Net Amount', 'Net Cash Amount', 'Filled Amount', 'Nilai', 'Jumlah', 'Jumlah keseluruhan', 'Giá trị', 'Tổng giá trị', 'Montant', 'Montant total', 'Valeur totale', 'Importe', 'Importe total', 'Monto', 'Monto total', 'Valor total', 'Betrag', 'Gesamtbetrag', 'Importo', 'Totale', 'Bedrag', 'Totaalbedrag', '金額', '合計金額', '約定代金', '受渡金額', 'إجمالي المبلغ', 'إجمالي القيمة', 'القيمة', 'มูลค่า', 'มูลค่ารวม', 'ยอดรวม', '금액', '총금액', '총액'],
   損益: ['損益', '實現損益', 'PnL', 'P/L', 'Realized PnL', 'Realized P/L', 'Realized Gain/Loss', 'Profit', 'P&L', 'Gain/Loss', 'Gain/Loss $', 'P&L $', 'P&L $ (Unrealized)', 'Unrealized P/L', 'Untung/Rugi', 'Untung rugi', 'Laba/Rugi', 'Lãi/Lỗ', 'Lãi lỗ', 'Lãi/Lỗ đã chốt', 'Plus/moins-value', 'Plus-value', 'Moins-value', 'Gain/Perte', 'Ganancia/Pérdida', 'Ganancias/Pérdidas', 'Resultado', 'Lucro/Prejuízo', 'Lucro / Prejuízo', 'Gewinn/Verlust', 'G/V', 'Utile/Perdita', 'Profitto/Perdita', 'Winst/Verlies', '実現損益', '含み損益', 'الربح أو الخسارة', 'الربح/الخسارة', 'الأرباح والخسائر', 'กำไรขาดทุน', 'กำไร/ขาดทุน', '손익', '실현손익'],
-  說明: ['Description', 'Name', 'Security Name', 'Details'],
+  說明: ['Description', 'Name', 'Security Name', 'Stock Name', 'Details', '股票名稱', '證券名稱', '銘柄'],
   持倉類型: ['Position', 'Position Type'],
   成本基礎: ['Cost Basis', 'Cost basis', 'Cost Basis $', 'Basis', 'Total Cost'],
   每股成本: ['Cost per Share', 'Cost/Share', 'Share Cost', 'Share/Contract Cost', 'Cost Price', 'Average Cost'],
   市值: ['Market Value', 'Position Value', 'Value'],
   開倉日: ['Open Date', 'Open'],
   帳戶類型: ['Account Type'],
-  手續費: ['Comm/Fee', 'Commission', 'Comm/Tax', 'Total Commission', 'Fee', 'Fees']
+  手續費: ['Comm/Fee', 'Commission', 'Comm/Tax', 'Total Commission', 'Fee', 'Fees', '手續費', '手续费', '佣金', '手数料']
 };
 
 const REQUIRED_STANDARD_FIELDS = ['日期', '類型', '代號', '數量'];
@@ -324,6 +324,94 @@ const CSV_IMPORT_PROFILES = [
       手續費: ['Fees', 'Fee'],
       說明: ['Details', 'Description']
     }
+  },
+  {
+    id: 'rakuten-transactions',
+    label: 'Rakuten Securities trades',
+    translationKey: 'header.csvProfiles.rakutenTransactions',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
+    preferredDecimalSeparator: '.',
+    signatureHeaders: {
+      日期: ['約定日', '受渡日'],
+      類型: ['売買'],
+      代號: ['銘柄コード'],
+      數量: ['約定数量', '株数'],
+      單價: ['約定単価', '約定価格'],
+      總金額: ['受渡金額', '約定代金'],
+      說明: ['銘柄']
+    }
+  },
+  {
+    id: 'sbi-transactions',
+    label: 'SBI Securities trades',
+    translationKey: 'header.csvProfiles.sbiTransactions',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
+    preferredDecimalSeparator: '.',
+    signatureHeaders: {
+      日期: ['約定日', '受渡日'],
+      類型: ['取引', '売買'],
+      代號: ['銘柄コード', 'コード'],
+      數量: ['約定数量', '株数'],
+      單價: ['約定単価', '約定価格'],
+      總金額: ['受渡金額', '約定代金'],
+      說明: ['銘柄']
+    }
+  },
+  {
+    id: 'sinopac-tw-transactions',
+    label: 'Sinopac Taiwan trades',
+    translationKey: 'header.csvProfiles.sinopacTwTransactions',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
+    preferredDecimalSeparator: '.',
+    signatureHeaders: {
+      日期: ['成交日期', '交易日期'],
+      類型: ['買賣別', '交易別'],
+      代號: ['股票代號'],
+      數量: ['成交股數', '成交數量'],
+      單價: ['成交價', '成交均價'],
+      總金額: ['成交價金', '成交金額'],
+      市場: ['市場別'],
+      說明: ['股票名稱']
+    }
+  },
+  {
+    id: 'fubon-tw-transactions',
+    label: 'Fubon Taiwan trades',
+    translationKey: 'header.csvProfiles.fubonTwTransactions',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
+    preferredDecimalSeparator: '.',
+    signatureHeaders: {
+      日期: ['成交日期', '交易日期'],
+      類型: ['買賣別', '交易別'],
+      代號: ['證券代號', '股票代號'],
+      數量: ['成交數量', '成交股數'],
+      單價: ['成交價格', '成交價'],
+      總金額: ['成交金額', '成交價金'],
+      市場: ['市場別'],
+      說明: ['證券名稱', '股票名稱']
+    }
+  },
+  {
+    id: 'futu-transactions',
+    label: 'Futu / moomoo activity',
+    translationKey: 'header.csvProfiles.futuTransactions',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
+    preferredDecimalSeparator: '.',
+    signatureHeaders: {
+      日期: ['成交時間', 'Date/Time'],
+      類型: ['交易方向', 'Action', 'Side'],
+      代號: ['證券代碼', '股票代號', 'Symbol', 'Stock Code'],
+      市場: ['市場', 'Market'],
+      數量: ['成交數量', 'Filled Qty', 'Quantity'],
+      單價: ['成交均價', 'Avg Price', 'Average Price'],
+      總金額: ['成交金額', 'Filled Amount', 'Amount'],
+      說明: ['股票名稱', 'Stock Name', 'Name']
+    }
   }
 ];
 
@@ -482,15 +570,16 @@ const buildHeaderMap = (rawHeaders) => {
   const headerMap = {};
 
   rawHeaders.forEach((rawHeader, index) => {
-    Object.entries(STANDARD_HEADER_ALIASES).forEach(([standardField, keywords]) => {
+    for (const [standardField, keywords] of Object.entries(STANDARD_HEADER_ALIASES)) {
       if (headerMap[standardField] !== undefined) {
-        return;
+        continue;
       }
 
       if (keywords.some((keyword) => matchesHeaderLabel(rawHeader, keyword))) {
         headerMap[standardField] = index;
+        break;
       }
-    });
+    }
   });
 
   return headerMap;
@@ -585,6 +674,76 @@ const normalizeTradeType = (rawValue) => {
   }
 
   return rawValue;
+};
+
+const MARKET_HINTS = [
+  { market: '台股', hints: ['台股', '臺股', '台灣', '臺灣', 'taiwan', 'tw', 'twse', 'tpex'] },
+  { market: '港股', hints: ['港股', '香港', 'hongkong', 'hk', 'hkex', '香港株'] },
+  { market: '日股', hints: ['日股', '日本', 'japan', 'jp', 'tse', 'tokyo', '日本株', '国内株'] },
+  { market: '美股', hints: ['美股', '美國', '美国', 'us', 'usa', 'nyse', 'nasdaq', '米国株'] },
+  { market: '陸股', hints: ['陸股', '中國', '中国', 'china', 'ashare', 'a股', '上海', '深圳', 'shanghai', 'shenzhen'] }
+];
+
+const resolveCanonicalMarket = (rawValue) => {
+  const normalizedMarket = normalizeHeaderLabel(rawValue);
+  if (!normalizedMarket) {
+    return '';
+  }
+
+  const matchedMarket = MARKET_HINTS.find(({ hints }) => (
+    hints.some((hint) => normalizedMarket.includes(normalizeHeaderLabel(hint)))
+  ));
+
+  return matchedMarket?.market || '';
+};
+
+const inferSymbolMarket = (rawSymbol) => {
+  const normalizedSymbol = String(rawSymbol || '').trim().toUpperCase();
+
+  if (/^\d{6}$/.test(normalizedSymbol) && (normalizedSymbol.startsWith('6') || normalizedSymbol.startsWith('0'))) {
+    return '陸股';
+  }
+
+  if (/^\d{4}$/.test(normalizedSymbol)) {
+    return '日股';
+  }
+
+  if (/^[A-Z][A-Z0-9-]*$/.test(normalizedSymbol)) {
+    return '美股';
+  }
+
+  return '';
+};
+
+const normalizeBrokerSymbolForMarket = (rawSymbol, market) => {
+  const normalizedSymbol = String(rawSymbol || '').trim().toUpperCase();
+  if (!normalizedSymbol || normalizedSymbol.includes('.') || normalizedSymbol.includes('=')) {
+    return normalizedSymbol;
+  }
+
+  if ((market === '台股' || market === '港股' || market === '日股') && /^\d{1,4}$/.test(normalizedSymbol)) {
+    return normalizedSymbol.padStart(4, '0');
+  }
+
+  if (market === '陸股' && /^\d{1,6}$/.test(normalizedSymbol)) {
+    return normalizedSymbol.padStart(6, '0');
+  }
+
+  return normalizedSymbol;
+};
+
+const prepareBrokerRow = (rawRow, options = {}) => {
+  const explicitMarket = resolveCanonicalMarket(rawRow['市場']);
+  const fallbackMarket = typeof options.resolveMarket === 'function'
+    ? options.resolveMarket(rawRow, explicitMarket)
+    : options.defaultMarket || '';
+  const market = explicitMarket || fallbackMarket || '';
+
+  return {
+    ...rawRow,
+    代號: normalizeBrokerSymbolForMarket(rawRow['代號'], market),
+    市場: market
+  };
 };
 
 const getNormalizedTradeTypeOrEmpty = (rawValue) => {
@@ -890,6 +1049,69 @@ const normalizeRobinhoodTransactionRow = (rawRow, preferredDecimalSeparator) => 
   }
 );
 
+const normalizeRakutenTransactionRow = (rawRow, preferredDecimalSeparator) => normalizeBrokerTransactionRow(
+  prepareBrokerRow(rawRow, {
+    resolveMarket: (sourceRow, explicitMarket) => explicitMarket || inferSymbolMarket(sourceRow['代號'])
+  }),
+  preferredDecimalSeparator
+);
+
+const normalizeSbiTransactionRow = (rawRow, preferredDecimalSeparator) => normalizeBrokerTransactionRow(
+  prepareBrokerRow(rawRow, {
+    resolveMarket: (sourceRow, explicitMarket) => explicitMarket || inferSymbolMarket(sourceRow['代號'])
+  }),
+  preferredDecimalSeparator
+);
+
+const normalizeSinopacTransactionRow = (rawRow, preferredDecimalSeparator) => normalizeBrokerTransactionRow(
+  prepareBrokerRow(rawRow, {
+    defaultMarket: '台股'
+  }),
+  preferredDecimalSeparator,
+  {
+    includeFeesInBuyCost: true
+  }
+);
+
+const normalizeFubonTransactionRow = (rawRow, preferredDecimalSeparator) => normalizeBrokerTransactionRow(
+  prepareBrokerRow(rawRow, {
+    defaultMarket: '台股'
+  }),
+  preferredDecimalSeparator,
+  {
+    includeFeesInBuyCost: true
+  }
+);
+
+const normalizeFutuTransactionRow = (rawRow, preferredDecimalSeparator) => normalizeBrokerTransactionRow(
+  prepareBrokerRow(rawRow, {
+    resolveMarket: (sourceRow, explicitMarket) => {
+      if (explicitMarket) {
+        return explicitMarket;
+      }
+
+      const symbol = String(sourceRow['代號'] || '').trim().toUpperCase();
+      if (/^\d{6}$/.test(symbol) && (symbol.startsWith('6') || symbol.startsWith('0'))) {
+        return '陸股';
+      }
+
+      if (/^\d{1,5}$/.test(symbol)) {
+        return '港股';
+      }
+
+      if (/^[A-Z][A-Z0-9-]*$/.test(symbol)) {
+        return '美股';
+      }
+
+      return '';
+    }
+  }),
+  preferredDecimalSeparator,
+  {
+    includeFeesInBuyCost: true
+  }
+);
+
 const normalizeRowForProfile = (rawRow, profile, preferredDecimalSeparator) => {
   switch (profile?.id) {
     case 'ibkr-transactions':
@@ -898,6 +1120,16 @@ const normalizeRowForProfile = (rawRow, profile, preferredDecimalSeparator) => {
       return normalizeFirstradeTransactionRow(rawRow, preferredDecimalSeparator);
     case 'robinhood-transactions':
       return normalizeRobinhoodTransactionRow(rawRow, preferredDecimalSeparator);
+    case 'rakuten-transactions':
+      return normalizeRakutenTransactionRow(rawRow, preferredDecimalSeparator);
+    case 'sbi-transactions':
+      return normalizeSbiTransactionRow(rawRow, preferredDecimalSeparator);
+    case 'sinopac-tw-transactions':
+      return normalizeSinopacTransactionRow(rawRow, preferredDecimalSeparator);
+    case 'fubon-tw-transactions':
+      return normalizeFubonTransactionRow(rawRow, preferredDecimalSeparator);
+    case 'futu-transactions':
+      return normalizeFutuTransactionRow(rawRow, preferredDecimalSeparator);
     default:
       return profile?.importKind === 'positions'
         ? normalizePositionRow(rawRow, preferredDecimalSeparator)

@@ -100,7 +100,7 @@ export default function Header({
   const importProfileHelperText = (
     selectedImportProfileOption.presetKind === 'broker'
       ? t('header.importProfileHelpBroker', {
-        defaultValue: 'Use a broker preset when you are importing a known export from Schwab, IBKR, Firstrade, or Robinhood. It locks the parser to that broker’s column meanings.'
+        defaultValue: 'Use a broker preset when the CSV comes from a supported broker export. It locks the parser to that broker’s usual column meanings and market hints.'
       })
       : selectedImportProfileOption.presetKind === 'generic'
         ? t('header.importProfileHelpGeneric', {
