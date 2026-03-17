@@ -327,9 +327,38 @@ const CSV_IMPORT_PROFILES = [
   }
 ];
 
+const buildProfileOption = ({ id, importKind, label, translationKey }) => ({
+  id,
+  importKind,
+  label,
+  translationKey,
+  presetKind: id.startsWith('broker-') || id === 'trade-lens' ? 'generic' : 'broker'
+});
+
 export const CSV_IMPORT_PROFILE_OPTIONS = [
-  { id: 'auto', label: 'Auto detect', translationKey: 'header.importProfileAuto' },
-  ...CSV_IMPORT_PROFILES.map(({ id, label, translationKey }) => ({ id, label, translationKey }))
+  { id: 'auto', label: 'Auto detect', translationKey: 'header.importProfileAuto', presetKind: 'auto', importKind: 'trades' },
+  ...CSV_IMPORT_PROFILES.map(buildProfileOption)
+];
+
+export const CSV_IMPORT_PROFILE_OPTION_GROUPS = [
+  {
+    id: 'recommended',
+    label: 'Recommended',
+    translationKey: 'header.importPresetGroups.recommended',
+    options: CSV_IMPORT_PROFILE_OPTIONS.filter((option) => option.presetKind === 'auto')
+  },
+  {
+    id: 'brokerPresets',
+    label: 'Broker presets',
+    translationKey: 'header.importPresetGroups.brokerPresets',
+    options: CSV_IMPORT_PROFILE_OPTIONS.filter((option) => option.presetKind === 'broker')
+  },
+  {
+    id: 'genericTemplates',
+    label: 'Generic templates',
+    translationKey: 'header.importPresetGroups.genericTemplates',
+    options: CSV_IMPORT_PROFILE_OPTIONS.filter((option) => option.presetKind === 'generic')
+  }
 ];
 
 const PROFILE_LOOKUP = new Map(CSV_IMPORT_PROFILES.map((profile) => [profile.id, profile]));

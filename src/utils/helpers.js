@@ -598,7 +598,12 @@ const MARKET_EXAMPLE_SYMBOLS = {
   虛擬幣: 'BTC' // Bitcoin
 };
 
-export { CSV_IMPORT_PROFILE_OPTIONS, parseCSV, parseCSVWithMeta } from './csvImport.js';
+export {
+  CSV_IMPORT_PROFILE_OPTIONS,
+  CSV_IMPORT_PROFILE_OPTION_GROUPS,
+  parseCSV,
+  parseCSVWithMeta
+} from './csvImport.js';
 
 export const initDB = () => {
   return new Promise((resolve, reject) => {

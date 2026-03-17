@@ -23,7 +23,10 @@ import {
   formatLocalizedNumber,
   shouldShowGregorianReference
 } from '../utils/localization';
-import { CSV_IMPORT_PROFILE_OPTIONS } from '../utils/helpers';
+import {
+  CSV_IMPORT_PROFILE_OPTIONS,
+  CSV_IMPORT_PROFILE_OPTION_GROUPS
+} from '../utils/helpers';
 
 export default function Header({
   apiKey,
@@ -77,9 +80,29 @@ export default function Header({
       ? t('header.importKindPositions', { defaultValue: 'Positions snapshot' })
       : t('header.importKindTrades', { defaultValue: 'Trades' })
   );
+  const getLocalizedImportGroupLabel = (group) => (
+    t(group.translationKey, { defaultValue: group.label })
+  );
 
   const importProfileLabel = t('header.importProfileLabel', { defaultValue: 'CSV parser' });
   const hasSkippedImportRows = (lastImportMeta?.skippedRowCount || 0) > 0;
+  const selectedImportProfileOption = CSV_IMPORT_PROFILE_OPTIONS
+    .find((option) => option.id === csvImportProfile) || CSV_IMPORT_PROFILE_OPTIONS[0];
+  const selectedImportProfileGroup = CSV_IMPORT_PROFILE_OPTION_GROUPS
+    .find((group) => group.options.some((option) => option.id === selectedImportProfileOption.id));
+  const importProfileHelperText = (
+    selectedImportProfileOption.presetKind === 'broker'
+      ? t('header.importProfileHelpBroker', {
+        defaultValue: 'Use a broker preset when you are importing a known export from Schwab, IBKR, Firstrade, or Robinhood. It locks the parser to that broker’s column meanings.'
+      })
+      : selectedImportProfileOption.presetKind === 'generic'
+        ? t('header.importProfileHelpGeneric', {
+          defaultValue: 'Use a generic template when the CSV looks familiar by language, but it does not come from one of the supported broker presets.'
+        })
+        : t('header.importProfileHelpAuto', {
+          defaultValue: 'Leave this on auto detect unless a specific broker export keeps getting guessed wrong. For most files, auto is the safest first shot.'
+        })
+  );
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
@@ -180,26 +203,49 @@ export default function Header({
         </button>
 
         <div className="relative flex items-center gap-2">
-          <label
-            className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 shadow-sm"
-            title={importProfileLabel}
-          >
-            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
-              {importProfileLabel}
-            </span>
-            <select
-              value={csvImportProfile}
-              onChange={(event) => setCsvImportProfile(event.target.value)}
-              className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 outline-none max-w-44"
+          <div className="flex flex-col gap-1">
+            <label
+              className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 shadow-sm"
               title={importProfileLabel}
             >
-              {CSV_IMPORT_PROFILE_OPTIONS.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {getLocalizedProfileLabel(option)}
-                </option>
-              ))}
-            </select>
-          </label>
+              <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+                {importProfileLabel}
+              </span>
+              <select
+                value={csvImportProfile}
+                onChange={(event) => setCsvImportProfile(event.target.value)}
+                className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 outline-none max-w-52"
+                title={importProfileLabel}
+              >
+                {CSV_IMPORT_PROFILE_OPTION_GROUPS.map((group) => (
+                  <optgroup key={group.id} label={getLocalizedImportGroupLabel(group)}>
+                    {group.options.map((option) => (
+                      <option key={option.id} value={option.id}>
+                        {getLocalizedProfileLabel(option)}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </label>
+
+            <div className="hidden xl:flex items-center gap-2 pl-1">
+              {selectedImportProfileGroup && (
+                <span className="inline-flex items-center rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+                  {getLocalizedImportGroupLabel(selectedImportProfileGroup)}
+                </span>
+              )}
+              {selectedImportProfileOption.presetKind !== 'auto' && (
+                <span className="inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-blue-600 dark:text-blue-300">
+                  {getLocalizedImportKindLabel(selectedImportProfileOption.importKind)}
+                </span>
+              )}
+            </div>
+
+            <p className="hidden xl:block max-w-80 pl-1 text-[11px] leading-5 text-slate-500 dark:text-slate-400">
+              {importProfileHelperText}
+            </p>
+          </div>
 
           <div className="relative group">
             <div className="pointer-events-none absolute right-0 top-14 w-80 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-xl shadow-xl z-50 text-sm text-slate-600 dark:text-slate-300 opacity-0 invisible translate-y-1 transition-all duration-200 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:visible group-focus-within:translate-y-0">
