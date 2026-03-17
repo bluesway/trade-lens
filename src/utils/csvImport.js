@@ -86,6 +86,7 @@ const DELIMITER_LABELS = {
   ';': ';',
   '\t': 'tab'
 };
+const MAX_SKIPPED_PREVIEW_ROWS = 5;
 
 const CSV_IMPORT_PROFILES = [
   {
@@ -1778,6 +1779,46 @@ const isLikelyOptionRow = (rawRow, normalizedRow) => {
     && OPTION_STRIKE_REGEX.test(combinedText);
 };
 
+const getSkippedRowReasonCode = (rawRow, normalizedRow, isOptionRow) => {
+  if (isOptionRow) {
+    return 'derivative';
+  }
+
+  if (!normalizedRow) {
+    return 'unsupportedRow';
+  }
+
+  if (!normalizedRow['日期'] || !normalizedRow['代號'] || !normalizedRow['類型']) {
+    return 'missingTradeFields';
+  }
+
+  const quantityValue = Number.parseFloat(normalizedRow['數量']);
+  if (!Number.isFinite(quantityValue) || quantityValue <= 0) {
+    return 'invalidQuantity';
+  }
+
+  const priceValue = Number.parseFloat(normalizedRow['單價']);
+  const amountValue = Number.parseFloat(normalizedRow['總金額']);
+  if (
+    (!Number.isFinite(priceValue) || priceValue <= 0)
+    && (!Number.isFinite(amountValue) || amountValue <= 0)
+  ) {
+    return 'invalidAmount';
+  }
+
+  return 'unsupportedRow';
+};
+
+const buildSkippedRowPreview = ({ rawRow, normalizedRow, rowNumber, reasonCode }) => ({
+  rowNumber,
+  reasonCode,
+  date: String(normalizedRow?.['日期'] || rawRow?.['日期'] || '').trim(),
+  type: String(normalizedRow?.['類型'] || rawRow?.['類型'] || '').trim(),
+  symbol: String(normalizedRow?.['代號'] || rawRow?.['代號'] || '').trim(),
+  market: String(normalizedRow?.['市場'] || rawRow?.['市場'] || '').trim(),
+  description: String(rawRow?.['說明'] || '').trim()
+});
+
 export const parseCSVWithMeta = (text, options = {}) => {
   const normalizedText = String(text || '').replace(/\r\n?/g, '\n');
   const lines = normalizedText.split('\n').filter((line) => line.trim() !== '');
@@ -1828,6 +1869,7 @@ export const parseCSVWithMeta = (text, options = {}) => {
   const result = [];
   let skippedRowCount = 0;
   let derivativeSkippedRowCount = 0;
+  const skippedPreviewRows = [];
   const problematicRowNumbers = [];
 
   for (let index = (layout?.headerIndex ?? 0) + 1; index < lines.length; index += 1) {
@@ -1858,6 +1900,15 @@ export const parseCSVWithMeta = (text, options = {}) => {
       if (isOptionRow) {
         derivativeSkippedRowCount += 1;
       }
+
+      if (skippedPreviewRows.length < MAX_SKIPPED_PREVIEW_ROWS) {
+        skippedPreviewRows.push(buildSkippedRowPreview({
+          rawRow,
+          normalizedRow,
+          rowNumber: index + 1,
+          reasonCode: getSkippedRowReasonCode(rawRow, normalizedRow, isOptionRow)
+        }));
+      }
     }
   }
 
@@ -1879,6 +1930,7 @@ export const parseCSVWithMeta = (text, options = {}) => {
         matchedFields: inspection.matchedFields || [],
         missingRequiredFields: [],
         derivativeSkippedRowCount,
+        skippedPreviewRows,
         problematicRowNumbers
       }
     };
@@ -1901,7 +1953,8 @@ export const parseCSVWithMeta = (text, options = {}) => {
         importKind,
         matchedFields: inspection.matchedFields || [],
         missingRequiredFields: [],
-        derivativeSkippedRowCount
+        derivativeSkippedRowCount,
+        skippedPreviewRows
       }
     };
   }
@@ -1921,7 +1974,8 @@ export const parseCSVWithMeta = (text, options = {}) => {
       importKind,
       matchedFields: inspection.matchedFields || [],
       missingRequiredFields: [],
-      derivativeSkippedRowCount
+      derivativeSkippedRowCount,
+      skippedPreviewRows
     }
   };
 };

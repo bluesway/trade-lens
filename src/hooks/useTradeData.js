@@ -66,6 +66,7 @@ const CSV_REQUIRED_FIELD_LABELS = {
 };
 const TRADE_ROW_SIGNATURE_FIELDS = ['日期', '類型', '代號', '市場', '數量', '單價', '總金額', '損益'];
 const CSV_IMPORT_PROFILE_IDS = new Set(CSV_IMPORT_PROFILE_OPTIONS.map(({ id }) => id));
+const MAX_IMPORT_SKIP_PREVIEW_ROWS = 5;
 
 const getFxRateSymbols = (fromCurrency, toCurrency) => {
   if (!fromCurrency || !toCurrency || fromCurrency === toCurrency) {
@@ -836,6 +837,16 @@ export function useTradeData(showToast) {
     })
     .join('\u241f');
 
+  const buildDuplicatePreviewRow = (row) => ({
+    rowNumber: null,
+    reasonCode: 'duplicate',
+    date: String(row['日期'] || '').trim(),
+    type: String(row['類型'] || '').trim(),
+    symbol: String(row['代號'] || '').trim(),
+    market: String(row['市場'] || '').trim(),
+    description: ''
+  });
+
   const prepareCsvImport = (text) => {
     const { rows, meta } = parseCSVWithMeta(text, { profileId: csvImportProfile });
     const importMeta = buildImportMeta(meta);
@@ -861,6 +872,7 @@ export function useTradeData(showToast) {
     const announceMode = Boolean(options.announceMode);
     let nextRows = preparedImport.rows;
     let duplicateRowCount = 0;
+    const duplicatePreviewRows = [];
 
     if (mode === 'append') {
       const existingSignatures = new Set(rawData.map(buildTradeRowSignature));
@@ -870,6 +882,9 @@ export function useTradeData(showToast) {
         const signature = buildTradeRowSignature(row);
         if (existingSignatures.has(signature)) {
           duplicateRowCount += 1;
+          if (duplicatePreviewRows.length < MAX_IMPORT_SKIP_PREVIEW_ROWS) {
+            duplicatePreviewRows.push(buildDuplicatePreviewRow(row));
+          }
           return;
         }
 
@@ -894,6 +909,13 @@ export function useTradeData(showToast) {
     const parserSkippedCount = importMeta.skippedRowCount || 0;
     const totalSkippedCount = parserSkippedCount + duplicateRowCount;
     const hasSkippedRows = totalSkippedCount > 0;
+    const skippedPreviewRows = [...(preparedImport.meta.skippedPreviewRows || [])];
+    const previewCapacity = Math.max(0, MAX_IMPORT_SKIP_PREVIEW_ROWS - skippedPreviewRows.length);
+    if (previewCapacity > 0) {
+      skippedPreviewRows.push(...duplicatePreviewRows.slice(0, previewCapacity));
+    }
+    importMeta.skippedPreviewRows = skippedPreviewRows;
+    importMeta.skippedPreviewOverflowCount = Math.max(0, totalSkippedCount - skippedPreviewRows.length);
     const actionLabel = announceMode
       ? t(
         mode === 'append' ? 'messages.csvImportApplyAppend' : 'messages.csvImportApplyReplace',

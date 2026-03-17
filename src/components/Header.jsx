@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Activity,
   Clock,
+  ChevronDown,
   Database,
   Info,
   Languages,
@@ -98,6 +99,9 @@ export default function Header({
   const totalSkippedImportRows = (lastImportMeta?.skippedRowCount || 0) + (lastImportMeta?.duplicateRowCount || 0);
   const hasSkippedImportRows = totalSkippedImportRows > 0;
   const appliedImportRowCount = lastImportMeta?.appliedRowCount ?? lastImportMeta?.importedRowCount ?? 0;
+  const skippedPreviewRows = lastImportMeta?.skippedPreviewRows || [];
+  const skippedPreviewOverflowCount = lastImportMeta?.skippedPreviewOverflowCount
+    ?? Math.max(0, totalSkippedImportRows - skippedPreviewRows.length);
   const selectedImportProfileOption = CSV_IMPORT_PROFILE_OPTIONS
     .find((option) => option.id === csvImportProfile) || CSV_IMPORT_PROFILE_OPTIONS[0];
   const selectedImportProfileGroup = CSV_IMPORT_PROFILE_OPTION_GROUPS
@@ -142,6 +146,23 @@ export default function Header({
   const refreshButtonTitle = apiKey
     ? (hasStaleMarketData ? t('header.updateWithCache') : t('header.forceRefreshTitle'))
     : t('header.setApiKeyFirst');
+
+  const getLocalizedSkippedReasonLabel = (reasonCode) => {
+    switch (reasonCode) {
+      case 'derivative':
+        return t('header.skippedReasonDerivative', { defaultValue: 'Likely option or derivative' });
+      case 'duplicate':
+        return t('header.skippedReasonDuplicate', { defaultValue: 'Exact duplicate of an existing trade' });
+      case 'missingTradeFields':
+        return t('header.skippedReasonMissingFields', { defaultValue: 'Missing date, symbol, or trade side' });
+      case 'invalidQuantity':
+        return t('header.skippedReasonQuantity', { defaultValue: 'Quantity is missing or invalid' });
+      case 'invalidAmount':
+        return t('header.skippedReasonAmount', { defaultValue: 'Price and amount are both unusable' });
+      default:
+        return t('header.skippedReasonGeneric', { defaultValue: 'Unsupported or incomplete row' });
+    }
+  };
 
   return (
     <div className="grid gap-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 xl:grid-cols-[minmax(0,1fr)_minmax(520px,1.08fr)]">
@@ -319,13 +340,13 @@ export default function Header({
           </div>
 
           {lastImportMeta && (
-            <div className="relative mt-4 group">
-              <div
+            <details className="relative mt-4 group/details">
+              <summary
                 className={`flex flex-wrap items-center gap-2 rounded-xl border px-3 py-2 text-xs font-medium ${
                   hasSkippedImportRows
                     ? 'border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300'
                     : 'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300'
-                }`}
+                } cursor-pointer list-none [&::-webkit-details-marker]:hidden`}
                 title={`${getLocalizedImportMetaProfileLabel(lastImportMeta)} · ${getLocalizedImportDelimiterLabel(lastImportMeta.delimiterLabel)}`}
               >
                 <span>{getLocalizedImportMetaProfileLabel(lastImportMeta)}</span>
@@ -343,9 +364,13 @@ export default function Header({
                     })}</span>
                   </>
                 )}
-              </div>
+                <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-current/80">
+                  {t('header.importDetailsToggle', { defaultValue: 'Details' })}
+                  <ChevronDown size={14} className="transition-transform group-open/details:rotate-180" />
+                </span>
+              </summary>
 
-              <div className="pointer-events-none absolute left-0 top-[calc(100%+0.75rem)] z-50 w-80 translate-y-1 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 opacity-0 invisible shadow-xl transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 lg:left-auto lg:right-0">
+              <div className="absolute left-0 top-[calc(100%+0.75rem)] z-50 w-full max-w-md rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 shadow-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 lg:left-auto lg:right-0">
                 <h4 className="mb-3 flex items-center gap-2 border-b border-slate-200 pb-2 font-bold text-slate-800 dark:border-slate-700 dark:text-slate-100">
                   <Info size={14} className="text-blue-500" />
                   {t('header.importSummaryTitle', { defaultValue: 'Last import' })}
@@ -388,8 +413,77 @@ export default function Header({
                     </>
                   )}
                 </div>
+
+                {hasSkippedImportRows && skippedPreviewRows.length > 0 && (
+                  <div className="mt-4 border-t border-slate-200 pt-3 dark:border-slate-700">
+                    <div className="flex items-center justify-between gap-3">
+                      <h5 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+                        {t('header.skippedPreviewTitle', { defaultValue: 'Skipped rows preview' })}
+                      </h5>
+                      <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                        {t('header.importBadgeSkipped', {
+                          defaultValue: '{{count}} skipped',
+                          count: formatLocalizedNumber(totalSkippedImportRows, activeLocale)
+                        })}
+                      </span>
+                    </div>
+
+                    <div className="mt-3 space-y-2">
+                      {skippedPreviewRows.map((previewRow, index) => (
+                        <div key={`${previewRow.reasonCode}-${previewRow.rowNumber || 'na'}-${previewRow.symbol || index}`} className="rounded-lg border border-slate-200 bg-slate-50/90 px-3 py-2 dark:border-slate-700 dark:bg-slate-900/60">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="font-semibold text-slate-800 dark:text-slate-100">
+                              {previewRow.symbol || t('header.skippedPreviewUnknownSymbol', { defaultValue: 'Unknown symbol' })}
+                            </span>
+                            {previewRow.type && (
+                              <span className="rounded bg-white px-1.5 py-0.5 text-[10px] font-medium text-slate-500 shadow-sm dark:bg-slate-800 dark:text-slate-300">
+                                {previewRow.type}
+                              </span>
+                            )}
+                            {previewRow.date && (
+                              <span className="text-[11px] text-slate-400 dark:text-slate-500">
+                                {previewRow.date}
+                              </span>
+                            )}
+                            {previewRow.rowNumber && (
+                              <span className="text-[11px] text-slate-400 dark:text-slate-500">
+                                {t('header.skippedPreviewRowNumber', {
+                                  defaultValue: 'row {{row}}',
+                                  row: formatLocalizedNumber(previewRow.rowNumber, activeLocale)
+                                })}
+                              </span>
+                            )}
+                          </div>
+                          <div className="mt-1 text-xs font-medium text-amber-700 dark:text-amber-300">
+                            {getLocalizedSkippedReasonLabel(previewRow.reasonCode)}
+                          </div>
+                          {(previewRow.market || previewRow.description) && (
+                            <div className="mt-1 text-[11px] leading-5 text-slate-500 dark:text-slate-400">
+                              {[
+                                previewRow.market && t('header.skippedPreviewMarket', {
+                                  defaultValue: 'Market: {{value}}',
+                                  value: previewRow.market
+                                }),
+                                previewRow.description
+                              ].filter(Boolean).join(' · ')}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    {skippedPreviewOverflowCount > 0 && (
+                      <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+                        {t('header.skippedPreviewOverflow', {
+                          defaultValue: '{{count}} more skipped rows are not shown here.',
+                          count: formatLocalizedNumber(skippedPreviewOverflowCount, activeLocale)
+                        })}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
-            </div>
+            </details>
           )}
         </div>
       </div>
