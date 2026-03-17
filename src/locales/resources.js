@@ -1,4 +1,5 @@
 import { applyImportTranslationCoverage } from './importTranslations.js';
+import { applyLocaleVoiceRefinements } from './voiceRefinements.js';
 
 const zhTW = {
   common: {
@@ -9030,7 +9031,7 @@ const urPK = mergeLocale(enUS, {
   }
 });
 
-const localeTranslations = applyImportTranslationCoverage({
+const localeTranslations = applyLocaleVoiceRefinements(applyImportTranslationCoverage({
   'zh-TW': zhTW,
   'yue-Hant-HK': yueHantHK,
   'zh-CN': zhCN,
@@ -9095,7 +9096,7 @@ const localeTranslations = applyImportTranslationCoverage({
   'ar-KW': arKW,
   'ar-QA': arQA,
   'ur-PK': urPK
-});
+}));
 
 export const resources = Object.fromEntries(
   Object.entries(localeTranslations).map(([locale, translation]) => [locale, { translation }])
