@@ -85,7 +85,9 @@ const zhTW = {
       brokerKo: '韓文券商 CSV',
       brokerTh: '泰文券商 CSV',
       brokerAr: '阿文券商 CSV',
-      brokerEuro: '歐系券商 CSV'
+      brokerEuro: '歐系券商 CSV',
+      schwabTransactions: '嘉信交易紀錄 CSV',
+      schwabPositions: '嘉信持倉快照 CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -200,6 +202,7 @@ const zhTW = {
     fetchFailed: '抓取失敗：{{message}}',
     baseCurrencyChanged: '基礎計價幣別已切換為 {{currency}}，正在更新匯率...',
     csvImportSuccess: '已匯入 {{count}} 筆交易（{{profile}} · {{delimiter}}）',
+    csvImportSuccessPositions: '已匯入 {{count}} 筆持倉，並轉成合成買入紀錄（{{profile}} · {{delimiter}}）',
     csvImportFailedNoData: 'CSV 匯入失敗：找不到可用的交易資料。',
     csvImportFailedHeaders: 'CSV 匯入失敗：缺少必要欄位 {{fields}}。',
     csvImportFailedRowWidth: 'CSV 匯入失敗：第 {{row}} 列欄位數爆掉了，通常是 {{delimiter}} 分隔檔裡的數字千分位沒被正確包住。',
@@ -301,7 +304,9 @@ const yueHantHK = {
       brokerKo: '韓文券商 CSV',
       brokerTh: '泰文券商 CSV',
       brokerAr: '阿文券商 CSV',
-      brokerEuro: '歐系券商 CSV'
+      brokerEuro: '歐系券商 CSV',
+      schwabTransactions: '嘉信交易紀錄 CSV',
+      schwabPositions: '嘉信持倉快照 CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -416,6 +421,7 @@ const yueHantHK = {
     fetchFailed: '抓取失敗：{{message}}',
     baseCurrencyChanged: '基礎計價幣別已切換成 {{currency}}，而家更新匯率...',
     csvImportSuccess: '已匯入 {{count}} 筆交易（{{profile}} · {{delimiter}}）',
+    csvImportSuccessPositions: '已匯入 {{count}} 筆持倉，並轉成合成買入紀錄（{{profile}} · {{delimiter}}）',
     csvImportFailedNoData: 'CSV 匯入失敗：搵唔到可用嘅交易資料。',
     csvImportFailedHeaders: 'CSV 匯入失敗：缺少必要欄位 {{fields}}。',
     csvImportFailedRowWidth: 'CSV 匯入失敗：第 {{row}} 列欄位數爆咗，通常係 {{delimiter}} 分隔檔入面嘅數字千分位冇包好。',
@@ -517,7 +523,9 @@ const zhCN = {
       brokerKo: '韩文券商 CSV',
       brokerTh: '泰文券商 CSV',
       brokerAr: '阿拉伯文券商 CSV',
-      brokerEuro: '欧系券商 CSV'
+      brokerEuro: '欧系券商 CSV',
+      schwabTransactions: '嘉信交易记录 CSV',
+      schwabPositions: '嘉信持仓快照 CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -632,6 +640,7 @@ const zhCN = {
     fetchFailed: '抓取失败：{{message}}',
     baseCurrencyChanged: '基础计价币种已切换为 {{currency}}，正在更新汇率...',
     csvImportSuccess: '已导入 {{count}} 笔交易（{{profile}} · {{delimiter}}）',
+    csvImportSuccessPositions: '已导入 {{count}} 笔持仓，并转成合成买入记录（{{profile}} · {{delimiter}}）',
     csvImportFailedNoData: 'CSV 导入失败：找不到可用的交易数据。',
     csvImportFailedHeaders: 'CSV 导入失败：缺少必要字段 {{fields}}。',
     csvImportFailedRowWidth: 'CSV 导入失败：第 {{row}} 行字段数爆了，通常是 {{delimiter}} 分隔文件里的数字千分位没有正确包起来。',
@@ -929,7 +938,9 @@ const enUS = {
       brokerKo: 'Korean broker CSV',
       brokerTh: 'Thai broker CSV',
       brokerAr: 'Arabic broker CSV',
-      brokerEuro: 'Euro-style broker CSV'
+      brokerEuro: 'Euro-style broker CSV',
+      schwabTransactions: 'Schwab transactions CSV',
+      schwabPositions: 'Schwab positions CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -1044,6 +1055,7 @@ const enUS = {
     fetchFailed: 'Fetch failed: {{message}}',
     baseCurrencyChanged: 'Base currency switched to {{currency}}. Refreshing FX rates...',
     csvImportSuccess: 'Imported {{count}} trades ({{profile}} · {{delimiter}}).',
+    csvImportSuccessPositions: 'Imported {{count}} positions as synthetic buy rows ({{profile}} · {{delimiter}}).',
     csvImportFailedNoData: 'CSV import failed: no usable trade rows were found.',
     csvImportFailedHeaders: 'CSV import failed: missing required fields {{fields}}.',
     csvImportFailedRowWidth: 'CSV import failed: row {{row}} has more columns than the header, usually because a thousands-separated number in a {{delimiter}} file was not quoted properly.',
@@ -1145,7 +1157,9 @@ const enGB = {
       brokerKo: 'Korean broker CSV',
       brokerTh: 'Thai broker CSV',
       brokerAr: 'Arabic broker CSV',
-      brokerEuro: 'Euro-style broker CSV'
+      brokerEuro: 'Euro-style broker CSV',
+      schwabTransactions: 'Schwab transactions CSV',
+      schwabPositions: 'Schwab positions CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -1260,6 +1274,7 @@ const enGB = {
     fetchFailed: 'Fetch failed: {{message}}',
     baseCurrencyChanged: 'Base currency switched to {{currency}}. Refreshing FX rates...',
     csvImportSuccess: 'Imported {{count}} trades ({{profile}} · {{delimiter}}).',
+    csvImportSuccessPositions: 'Imported {{count}} positions as synthetic buy rows ({{profile}} · {{delimiter}}).',
     csvImportFailedNoData: 'CSV import failed: no usable trade rows were found.',
     csvImportFailedHeaders: 'CSV import failed: missing required fields {{fields}}.',
     csvImportFailedRowWidth: 'CSV import failed: row {{row}} has more columns than the header, usually because a thousands-separated number in a {{delimiter}} file was not quoted properly.',
@@ -1404,7 +1419,9 @@ const jaJP = {
       brokerKo: '韓国語ブローカー CSV',
       brokerTh: 'タイ語ブローカー CSV',
       brokerAr: 'アラビア語ブローカー CSV',
-      brokerEuro: '欧州系ブローカー CSV'
+      brokerEuro: '欧州系ブローカー CSV',
+      schwabTransactions: 'Schwab 取引履歴 CSV',
+      schwabPositions: 'Schwab 保有残高 CSV'
     },
     csvDelimiters: {
       tab: 'tab'
@@ -1519,6 +1536,7 @@ const jaJP = {
     fetchFailed: '取得に失敗しました: {{message}}',
     baseCurrencyChanged: '基準通貨を {{currency}} に切り替えました。為替を更新しています...',
     csvImportSuccess: '{{count}} 件の取引を読み込みました（{{profile}} · {{delimiter}}）。',
+    csvImportSuccessPositions: '{{count}} 件の保有残高を合成買い付け履歴として読み込みました（{{profile}} · {{delimiter}}）。',
     csvImportFailedNoData: 'CSV の読み込みに失敗しました。使える取引データが見つかりません。',
     csvImportFailedHeaders: 'CSV の読み込みに失敗しました。必須項目 {{fields}} が足りません。',
     csvImportFailedRowWidth: 'CSV の読み込みに失敗しました。第 {{row}} 行の列数がヘッダーより多く、{{delimiter}} 区切りの数値が正しく引用されていない可能性があります。',

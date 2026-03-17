@@ -10,6 +10,8 @@ const BUY_TYPE_TERMS = [
   'acquisto',
   'compra',
   'comprar',
+  'reinvest',
+  'reinvestment',
   'koopt',
   'kopen',
   'kauf',
@@ -59,7 +61,13 @@ const STANDARD_HEADER_ALIASES = {
   數量: ['數量', '成交股數', '股數', 'Quantity', 'Qty', 'Shares', 'Kuantitas', 'Jumlah saham', 'Kuantiti', 'Bilangan unit', 'Bilangan saham', 'Số lượng', 'Khối lượng', 'Quantité', 'Cantidad', 'Acciones', 'Quantidade', 'Qtd', 'Stückzahl', 'Menge', 'Quantità', 'Aantal', '数量', '株数', 'الكمية', 'عدد الأسهم', 'จำนวน', 'จำนวนหุ้น', '수량', '주수'],
   單價: ['單價', '成交價', '成交單價', 'Price', 'Execution Price', 'Harga', 'Harga per unit', 'Harga seunit', 'Giá', 'Giá khớp', 'Đơn giá', 'Prix', 'Prix unitaire', 'Precio', 'Precio unitario', 'Preço', 'Preço unitário', 'Preis', 'Kurs', 'Prezzo', 'Prijs', '単価', '価格', '約定価格', 'سعر الوحدة', 'السعر', 'ราคา', 'ราคาต่อหุ้น', 'ราคาต่อหน่วย', '단가', '체결가', '가격'],
   總金額: ['總金額', '成交金額', '淨額', 'Amount', 'Total Amount', 'Net Amount', 'Nilai', 'Jumlah', 'Jumlah keseluruhan', 'Giá trị', 'Tổng giá trị', 'Montant', 'Montant total', 'Valeur totale', 'Importe', 'Importe total', 'Monto', 'Monto total', 'Valor total', 'Betrag', 'Gesamtbetrag', 'Importo', 'Totale', 'Bedrag', 'Totaalbedrag', '金額', '合計金額', '約定代金', 'إجمالي المبلغ', 'إجمالي القيمة', 'القيمة', 'มูลค่า', 'มูลค่ารวม', 'ยอดรวม', '금액', '총금액', '총액'],
-  損益: ['損益', '實現損益', 'PnL', 'Realized PnL', 'Profit', 'P&L', 'Untung/Rugi', 'Untung rugi', 'Laba/Rugi', 'Lãi/Lỗ', 'Lãi lỗ', 'Lãi/Lỗ đã chốt', 'Plus/moins-value', 'Plus-value', 'Moins-value', 'Gain/Perte', 'Ganancia/Pérdida', 'Ganancias/Pérdidas', 'Resultado', 'Lucro/Prejuízo', 'Lucro / Prejuízo', 'Gewinn/Verlust', 'G/V', 'Utile/Perdita', 'Profitto/Perdita', 'Winst/Verlies', '実現損益', 'الربح أو الخسارة', 'الربح/الخسارة', 'الأرباح والخسائر', 'กำไรขาดทุน', 'กำไร/ขาดทุน', '손익', '실현손익']
+  損益: ['損益', '實現損益', 'PnL', 'Realized PnL', 'Profit', 'P&L', 'Gain/Loss', 'Gain/Loss $', 'P&L $', 'P&L $ (Unrealized)', 'Untung/Rugi', 'Untung rugi', 'Laba/Rugi', 'Lãi/Lỗ', 'Lãi lỗ', 'Lãi/Lỗ đã chốt', 'Plus/moins-value', 'Plus-value', 'Moins-value', 'Gain/Perte', 'Ganancia/Pérdida', 'Ganancias/Pérdidas', 'Resultado', 'Lucro/Prejuízo', 'Lucro / Prejuízo', 'Gewinn/Verlust', 'G/V', 'Utile/Perdita', 'Profitto/Perdita', 'Winst/Verlies', '実現損益', 'الربح أو الخسارة', 'الربح/الخسارة', 'الأرباح والخسائر', 'กำไรขาดทุน', 'กำไร/ขาดทุน', '손익', '실현손익'],
+  說明: ['Description', 'Name', 'Security Name', 'Details'],
+  持倉類型: ['Position', 'Position Type'],
+  成本基礎: ['Cost Basis', 'Cost basis', 'Cost Basis $', 'Total Cost'],
+  每股成本: ['Cost per Share', 'Cost/Share', 'Share Cost', 'Share/Contract Cost'],
+  市值: ['Market Value', 'Position Value', 'Value'],
+  開倉日: ['Open Date']
 };
 
 const REQUIRED_STANDARD_FIELDS = ['日期', '類型', '代號', '數量'];
@@ -75,6 +83,8 @@ const CSV_IMPORT_PROFILES = [
     id: 'trade-lens',
     label: 'Trade Lens',
     translationKey: 'header.csvProfiles.tradeLens',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
     preferredDecimalSeparator: '.',
     signatureHeaders: {
       日期: ['日期'],
@@ -90,6 +100,8 @@ const CSV_IMPORT_PROFILES = [
     id: 'broker-zh',
     label: '中文 CSV',
     translationKey: 'header.csvProfiles.brokerZh',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
     preferredDecimalSeparator: '.',
     signatureHeaders: {
       日期: ['交易日期', '成交日期'],
@@ -104,6 +116,8 @@ const CSV_IMPORT_PROFILES = [
     id: 'broker-en',
     label: 'English CSV',
     translationKey: 'header.csvProfiles.brokerEn',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
     preferredDecimalSeparator: '.',
     signatureHeaders: {
       日期: ['Trade Date', 'Date'],
@@ -119,6 +133,8 @@ const CSV_IMPORT_PROFILES = [
     id: 'broker-ja',
     label: '日本語 CSV',
     translationKey: 'header.csvProfiles.brokerJa',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
     preferredDecimalSeparator: '.',
     signatureHeaders: {
       日期: ['取引日', '日付'],
@@ -134,6 +150,8 @@ const CSV_IMPORT_PROFILES = [
     id: 'broker-ko',
     label: '한국어 CSV',
     translationKey: 'header.csvProfiles.brokerKo',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
     preferredDecimalSeparator: '.',
     signatureHeaders: {
       日期: ['거래일', '체결일', '날짜'],
@@ -149,6 +167,8 @@ const CSV_IMPORT_PROFILES = [
     id: 'broker-th',
     label: 'ไทย CSV',
     translationKey: 'header.csvProfiles.brokerTh',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
     preferredDecimalSeparator: '.',
     signatureHeaders: {
       日期: ['วันที่ซื้อขาย', 'วันที่'],
@@ -164,6 +184,8 @@ const CSV_IMPORT_PROFILES = [
     id: 'broker-ar',
     label: 'العربية CSV',
     translationKey: 'header.csvProfiles.brokerAr',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
     preferredDecimalSeparator: '.',
     signatureHeaders: {
       日期: ['التاريخ'],
@@ -179,6 +201,8 @@ const CSV_IMPORT_PROFILES = [
     id: 'broker-euro',
     label: 'Euro-style CSV',
     translationKey: 'header.csvProfiles.brokerEuro',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
     preferredDecimalSeparator: ',',
     signatureHeaders: {
       日期: ['Date de transaction', 'Date opération', 'Fecha de transacción', 'Fecha de operación', 'Data operação', 'Handelsdatum', 'Data di negoziazione'],
@@ -188,6 +212,42 @@ const CSV_IMPORT_PROFILES = [
       單價: ['Prix unitaire', 'Precio unitario', 'Preço unitário', 'Kurs', 'Prezzo', 'Prijs'],
       總金額: ['Montant total', 'Importe total', 'Valor total', 'Gesamtbetrag', 'Importo', 'Totaalbedrag'],
       損益: ['Gain/Perte', 'Ganancia/Pérdida', 'Lucro/Prejuízo', 'Gewinn/Verlust', 'Profitto/Perdita', 'Winst/Verlies']
+    }
+  },
+  {
+    id: 'schwab-transactions',
+    label: 'Schwab transactions',
+    translationKey: 'header.csvProfiles.schwabTransactions',
+    importKind: 'trades',
+    requiredFields: ['日期', '類型', '代號', '數量'],
+    preferredDecimalSeparator: '.',
+    signatureHeaders: {
+      日期: ['Date'],
+      類型: ['Action'],
+      代號: ['Symbol'],
+      數量: ['Quantity'],
+      單價: ['Price'],
+      總金額: ['Amount'],
+      說明: ['Description']
+    }
+  },
+  {
+    id: 'schwab-positions',
+    label: 'Schwab positions',
+    translationKey: 'header.csvProfiles.schwabPositions',
+    importKind: 'positions',
+    requiredFields: ['代號', '數量'],
+    preferredDecimalSeparator: '.',
+    signatureHeaders: {
+      代號: ['Symbol'],
+      數量: ['Quantity'],
+      單價: ['Price'],
+      市值: ['Market Value'],
+      成本基礎: ['Cost Basis', 'Cost basis'],
+      每股成本: ['Cost per Share', 'Share/Contract Cost', 'Cost/Share'],
+      開倉日: ['Open Date'],
+      說明: ['Description'],
+      持倉類型: ['Position']
     }
   }
 ];
@@ -335,10 +395,16 @@ const buildHeaderMap = (rawHeaders) => {
 const inspectHeaderRow = (rawHeaders, preferredProfileId = 'auto') => {
   const headerMap = buildHeaderMap(rawHeaders);
   const matchedFields = Object.keys(headerMap);
-  const matchedRequiredFields = REQUIRED_STANDARD_FIELDS.filter((field) => headerMap[field] !== undefined);
-  const hasSymbolAndType = headerMap['代號'] !== undefined && headerMap['類型'] !== undefined;
-  const hasValueField = headerMap['總金額'] !== undefined || headerMap['單價'] !== undefined;
   const profileDetection = detectProfile(rawHeaders, preferredProfileId);
+  const requiredFields = profileDetection.profile?.requiredFields || REQUIRED_STANDARD_FIELDS;
+  const matchedRequiredFields = requiredFields.filter((field) => headerMap[field] !== undefined);
+  const hasSymbolAndType = headerMap['代號'] !== undefined
+    && (headerMap['類型'] !== undefined || profileDetection.profile?.importKind === 'positions');
+  const hasValueField = headerMap['總金額'] !== undefined
+    || headerMap['單價'] !== undefined
+    || headerMap['成本基礎'] !== undefined
+    || headerMap['市值'] !== undefined
+    || headerMap['每股成本'] !== undefined;
   const score = (
     matchedFields.length * 8
     + matchedRequiredFields.length * 20
@@ -350,6 +416,7 @@ const inspectHeaderRow = (rawHeaders, preferredProfileId = 'auto') => {
     score,
     headerMap,
     matchedFields,
+    requiredFields,
     matchedRequiredFields,
     hasSymbolAndType,
     hasValueField,
@@ -506,9 +573,61 @@ const normalizeParsedRow = (rawRow, preferredDecimalSeparator) => {
   return normalizedRow;
 };
 
-const isImportableRow = (row) => (
+const resolveSnapshotDate = (rawDateValue) => {
+  const trimmedDate = String(rawDateValue || '').trim();
+  if (trimmedDate) {
+    return trimmedDate;
+  }
+
+  const today = new Date();
+  return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+};
+
+const normalizePositionRow = (rawRow, preferredDecimalSeparator) => {
+  const quantity = normalizeNumericCell(rawRow['數量'], preferredDecimalSeparator);
+  const currentPrice = normalizeNumericCell(rawRow['單價'], preferredDecimalSeparator);
+  const costPerShare = normalizeNumericCell(rawRow['每股成本'], preferredDecimalSeparator);
+  const costBasis = normalizeNumericCell(rawRow['成本基礎'], preferredDecimalSeparator);
+  const marketValue = normalizeNumericCell(rawRow['市值'], preferredDecimalSeparator);
+  const positionType = normalizeHeaderLabel(rawRow['持倉類型']);
+
+  if (positionType.includes('short')) {
+    return null;
+  }
+
+  const quantityValue = Number.parseFloat(quantity);
+  if (!Number.isFinite(quantityValue) || quantityValue <= 0) {
+    return null;
+  }
+
+  const totalCostValue = Number.parseFloat(costBasis)
+    || (Number.parseFloat(costPerShare) * quantityValue)
+    || Number.parseFloat(marketValue)
+    || (Number.parseFloat(currentPrice) * quantityValue);
+
+  if (!Number.isFinite(totalCostValue) || totalCostValue <= 0) {
+    return null;
+  }
+
+  const unitCost = Number.parseFloat(costPerShare) > 0
+    ? Number.parseFloat(costPerShare)
+    : totalCostValue / quantityValue;
+
+  return {
+    日期: resolveSnapshotDate(rawRow['開倉日'] || rawRow['日期']),
+    類型: '買入',
+    代號: String(rawRow['代號'] || '').trim(),
+    市場: String(rawRow['市場'] || '').trim(),
+    數量: formatParsedNumber(quantityValue),
+    單價: formatParsedNumber(unitCost),
+    總金額: formatParsedNumber(totalCostValue),
+    損益: ''
+  };
+};
+
+const isImportableTradeRow = (row) => (
   Boolean(row['日期'])
-  && Boolean(row['類型'])
+  && (row['類型'] === '買入' || row['類型'] === '賣出')
   && Boolean(row['代號'])
   && Boolean(row['數量'])
   && (Boolean(row['單價']) || Boolean(row['總金額']))
@@ -534,7 +653,9 @@ export const parseCSVWithMeta = (text, options = {}) => {
   const layout = detectLayout(lines, options.profileId || 'auto');
   const inspection = layout?.inspection || inspectHeaderRow(splitDelimitedLine(lines[0] || '', ','), options.profileId || 'auto');
   const rawHeaderCount = layout?.rawHeaders?.length || 0;
-  const missingRequiredFields = REQUIRED_STANDARD_FIELDS.filter((field) => inspection.headerMap?.[field] === undefined);
+  const importKind = inspection.profile?.importKind || 'trades';
+  const missingRequiredFields = (inspection.requiredFields || REQUIRED_STANDARD_FIELDS)
+    .filter((field) => inspection.headerMap?.[field] === undefined);
 
   if (missingRequiredFields.length > 0) {
     return {
@@ -550,6 +671,7 @@ export const parseCSVWithMeta = (text, options = {}) => {
         profileId: inspection.profile?.id || 'generic',
         profileLabel: inspection.profileLabel || 'Generic CSV',
         profileLabelKey: inspection.profileLabelKey || '',
+        importKind,
         matchedFields: inspection.matchedFields || [],
         missingRequiredFields
       }
@@ -580,8 +702,11 @@ export const parseCSVWithMeta = (text, options = {}) => {
       rawRow[field] = fieldIndex !== undefined ? cells[fieldIndex] || '' : '';
     });
 
-    const normalizedRow = normalizeParsedRow(rawRow, preferredDecimalSeparator);
-    if (isImportableRow(normalizedRow)) {
+    const normalizedRow = importKind === 'positions'
+      ? normalizePositionRow(rawRow, preferredDecimalSeparator)
+      : normalizeParsedRow(rawRow, preferredDecimalSeparator);
+
+    if (normalizedRow && isImportableTradeRow(normalizedRow)) {
       result.push(normalizedRow);
     } else {
       skippedRowCount += 1;
@@ -602,6 +727,7 @@ export const parseCSVWithMeta = (text, options = {}) => {
         profileId: inspection.profile?.id || 'generic',
         profileLabel: inspection.profileLabel || 'Generic CSV',
         profileLabelKey: inspection.profileLabelKey || '',
+        importKind,
         matchedFields: inspection.matchedFields || [],
         missingRequiredFields: [],
         problematicRowNumbers
@@ -623,6 +749,7 @@ export const parseCSVWithMeta = (text, options = {}) => {
         profileId: inspection.profile?.id || 'generic',
         profileLabel: inspection.profileLabel || 'Generic CSV',
         profileLabelKey: inspection.profileLabelKey || '',
+        importKind,
         matchedFields: inspection.matchedFields || [],
         missingRequiredFields: []
       }
@@ -641,6 +768,7 @@ export const parseCSVWithMeta = (text, options = {}) => {
       profileId: inspection.profile?.id || 'generic',
       profileLabel: inspection.profileLabel || 'Generic CSV',
       profileLabelKey: inspection.profileLabelKey || '',
+      importKind,
       matchedFields: inspection.matchedFields || [],
       missingRequiredFields: []
     }

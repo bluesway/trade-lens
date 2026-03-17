@@ -527,8 +527,15 @@ export function useTradeData(showToast) {
     persistRawData(rows);
     setIsDemo(false);
     setLastImportMeta(meta);
-    showToast(t('messages.csvImportSuccess', {
-      defaultValue: 'Imported {{count}} trades ({{profile}} · {{delimiter}}).',
+    const successMessageKey = meta.importKind === 'positions'
+      ? 'messages.csvImportSuccessPositions'
+      : 'messages.csvImportSuccess';
+    const successDefaultValue = meta.importKind === 'positions'
+      ? 'Imported {{count}} positions as synthetic buy rows ({{profile}} · {{delimiter}}).'
+      : 'Imported {{count}} trades ({{profile}} · {{delimiter}}).';
+
+    showToast(t(successMessageKey, {
+      defaultValue: successDefaultValue,
       count: formatLocalizedNumber(meta.importedRowCount, activeLocale),
       profile: localizedProfileLabel,
       delimiter: localizedDelimiterLabel
