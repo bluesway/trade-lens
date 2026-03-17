@@ -8,6 +8,7 @@ import { isRtlLocale, normalizeLocale } from './locales/config';
 import ChartsSection from './components/ChartsSection';
 import DataTable from './components/DataTable';
 import Header from './components/Header';
+import ImportReviewDialog from './components/ImportReviewDialog';
 import ManagerPanel from './components/ManagerPanel';
 import SummaryCards from './components/SummaryCards';
 import UserNotice from './components/UserNotice';
@@ -16,6 +17,8 @@ export default function App() {
   const [toastMsg, setToastMsg] = useState('');
   const [darkMode, setDarkMode] = useState(false);
   const [showUserNotice, setShowUserNotice] = useState(false);
+  const [pendingImport, setPendingImport] = useState(null);
+  const [backupBeforeImport, setBackupBeforeImport] = useState(true);
   const { t, i18n } = useTranslation();
 
   const pieChartRef = useRef(null);
@@ -55,7 +58,6 @@ export default function App() {
     hideZeroHolding,
     historySortConfig,
     holdingCount,
-    importCsvText,
     isAppLoaded,
     isDemo,
     isLoadingPrices,
@@ -66,6 +68,8 @@ export default function App() {
     newRec,
     overallRealizedPercent,
     overallUnrealizedPercent,
+    applyPreparedCsvImport,
+    prepareCsvImport,
     rawData,
     requestSort,
     setApiKey,
@@ -150,10 +154,47 @@ export default function App() {
 
     const reader = new FileReader();
     reader.onload = (loadEvent) => {
-      importCsvText(loadEvent.target.result);
+      const preparedImport = prepareCsvImport(loadEvent.target.result);
       input.value = '';
+
+      if (!preparedImport) {
+        return;
+      }
+
+      const hasExistingUserData = rawData.length > 0 && !isDemo;
+      if (!hasExistingUserData) {
+        applyPreparedCsvImport(preparedImport, { mode: 'replace', announceMode: false });
+        return;
+      }
+
+      setBackupBeforeImport(true);
+      setPendingImport({
+        ...preparedImport,
+        fileName: file.name
+      });
     };
     reader.readAsText(file);
+  };
+
+  const closeImportReview = () => {
+    setPendingImport(null);
+    setBackupBeforeImport(true);
+  };
+
+  const applyPendingImport = (mode) => {
+    if (!pendingImport) {
+      return;
+    }
+
+    if (backupBeforeImport && rawData.length > 0 && !isDemo) {
+      handleExportCSV();
+    }
+
+    applyPreparedCsvImport(pendingImport, {
+      mode,
+      announceMode: true
+    });
+    closeImportReview();
   };
 
   const handleExportCSV = () => {
@@ -198,6 +239,16 @@ export default function App() {
 
   return (
     <div dir={isRtl ? 'rtl' : 'ltr'} className={`min-h-screen transition-colors duration-300 ${darkMode ? 'dark bg-slate-950 text-slate-200' : 'bg-slate-50 dark:bg-slate-900/50 text-slate-800 dark:text-slate-200'} p-4 md:p-8 font-sans`}>
+      <ImportReviewDialog
+        backupBeforeApply={backupBeforeImport}
+        currentRowCount={rawData.length}
+        onAppend={() => applyPendingImport('append')}
+        onCancel={closeImportReview}
+        onReplace={() => applyPendingImport('replace')}
+        pendingImport={pendingImport}
+        setBackupBeforeApply={setBackupBeforeImport}
+      />
+
       {toastMsg && (
         <div className="fixed bottom-6 right-6 bg-slate-800 dark:bg-blue-600 text-white px-5 py-3 rounded-xl shadow-2xl z-50 animate-fade-in-up border border-white/10 flex items-center gap-2">
           <ShieldCheck size={18} />

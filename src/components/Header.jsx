@@ -80,12 +80,19 @@ export default function Header({
       ? t('header.importKindPositions', { defaultValue: 'Positions snapshot' })
       : t('header.importKindTrades', { defaultValue: 'Trades' })
   );
+  const getLocalizedImportApplyModeLabel = (applyMode) => (
+    applyMode === 'append'
+      ? t('header.importApplyModeAppend', { defaultValue: 'Append to current data' })
+      : t('header.importApplyModeReplace', { defaultValue: 'Replace current data' })
+  );
   const getLocalizedImportGroupLabel = (group) => (
     t(group.translationKey, { defaultValue: group.label })
   );
 
   const importProfileLabel = t('header.importProfileLabel', { defaultValue: 'CSV parser' });
-  const hasSkippedImportRows = (lastImportMeta?.skippedRowCount || 0) > 0;
+  const totalSkippedImportRows = (lastImportMeta?.skippedRowCount || 0) + (lastImportMeta?.duplicateRowCount || 0);
+  const hasSkippedImportRows = totalSkippedImportRows > 0;
+  const appliedImportRowCount = lastImportMeta?.appliedRowCount ?? lastImportMeta?.importedRowCount ?? 0;
   const selectedImportProfileOption = CSV_IMPORT_PROFILE_OPTIONS
     .find((option) => option.id === csvImportProfile) || CSV_IMPORT_PROFILE_OPTIONS[0];
   const selectedImportProfileGroup = CSV_IMPORT_PROFILE_OPTION_GROUPS
@@ -306,14 +313,14 @@ export default function Header({
                 <span className={hasSkippedImportRows ? 'text-amber-400 dark:text-amber-500' : 'text-emerald-400 dark:text-emerald-500'}>•</span>
                 <span>{t('header.importBadgeImported', {
                   defaultValue: '{{count}} imported',
-                  count: formatLocalizedNumber(lastImportMeta.importedRowCount, activeLocale)
+                  count: formatLocalizedNumber(appliedImportRowCount, activeLocale)
                 })}</span>
                 {hasSkippedImportRows && (
                   <>
                     <span className="text-amber-400 dark:text-amber-500">•</span>
                     <span>{t('header.importBadgeSkipped', {
                       defaultValue: '{{count}} skipped',
-                      count: formatLocalizedNumber(lastImportMeta.skippedRowCount, activeLocale)
+                      count: formatLocalizedNumber(totalSkippedImportRows, activeLocale)
                     })}</span>
                   </>
                 )}
@@ -332,6 +339,13 @@ export default function Header({
                   <span className="text-slate-500 dark:text-slate-400">{t('header.importSummaryMode', { defaultValue: 'Mode' })}</span>
                   <span className="font-medium text-right text-slate-700 dark:text-slate-200">{getLocalizedImportModeLabel(lastImportMeta.selectionMode)}</span>
 
+                  {lastImportMeta.applyMode && (
+                    <>
+                      <span className="text-slate-500 dark:text-slate-400">{t('header.importSummaryApply', { defaultValue: 'Apply mode' })}</span>
+                      <span className="font-medium text-right text-slate-700 dark:text-slate-200">{getLocalizedImportApplyModeLabel(lastImportMeta.applyMode)}</span>
+                    </>
+                  )}
+
                   <span className="text-slate-500 dark:text-slate-400">{t('header.importSummaryKind', { defaultValue: 'Import kind' })}</span>
                   <span className="font-medium text-right text-slate-700 dark:text-slate-200">{getLocalizedImportKindLabel(lastImportMeta.importKind)}</span>
 
@@ -339,12 +353,21 @@ export default function Header({
                   <span className="font-medium text-right text-slate-700 dark:text-slate-200">{getLocalizedImportDelimiterLabel(lastImportMeta.delimiterLabel)}</span>
 
                   <span className="text-slate-500 dark:text-slate-400">{t('header.importSummaryImported', { defaultValue: 'Imported rows' })}</span>
-                  <span className="font-medium text-right text-emerald-600 dark:text-emerald-400">{formatLocalizedNumber(lastImportMeta.importedRowCount, activeLocale)}</span>
+                  <span className="font-medium text-right text-emerald-600 dark:text-emerald-400">{formatLocalizedNumber(appliedImportRowCount, activeLocale)}</span>
 
-                  <span className="text-slate-500 dark:text-slate-400">{t('header.importSummarySkipped', { defaultValue: 'Skipped rows' })}</span>
+                  <span className="text-slate-500 dark:text-slate-400">{t('header.importSummarySkipped', { defaultValue: 'Parser skipped' })}</span>
                   <span className={`font-medium text-right ${hasSkippedImportRows ? 'text-amber-600 dark:text-amber-400' : 'text-slate-700 dark:text-slate-200'}`}>
                     {formatLocalizedNumber(lastImportMeta.skippedRowCount || 0, activeLocale)}
                   </span>
+
+                  {lastImportMeta.duplicateRowCount !== undefined && (
+                    <>
+                      <span className="text-slate-500 dark:text-slate-400">{t('header.importSummaryDuplicates', { defaultValue: 'Exact duplicates skipped' })}</span>
+                      <span className={`font-medium text-right ${(lastImportMeta.duplicateRowCount || 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-700 dark:text-slate-200'}`}>
+                        {formatLocalizedNumber(lastImportMeta.duplicateRowCount || 0, activeLocale)}
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

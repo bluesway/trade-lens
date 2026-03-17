@@ -68,6 +68,7 @@ const CSV_REQUIRED_FIELD_LABELS = {
   代號: { key: 'manager.fields.symbol', defaultValue: 'Symbol' },
   數量: { key: 'manager.fields.quantity', defaultValue: 'Quantity' }
 };
+const TRADE_ROW_SIGNATURE_FIELDS = ['日期', '類型', '代號', '市場', '數量', '單價', '總金額', '損益'];
 const CSV_IMPORT_PROFILE_IDS = new Set(CSV_IMPORT_PROFILE_OPTIONS.map(({ id }) => id));
 
 const getFxRateSymbols = (fromCurrency, toCurrency) => {
@@ -490,67 +491,172 @@ export function useTradeData(showToast) {
       : delimiterLabel
   );
 
-  const importCsvText = (text) => {
-    const { rows, meta } = parseCSVWithMeta(text, { profileId: csvImportProfile });
-    const importMeta = {
-      ...meta,
-      selectionMode: csvImportProfile === 'auto' ? 'auto' : 'manual'
-    };
-    const localizedProfileLabel = getLocalizedProfileLabel(importMeta.profileLabelKey, importMeta.profileLabel);
+  const buildImportMeta = (meta) => ({
+    ...meta,
+    selectionMode: csvImportProfile === 'auto' ? 'auto' : 'manual'
+  });
+
+  const showImportErrorToast = (importMeta) => {
     const localizedDelimiterLabel = getLocalizedDelimiterLabel(importMeta.delimiterLabel);
+
+    if (importMeta.errorCode === 'missingRequiredHeaders') {
+      const missingFieldLabels = importMeta.missingRequiredFields
+        .map((field) => CSV_REQUIRED_FIELD_LABELS[field])
+        .filter(Boolean)
+        .map(({ key, defaultValue }) => t(key, { defaultValue }))
+        .join(' / ');
+
+      showToast(t('messages.csvImportFailedHeaders', {
+        defaultValue: 'CSV import failed: missing required fields {{fields}}.',
+        fields: missingFieldLabels
+      }));
+    } else if (importMeta.errorCode === 'rowWidthMismatch') {
+      showToast(t('messages.csvImportFailedRowWidth', {
+        defaultValue: 'CSV import failed: row {{row}} has more columns than the header, usually because a thousands-separated number in a {{delimiter}} file was not quoted properly.',
+        row: formatLocalizedNumber(importMeta.problematicRowNumbers[0], activeLocale),
+        delimiter: localizedDelimiterLabel
+      }));
+    } else {
+      showToast(t('messages.csvImportFailedNoData', {
+        defaultValue: 'CSV import failed: no usable trade rows were found.'
+      }));
+    }
+  };
+
+  const buildTradeRowSignature = (row) => TRADE_ROW_SIGNATURE_FIELDS
+    .map((field) => {
+      const rawValue = String(row[field] || '').trim();
+
+      if (['數量', '單價', '總金額', '損益'].includes(field)) {
+        const numericValue = Number.parseFloat(rawValue.replace(/[^0-9.-]+/g, ''));
+        return Number.isFinite(numericValue) ? numericValue.toString() : '';
+      }
+
+      if (field === '代號') {
+        return rawValue.toUpperCase();
+      }
+
+      return rawValue;
+    })
+    .join('\u241f');
+
+  const prepareCsvImport = (text) => {
+    const { rows, meta } = parseCSVWithMeta(text, { profileId: csvImportProfile });
+    const importMeta = buildImportMeta(meta);
 
     if (!importMeta.ok) {
       setLastImportMeta(null);
-
-      if (importMeta.errorCode === 'missingRequiredHeaders') {
-        const missingFieldLabels = importMeta.missingRequiredFields
-          .map((field) => CSV_REQUIRED_FIELD_LABELS[field])
-          .filter(Boolean)
-          .map(({ key, defaultValue }) => t(key, { defaultValue }))
-          .join(' / ');
-
-        showToast(t('messages.csvImportFailedHeaders', {
-          defaultValue: 'CSV import failed: missing required fields {{fields}}.',
-          fields: missingFieldLabels
-        }));
-      } else if (importMeta.errorCode === 'rowWidthMismatch') {
-        showToast(t('messages.csvImportFailedRowWidth', {
-          defaultValue: 'CSV import failed: row {{row}} has more columns than the header, usually because a thousands-separated number in a {{delimiter}} file was not quoted properly.',
-          row: formatLocalizedNumber(importMeta.problematicRowNumbers[0], activeLocale),
-          delimiter: localizedDelimiterLabel
-        }));
-      } else {
-        showToast(t('messages.csvImportFailedNoData', {
-          defaultValue: 'CSV import failed: no usable trade rows were found.'
-        }));
-      }
-
-      return importMeta;
+      showImportErrorToast(importMeta);
+      return null;
     }
 
-    persistRawData(rows);
-    setIsDemo(false);
-    setLastImportMeta(importMeta);
-    const hasSkippedRows = importMeta.skippedRowCount > 0;
+    return {
+      rows,
+      meta: importMeta
+    };
+  };
+
+  const applyPreparedCsvImport = (preparedImport, options = {}) => {
+    if (!preparedImport?.meta?.ok || !Array.isArray(preparedImport.rows)) {
+      return null;
+    }
+
+    const mode = options.mode === 'append' ? 'append' : 'replace';
+    const announceMode = Boolean(options.announceMode);
+    let nextRows = preparedImport.rows;
+    let duplicateRowCount = 0;
+
+    if (mode === 'append') {
+      const existingSignatures = new Set(rawData.map(buildTradeRowSignature));
+      const uniqueRows = [];
+
+      preparedImport.rows.forEach((row) => {
+        const signature = buildTradeRowSignature(row);
+        if (existingSignatures.has(signature)) {
+          duplicateRowCount += 1;
+          return;
+        }
+
+        existingSignatures.add(signature);
+        uniqueRows.push(row);
+      });
+
+      nextRows = [...rawData, ...uniqueRows];
+    }
+
+    const appliedRowCount = mode === 'append'
+      ? preparedImport.rows.length - duplicateRowCount
+      : preparedImport.rows.length;
+    const importMeta = {
+      ...preparedImport.meta,
+      applyMode: mode,
+      appliedRowCount,
+      duplicateRowCount
+    };
+    const localizedProfileLabel = getLocalizedProfileLabel(importMeta.profileLabelKey, importMeta.profileLabel);
+    const localizedDelimiterLabel = getLocalizedDelimiterLabel(importMeta.delimiterLabel);
+    const parserSkippedCount = importMeta.skippedRowCount || 0;
+    const totalSkippedCount = parserSkippedCount + duplicateRowCount;
+    const hasSkippedRows = totalSkippedCount > 0;
+    const actionLabel = announceMode
+      ? t(
+        mode === 'append' ? 'messages.csvImportApplyAppend' : 'messages.csvImportApplyReplace',
+        {
+          defaultValue: mode === 'append'
+            ? '已追加到現有資料'
+            : '已覆蓋目前資料'
+        }
+      )
+      : '';
     const successMessageKey = importMeta.importKind === 'positions'
-      ? (hasSkippedRows ? 'messages.csvImportSuccessPositionsSkipped' : 'messages.csvImportSuccessPositions')
-      : (hasSkippedRows ? 'messages.csvImportSuccessSkipped' : 'messages.csvImportSuccess');
-    const successDefaultValue = importMeta.importKind === 'positions'
       ? (
-        hasSkippedRows
-          ? 'Imported {{count}} positions as synthetic buy rows and skipped {{skipped}} unsupported rows ({{profile}} · {{delimiter}}).'
-          : 'Imported {{count}} positions as synthetic buy rows ({{profile}} · {{delimiter}}).'
+        announceMode
+          ? (hasSkippedRows ? 'messages.csvImportSuccessPositionsAppliedSkipped' : 'messages.csvImportSuccessPositionsApplied')
+          : (hasSkippedRows ? 'messages.csvImportSuccessPositionsSkipped' : 'messages.csvImportSuccessPositions')
       )
       : (
-        hasSkippedRows
-          ? 'Imported {{count}} trades and skipped {{skipped}} unsupported rows ({{profile}} · {{delimiter}}).'
-          : 'Imported {{count}} trades ({{profile}} · {{delimiter}}).'
+        announceMode
+          ? (hasSkippedRows ? 'messages.csvImportSuccessAppliedSkipped' : 'messages.csvImportSuccessApplied')
+          : (hasSkippedRows ? 'messages.csvImportSuccessSkipped' : 'messages.csvImportSuccess')
       );
+    const successDefaultValue = importMeta.importKind === 'positions'
+      ? (
+        announceMode
+          ? (
+            hasSkippedRows
+              ? 'Imported {{count}} positions as synthetic buy rows, {{action}}, and skipped {{skipped}} rows ({{profile}} · {{delimiter}}).'
+              : 'Imported {{count}} positions as synthetic buy rows and {{action}} ({{profile}} · {{delimiter}}).'
+          )
+          : (
+            hasSkippedRows
+              ? 'Imported {{count}} positions as synthetic buy rows and skipped {{skipped}} unsupported rows ({{profile}} · {{delimiter}}).'
+              : 'Imported {{count}} positions as synthetic buy rows ({{profile}} · {{delimiter}}).'
+          )
+      )
+      : (
+        announceMode
+          ? (
+            hasSkippedRows
+              ? 'Imported {{count}} trades, {{action}}, and skipped {{skipped}} rows ({{profile}} · {{delimiter}}).'
+              : 'Imported {{count}} trades and {{action}} ({{profile}} · {{delimiter}}).'
+          )
+          : (
+            hasSkippedRows
+              ? 'Imported {{count}} trades and skipped {{skipped}} unsupported rows ({{profile}} · {{delimiter}}).'
+              : 'Imported {{count}} trades ({{profile}} · {{delimiter}}).'
+          )
+      );
+
+    persistRawData(nextRows);
+    setIsDemo(false);
+    setLastImportMeta(importMeta);
 
     showToast(t(successMessageKey, {
       defaultValue: successDefaultValue,
-      count: formatLocalizedNumber(importMeta.importedRowCount, activeLocale),
-      skipped: formatLocalizedNumber(importMeta.skippedRowCount, activeLocale),
+      count: formatLocalizedNumber(appliedRowCount, activeLocale),
+      skipped: formatLocalizedNumber(totalSkippedCount, activeLocale),
+      duplicates: formatLocalizedNumber(duplicateRowCount, activeLocale),
+      action: actionLabel,
       profile: localizedProfileLabel,
       delimiter: localizedDelimiterLabel
     }));
@@ -1061,7 +1167,7 @@ export function useTradeData(showToast) {
     hideZeroHolding,
     historySortConfig,
     holdingCount,
-    importCsvText,
+    applyPreparedCsvImport,
     isAppLoaded,
     isDemo,
     isLoadingPrices,
@@ -1073,6 +1179,7 @@ export function useTradeData(showToast) {
     overallRealizedPercent,
     overallUnrealizedPercent,
     processedData,
+    prepareCsvImport,
     rawData,
     requestSort,
     setApiKey,
