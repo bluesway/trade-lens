@@ -435,19 +435,46 @@ const buildTrackedSymbolEntries = (rows) => {
   return Array.from(entriesBySymbol.values());
 };
 
-const hasResolvedQuoteSnapshot = (symbol, liveSnapshot, manualSnapshot) => {
-  const manualPrice = Number.parseFloat(manualSnapshot?.[symbol]?.price);
+const getSnapshotTimestamp = (value) => {
+  const numericTimestamp = Number(value);
+  return Number.isFinite(numericTimestamp) && numericTimestamp > 0 ? numericTimestamp : null;
+};
+
+const isFreshSnapshotTimestamp = (timestamp, now) => (
+  Number.isFinite(timestamp) && timestamp > 0 && now - timestamp <= ONE_DAY
+);
+
+const getResolvedQuoteSnapshotStatus = (symbol, liveSnapshot, manualSnapshot, now = Date.now()) => {
+  const manualEntry = manualSnapshot?.[symbol];
+  const manualPrice = Number.parseFloat(manualEntry?.price);
+  const manualTimestamp = getSnapshotTimestamp(manualEntry?.timestamp);
+
   if (Number.isFinite(manualPrice) && Math.abs(manualPrice) > POSITION_EPSILON) {
-    return true;
+    return {
+      hasQuote: true,
+      isFresh: isFreshSnapshotTimestamp(manualTimestamp, now),
+      source: 'manual'
+    };
   }
 
+  const liveQuote = liveSnapshot?.[symbol];
   const normalizedQuote = normalizeQuoteCurrencyData(
-    liveSnapshot?.[symbol]?.currency,
-    liveSnapshot?.[symbol]?.price
+    liveQuote?.currency,
+    liveQuote?.price
   );
+  const liveTimestamp = getSnapshotTimestamp(liveQuote?.timestamp);
+  const hasQuote = Number.isFinite(normalizedQuote.price) && Math.abs(normalizedQuote.price) > POSITION_EPSILON;
 
-  return Number.isFinite(normalizedQuote.price) && Math.abs(normalizedQuote.price) > POSITION_EPSILON;
+  return {
+    hasQuote,
+    isFresh: hasQuote && isFreshSnapshotTimestamp(liveTimestamp, now),
+    source: hasQuote ? 'api' : 'missing'
+  };
 };
+
+const hasResolvedQuoteSnapshot = (symbol, liveSnapshot, manualSnapshot) => (
+  getResolvedQuoteSnapshotStatus(symbol, liveSnapshot, manualSnapshot).hasQuote
+);
 
 const buildMissingImportedSymbolEntries = (symbolEntries, liveSnapshot, manualSnapshot) => (
   symbolEntries
@@ -727,10 +754,11 @@ export function useTradeData(showToast) {
     let staleQuoteCount = 0;
 
     uniqueSymbols.forEach((symbol) => {
+      const quoteStatus = getResolvedQuoteSnapshotStatus(symbol, liveData, manualStockData, now);
       const cachedQuote = liveData[symbol];
-      if (!cachedQuote) {
+      if (!quoteStatus.hasQuote) {
         missingQuoteCount += 1;
-      } else if (!cachedQuote.timestamp || now - cachedQuote.timestamp > ONE_DAY) {
+      } else if (!quoteStatus.isFresh) {
         staleQuoteCount += 1;
       }
 
@@ -755,10 +783,8 @@ export function useTradeData(showToast) {
 
     const codesToFetch = uniqueSymbols.filter((symbol) => {
       if (isForce) return true;
-      const cachedQuote = liveData[symbol];
-      if (!cachedQuote) return true;
-      if (!cachedQuote.timestamp || now - cachedQuote.timestamp > ONE_DAY) return true;
-      return false;
+      const quoteStatus = getResolvedQuoteSnapshotStatus(symbol, liveData, manualStockData, now);
+      return !quoteStatus.hasQuote || !quoteStatus.isFresh;
     });
 
     const currenciesToFetch = new Set();
@@ -804,7 +830,7 @@ export function useTradeData(showToast) {
 
   const refreshPlan = useMemo(
     () => buildRefreshPlan(baseCurrency, false),
-    [baseCurrency, exchangeRates, liveData, rawData]
+    [baseCurrency, exchangeRates, liveData, manualStockData, rawData]
   );
   const hasStaleMarketData = refreshPlan.requiresNetworkRefresh;
 
