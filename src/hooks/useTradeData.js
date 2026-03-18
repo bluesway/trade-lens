@@ -69,6 +69,10 @@ const CSV_IMPORT_PROFILE_IDS = new Set(CSV_IMPORT_PROFILE_OPTIONS.map(({ id }) =
 const MAX_IMPORT_SKIP_PREVIEW_ROWS = 5;
 const SPLIT_TRADE_TYPES = new Set(['拆股', '反向拆股']);
 const LEDGER_TRADE_TYPES = new Set(['買入', '賣出', '拆股', '反向拆股']);
+const TRADE_DATE_PATTERNS = [
+  /(\d{4})[/-](\d{1,2})[/-](\d{1,2})/g,
+  /(\d{1,2})[/-](\d{1,2})[/-](\d{4})/g
+];
 
 const getFxRateSymbols = (fromCurrency, toCurrency) => {
   if (!fromCurrency || !toCurrency || fromCurrency === toCurrency) {
@@ -114,10 +118,57 @@ const formatNumericValue = (value, maxFractionDigits = 8) => {
 
 const hasMeaningfulValue = (value) => Number.isFinite(value) && Math.abs(value) > POSITION_EPSILON;
 
-const getTradeTimestamp = (dateValue) => {
-  const parsedDate = new Date(dateValue || 0);
+const buildTradeDateTimestamp = (year, month, day) => {
+  const parsedYear = Number.parseInt(year, 10);
+  const parsedMonth = Number.parseInt(month, 10);
+  const parsedDay = Number.parseInt(day, 10);
+
+  if (
+    !Number.isInteger(parsedYear)
+    || !Number.isInteger(parsedMonth)
+    || !Number.isInteger(parsedDay)
+    || parsedMonth < 1
+    || parsedMonth > 12
+    || parsedDay < 1
+    || parsedDay > 31
+  ) {
+    return null;
+  }
+
+  return new Date(parsedYear, parsedMonth - 1, parsedDay).getTime();
+};
+
+const extractTradeDateTimestamp = (dateValue) => {
+  const normalizedValue = String(dateValue || '').trim();
+  if (!normalizedValue) {
+    return null;
+  }
+
+  const matchedTimestamps = [];
+  TRADE_DATE_PATTERNS.forEach((pattern, patternIndex) => {
+    const matches = normalizedValue.matchAll(pattern);
+    for (const match of matches) {
+      const timestamp = patternIndex === 0
+        ? buildTradeDateTimestamp(match[1], match[2], match[3])
+        : buildTradeDateTimestamp(match[3], match[1], match[2]);
+
+      if (Number.isFinite(timestamp)) {
+        matchedTimestamps.push(timestamp);
+      }
+    }
+  });
+
+  if (matchedTimestamps.length > 0) {
+    return Math.min(...matchedTimestamps);
+  }
+
+  const parsedDate = new Date(normalizedValue);
   const timestamp = parsedDate.getTime();
-  return Number.isNaN(timestamp) ? 0 : timestamp;
+  return Number.isNaN(timestamp) ? null : timestamp;
+};
+
+const getTradeTimestamp = (dateValue) => {
+  return extractTradeDateTimestamp(dateValue) ?? 0;
 };
 
 const sortTradeRowsChronologically = (rows) => [...rows].sort((a, b) => {
