@@ -521,6 +521,132 @@ const getDemoExchangeRate = (fromCurrency, toCurrency) => {
   return fromUsdRate / toUsdRate;
 };
 
+const getExchangeRateValue = (fromCurrency, toCurrency, effectiveExchangeRates, isDemo) => {
+  if (fromCurrency === toCurrency) return 1;
+
+  const directRate = effectiveExchangeRates?.[`${fromCurrency}${toCurrency}=X`]?.rate;
+  if (Number.isFinite(directRate) && directRate > 0) {
+    return directRate;
+  }
+
+  const sourceToUsdRate = effectiveExchangeRates?.[`${fromCurrency}${FX_BRIDGE_CURRENCY}=X`]?.rate;
+  const usdToTargetRate = effectiveExchangeRates?.[`${FX_BRIDGE_CURRENCY}${toCurrency}=X`]?.rate;
+  if (
+    Number.isFinite(sourceToUsdRate) && sourceToUsdRate > 0
+    && Number.isFinite(usdToTargetRate) && usdToTargetRate > 0
+  ) {
+    return sourceToUsdRate * usdToTargetRate;
+  }
+
+  if (isDemo) {
+    return getDemoExchangeRate(fromCurrency, toCurrency);
+  }
+
+  return 1;
+};
+
+const buildRefreshPlan = ({
+  exchangeRates,
+  liveData,
+  manualStockData,
+  rawData,
+  targetBaseCurrency,
+  isForce = false,
+  symbolEntriesInput = null,
+  now = Date.now()
+}) => {
+  const symbolEntries = Array.isArray(symbolEntriesInput)
+    ? symbolEntriesInput
+    : buildTrackedSymbolEntries(rawData);
+
+  const uniqueSymbols = Array.from(new Set(symbolEntries.map((entry) => entry.symbol)));
+  const marketBySymbol = new Map(symbolEntries.map((entry) => [entry.symbol, entry.market]));
+  const missingRateKeys = new Set();
+  const staleRateKeys = new Set();
+
+  let missingQuoteCount = 0;
+  let staleQuoteCount = 0;
+
+  uniqueSymbols.forEach((symbol) => {
+    const quoteStatus = getResolvedQuoteSnapshotStatus(symbol, liveData, manualStockData, now);
+    const cachedQuote = liveData[symbol];
+    if (!quoteStatus.hasQuote) {
+      if (!quoteStatus.hasRecentAttempt) {
+        missingQuoteCount += 1;
+      }
+    } else if (!quoteStatus.isFresh) {
+      staleQuoteCount += 1;
+    }
+
+    const fallbackCurrency = getCurrencyBySymbolOrMarket(symbol, marketBySymbol.get(symbol));
+    const currency = normalizeQuoteCurrencyData(cachedQuote?.currency).currency || fallbackCurrency;
+    if (!currency || currency === targetBaseCurrency) {
+      return;
+    }
+
+    getFxRateSymbols(currency, targetBaseCurrency).forEach((rateKey) => {
+      const cachedRate = exchangeRates[rateKey];
+      const rateStatus = getRateSnapshotStatus(cachedRate, now);
+      if (!rateStatus.hasRate) {
+        if (!rateStatus.hasRecentAttempt) {
+          missingRateKeys.add(rateKey);
+        }
+        return;
+      }
+
+      if (!rateStatus.isFresh) {
+        staleRateKeys.add(rateKey);
+      }
+    });
+  });
+
+  const codesToFetch = uniqueSymbols.filter((symbol) => {
+    if (isForce) return true;
+    const quoteStatus = getResolvedQuoteSnapshotStatus(symbol, liveData, manualStockData, now);
+    return !quoteStatus.hasRecentAttempt;
+  });
+
+  const currenciesToFetch = new Set();
+  uniqueSymbols.forEach((symbol) => {
+    const cachedQuote = liveData[symbol];
+    const fallbackCurrency = getCurrencyBySymbolOrMarket(symbol, marketBySymbol.get(symbol));
+    const currency = normalizeQuoteCurrencyData(cachedQuote?.currency).currency || fallbackCurrency;
+
+    if (currency && currency !== targetBaseCurrency) {
+      getFxRateSymbols(currency, targetBaseCurrency).forEach((rateKey) => {
+        const rateStatus = getRateSnapshotStatus(exchangeRates[rateKey], now);
+        if (isForce || !rateStatus.hasRecentAttempt) {
+          currenciesToFetch.add(rateKey);
+        }
+      });
+    }
+  });
+
+  if (codesToFetch.length > 0) {
+    uniqueSymbols.forEach((symbol) => {
+      const currency = getCurrencyBySymbolOrMarket(symbol, marketBySymbol.get(symbol));
+      if (currency && currency !== targetBaseCurrency) {
+        getFxRateSymbols(currency, targetBaseCurrency).forEach((rateKey) => {
+          currenciesToFetch.add(rateKey);
+        });
+      }
+    });
+  }
+
+  return {
+    now,
+    uniqueSymbols,
+    marketBySymbol,
+    codesToFetch,
+    rateSymbolsToFetch: Array.from(currenciesToFetch),
+    missingQuoteCount,
+    staleQuoteCount,
+    missingRateCount: missingRateKeys.size,
+    staleRateCount: staleRateKeys.size,
+    requiresNetworkRefresh: codesToFetch.length > 0 || currenciesToFetch.size > 0
+  };
+};
+
 const DEMO_LAST_UPDATE = (() => {
   const parsedDate = new Date(DEMO_REFERENCE_UPDATED_AT);
   return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
@@ -645,30 +771,6 @@ export function useTradeData(showToast) {
     loadInitialData();
   }, []);
 
-  const getExchangeRate = (fromCurrency, toCurrency) => {
-    if (fromCurrency === toCurrency) return 1;
-
-    const directRate = effectiveExchangeRates?.[`${fromCurrency}${toCurrency}=X`]?.rate;
-    if (Number.isFinite(directRate) && directRate > 0) {
-      return directRate;
-    }
-
-    const sourceToUsdRate = effectiveExchangeRates?.[`${fromCurrency}${FX_BRIDGE_CURRENCY}=X`]?.rate;
-    const usdToTargetRate = effectiveExchangeRates?.[`${FX_BRIDGE_CURRENCY}${toCurrency}=X`]?.rate;
-    if (
-      Number.isFinite(sourceToUsdRate) && sourceToUsdRate > 0
-      && Number.isFinite(usdToTargetRate) && usdToTargetRate > 0
-    ) {
-      return sourceToUsdRate * usdToTargetRate;
-    }
-
-    if (isDemo) {
-      return getDemoExchangeRate(fromCurrency, toCurrency);
-    }
-
-    return 1;
-  };
-
   const handleSaveApiKey = () => {
     persistValue(STORAGE_KEYS.apiKey, apiKey);
     showToast(t('messages.apiKeySaved'));
@@ -759,102 +861,14 @@ export function useTradeData(showToast) {
     [rawData]
   );
 
-  const buildRefreshPlan = (targetBaseCurrency = baseCurrency, isForce = false, symbolEntriesInput = null) => {
-    const now = Date.now();
-    const symbolEntries = Array.isArray(symbolEntriesInput)
-      ? symbolEntriesInput
-      : buildTrackedSymbolEntries(rawData);
-
-    const uniqueSymbols = Array.from(new Set(symbolEntries.map((entry) => entry.symbol)));
-    const marketBySymbol = new Map(symbolEntries.map((entry) => [entry.symbol, entry.market]));
-    const missingRateKeys = new Set();
-    const staleRateKeys = new Set();
-
-    let missingQuoteCount = 0;
-    let staleQuoteCount = 0;
-
-    uniqueSymbols.forEach((symbol) => {
-      const quoteStatus = getResolvedQuoteSnapshotStatus(symbol, liveData, manualStockData, now);
-      const cachedQuote = liveData[symbol];
-      if (!quoteStatus.hasQuote) {
-        if (!quoteStatus.hasRecentAttempt) {
-          missingQuoteCount += 1;
-        }
-      } else if (!quoteStatus.isFresh) {
-        staleQuoteCount += 1;
-      }
-
-      const fallbackCurrency = getCurrencyBySymbolOrMarket(symbol, marketBySymbol.get(symbol));
-      const currency = normalizeQuoteCurrencyData(cachedQuote?.currency).currency || fallbackCurrency;
-      if (!currency || currency === targetBaseCurrency) {
-        return;
-      }
-
-      getFxRateSymbols(currency, targetBaseCurrency).forEach((rateKey) => {
-        const cachedRate = exchangeRates[rateKey];
-        const rateStatus = getRateSnapshotStatus(cachedRate, now);
-        if (!rateStatus.hasRate) {
-          if (!rateStatus.hasRecentAttempt) {
-            missingRateKeys.add(rateKey);
-          }
-          return;
-        }
-
-        if (!rateStatus.isFresh) {
-          staleRateKeys.add(rateKey);
-        }
-      });
-    });
-
-    const codesToFetch = uniqueSymbols.filter((symbol) => {
-      if (isForce) return true;
-      const quoteStatus = getResolvedQuoteSnapshotStatus(symbol, liveData, manualStockData, now);
-      return !quoteStatus.hasRecentAttempt;
-    });
-
-    const currenciesToFetch = new Set();
-    uniqueSymbols.forEach((symbol) => {
-      const cachedQuote = liveData[symbol];
-      const fallbackCurrency = getCurrencyBySymbolOrMarket(symbol, marketBySymbol.get(symbol));
-      const currency = normalizeQuoteCurrencyData(cachedQuote?.currency).currency || fallbackCurrency;
-
-      if (currency && currency !== targetBaseCurrency) {
-        getFxRateSymbols(currency, targetBaseCurrency).forEach((rateKey) => {
-          const rateStatus = getRateSnapshotStatus(exchangeRates[rateKey], now);
-          if (isForce || !rateStatus.hasRecentAttempt) {
-            currenciesToFetch.add(rateKey);
-          }
-        });
-      }
-    });
-
-    if (codesToFetch.length > 0) {
-      uniqueSymbols.forEach((symbol) => {
-        const currency = getCurrencyBySymbolOrMarket(symbol, marketBySymbol.get(symbol));
-        if (currency && currency !== targetBaseCurrency) {
-          getFxRateSymbols(currency, targetBaseCurrency).forEach((rateKey) => {
-            currenciesToFetch.add(rateKey);
-          });
-        }
-      });
-    }
-
-    return {
-      now,
-      uniqueSymbols,
-      marketBySymbol,
-      codesToFetch,
-      rateSymbolsToFetch: Array.from(currenciesToFetch),
-      missingQuoteCount,
-      staleQuoteCount,
-      missingRateCount: missingRateKeys.size,
-      staleRateCount: staleRateKeys.size,
-      requiresNetworkRefresh: codesToFetch.length > 0 || currenciesToFetch.size > 0
-    };
-  };
-
   const refreshPlan = useMemo(
-    () => buildRefreshPlan(baseCurrency, false),
+    () => buildRefreshPlan({
+      exchangeRates,
+      liveData,
+      manualStockData,
+      rawData,
+      targetBaseCurrency: baseCurrency
+    }),
     [baseCurrency, exchangeRates, liveData, manualStockData, rawData]
   );
   const hasStaleMarketData = refreshPlan.requiresNetworkRefresh;
@@ -883,7 +897,15 @@ export function useTradeData(showToast) {
       };
     }
 
-    const refreshTargets = buildRefreshPlan(targetBaseCurrency, isForce, symbolEntries);
+    const refreshTargets = buildRefreshPlan({
+      exchangeRates,
+      liveData,
+      manualStockData,
+      rawData,
+      targetBaseCurrency,
+      isForce,
+      symbolEntriesInput: symbolEntries
+    });
     const { codesToFetch, marketBySymbol, rateSymbolsToFetch, uniqueSymbols } = refreshTargets;
     if (uniqueSymbols.length === 0) {
       return {
@@ -1682,7 +1704,7 @@ export function useTradeData(showToast) {
         const priceUpdateTimestamp = isManualPrice ? manualData?.timestamp || null : apiData?.timestamp || null;
         const lastUpdateTimestamp = priceUpdateTimestamp || nameUpdateTimestamp;
         const currency = normalizedApiQuote.currency || getCurrencyBySymbolOrMarket(stock.symbol, stock.market);
-        const exchangeRate = getExchangeRate(currency, baseCurrency);
+        const exchangeRate = getExchangeRateValue(currency, baseCurrency, effectiveExchangeRates, isDemo);
 
         const hasCurrentPrice = hasMeaningfulValue(currentPrice);
         const currentValueOriginal = hasCurrentPrice ? stock.holdingQty * currentPrice : 0;
@@ -1739,7 +1761,16 @@ export function useTradeData(showToast) {
         };
       })
       .sort((a, b) => b.realizedPnlBase - a.realizedPnlBase);
-  }, [baseCurrency, exchangeRates, isAppLoaded, liveData, manualStockData, resolvedTradeRowsChronological, t]);
+  }, [
+    baseCurrency,
+    effectiveExchangeRates,
+    isAppLoaded,
+    isDemo,
+    liveData,
+    manualStockData,
+    resolvedTradeRowsChronological,
+    t
+  ]);
 
   const chartData = useMemo(() => {
     let holdingData = [];
@@ -1855,7 +1886,7 @@ export function useTradeData(showToast) {
       if (Number.isNaN(dateObject.getTime())) return;
 
       const currency = row.__currency || getCurrencyBySymbolOrMarket(symbol, market);
-      const exchangeRate = getExchangeRate(currency, baseCurrency);
+      const exchangeRate = getExchangeRateValue(currency, baseCurrency, effectiveExchangeRates, isDemo);
 
       if (!stockStates[symbol]) {
         stockStates[symbol] = {
@@ -1906,7 +1937,15 @@ export function useTradeData(showToast) {
         day: 'numeric'
       })
     }));
-  }, [activeLocale, baseCurrency, exchangeRates, isAppLoaded, resolvedTradeRowsChronological, trendTimeRange]);
+  }, [
+    activeLocale,
+    baseCurrency,
+    effectiveExchangeRates,
+    isAppLoaded,
+    isDemo,
+    resolvedTradeRowsChronological,
+    trendTimeRange
+  ]);
 
   const availableMarkets = useMemo(
     () => Array.from(new Set(processedData.map((stock) => stock.market))).filter(Boolean),

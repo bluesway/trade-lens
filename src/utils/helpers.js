@@ -655,7 +655,9 @@ export const asyncStorage = {
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
       });
-    } catch (e) {}
+    } catch (e) {
+      return undefined;
+    }
   }
 };
 

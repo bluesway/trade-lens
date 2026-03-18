@@ -1212,7 +1212,7 @@ const normalizeNumericCell = (rawValue, preferredDecimalSeparator = '.') => {
 
   const isNegativeByParentheses = /^\(.*\)$/.test(value);
   value = value.replace(/[()\s\u00A0\u202F]/g, '');
-  value = value.replace(/[^\d,.\-]/g, '');
+  value = value.replace(/[^\d,.-]/g, '');
 
   if (!value) {
     return '';
