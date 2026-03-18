@@ -14,6 +14,28 @@ const mergeLocale = (base, overrides) => {
   return merged;
 };
 
+const fillMissingLocale = (base, fallback) => {
+  if (!isPlainObject(fallback)) {
+    return base === undefined ? fallback : base;
+  }
+
+  const resolvedBase = isPlainObject(base) ? base : {};
+  const merged = { ...resolvedBase };
+
+  Object.entries(fallback).forEach(([key, value]) => {
+    if (isPlainObject(value)) {
+      merged[key] = fillMissingLocale(resolvedBase[key], value);
+      return;
+    }
+
+    if (merged[key] === undefined) {
+      merged[key] = value;
+    }
+  });
+
+  return merged;
+};
+
 const pick = (source, keys) =>
   keys.reduce((acc, key) => {
     if (source?.[key] !== undefined) {
@@ -43,34 +65,66 @@ const pickImportPatch = (locale) => ({
     'importReviewReplaceHelp',
     'importReviewAppendAction',
     'importReviewReplaceAction',
-    'importReviewCancel'
+    'importReviewCancel',
+    'importMissingDataBadge',
+    'importMissingDataTitle',
+    'importMissingDataIntro',
+    'importMissingDataIntroNoApi',
+    'importMissingDataSelectAll',
+    'importMissingDataClearSelection',
+    'importMissingDataRowsLabel',
+    'importMissingDataRowsShort',
+    'importMissingDataNamePlaceholder',
+    'importMissingDataSaveSelected',
+    'importMissingDataDeleteSelected',
+    'importMissingDataClose',
+    'importMissingDataSelectedCount',
+    'importMissingDataDeleteConfirm'
   ]),
-  header: pick(locale?.header, [
-    'importProfileLabel',
-    'importModeAutoDetected',
-    'importModeManualOverride',
-    'importKindTrades',
-    'importKindPositions',
-    'importApplyModeAppend',
-    'importApplyModeReplace',
-    'importSummaryTitle',
-    'importSummaryProfile',
-    'importSummaryMode',
-    'importSummaryApply',
-    'importSummaryKind',
-    'importSummaryDelimiter',
-    'importSummaryImported',
-    'importSummarySkipped',
-    'importSummaryDuplicates',
-    'importBadgeImported',
-    'importBadgeSkipped',
-    'importPresetGroups',
-    'importProfileHelpAuto',
-    'importProfileHelpBroker',
-    'importProfileHelpGeneric',
-    'importProfileAuto',
-    'csvProfiles'
-  ]),
+  header: {
+    ...pick(locale?.header, [
+      'importProfileLabel',
+      'importModeAutoDetected',
+      'importModeManualOverride',
+      'importKindTrades',
+      'importKindPositions',
+      'importApplyModeAppend',
+      'importApplyModeReplace',
+      'importSummaryTitle',
+      'importSummaryProfile',
+      'importSummaryMode',
+      'importSummaryApply',
+      'importSummaryKind',
+      'importSummaryDelimiter',
+      'importSummaryImported',
+      'importSummarySkipped',
+      'importSummaryDuplicates',
+      'importBadgeImported',
+      'importBadgeSkipped',
+      'importPresetGroups',
+      'importProfileHelpAuto',
+      'importProfileHelpBroker',
+      'importProfileHelpGeneric',
+      'importProfileAuto',
+      'csvProfiles',
+      'csvNote3',
+      'importDetailsToggle',
+      'skippedPreviewTitle',
+      'skippedPreviewUnknownSymbol',
+      'skippedPreviewRowNumber',
+      'skippedPreviewMarket',
+      'skippedPreviewOverflow',
+      'skippedReasonDerivative',
+      'skippedReasonDuplicate',
+      'skippedReasonMissingFields',
+      'skippedReasonQuantity',
+      'skippedReasonAmount',
+      'skippedReasonGeneric'
+    ]),
+    csvDelimiters: pick(locale?.header?.csvDelimiters, [
+      'tab'
+    ])
+  },
   messages: pick(locale?.messages, [
     'csvImportApplyAppend',
     'csvImportApplyReplace',
@@ -84,9 +138,46 @@ const pickImportPatch = (locale) => ({
     'csvImportSuccessPositionsAppliedSkipped',
     'csvImportFailedNoData',
     'csvImportFailedHeaders',
-    'csvImportFailedRowWidth'
+    'csvImportFailedRowWidth',
+    'importMissingDataNeedPrice',
+    'importMissingDataSaved',
+    'importMissingDataDeleted'
   ])
 });
+
+const IMPORT_COPY_DEFAULTS = {
+  detailsToggle: 'Details',
+  csvNote3: '* Note 3: The app auto-detects common broker CSV layouts plus semicolon and tab-delimited files. After import, the detected layout shows up on the top right.',
+  csvDelimiterTab: 'tab',
+  skippedPreviewTitle: 'Skipped rows preview',
+  skippedPreviewUnknownSymbol: 'Unknown symbol',
+  skippedPreviewRowNumber: 'row {{row}}',
+  skippedPreviewMarket: 'Market: {{value}}',
+  skippedPreviewOverflow: '{{count}} more skipped rows are not shown here.',
+  skippedReasonDerivative: 'Likely option or derivative',
+  skippedReasonDuplicate: 'Exact duplicate of an existing trade',
+  skippedReasonMissingFields: 'Missing date, symbol, or trade side',
+  skippedReasonQuantity: 'Quantity is missing or invalid',
+  skippedReasonAmount: 'Price and amount are both unusable',
+  skippedReasonGeneric: 'Unsupported or incomplete row',
+  importMissingDataBadge: 'Needs quote review',
+  importMissingDataTitle: 'Some imported symbols still need prices',
+  importMissingDataIntro: 'Trade Lens already tried to fetch quotes for the newly imported symbols. The ones below still need a manual name and price, or you can delete their rows in one shot.',
+  importMissingDataIntroNoApi: 'These imported symbols do not have cached quotes yet. Add a manual name and price now, or delete their rows. You can also open the trade manager to fix the records first.',
+  importMissingDataSelectAll: 'Select all',
+  importMissingDataClearSelection: 'Clear selection',
+  importMissingDataRowsLabel: '{{count}} rows',
+  importMissingDataRowsShort: 'Rows',
+  importMissingDataNamePlaceholder: 'Optional display name',
+  importMissingDataSaveSelected: 'Save selected',
+  importMissingDataDeleteSelected: 'Delete selected rows',
+  importMissingDataClose: 'Close for now',
+  importMissingDataSelectedCount: '{{count}} selected',
+  importMissingDataDeleteConfirm: 'Delete the selected symbols and all of their imported rows?',
+  importMissingDataNeedPrice: 'Selected symbols still need a valid manual price.',
+  importMissingDataSaved: 'Saved manual quotes for {{count}} symbols.',
+  importMissingDataDeleted: 'Deleted {{count}} unresolved symbols and their rows.'
+};
 
 const buildCsvProfiles = (labels) => ({
   tradeLens: labels.tradeLens,
@@ -125,71 +216,111 @@ const buildCsvProfiles = (labels) => ({
   hkStatementTransactions: labels.hkStatement
 });
 
-const createImportPatch = (copy) => ({
+const createImportPatch = (copy) => {
+  const resolvedCopy = {
+    ...IMPORT_COPY_DEFAULTS,
+    ...copy
+  };
+
+  return {
   app: {
-    importReviewBadge: copy.reviewBadge,
-    importReviewTitle: copy.reviewTitle,
-    importReviewIntro: copy.reviewIntro,
-    importReviewFile: copy.file,
-    importReviewProfile: copy.profile,
-    importReviewMode: copy.mode,
-    importReviewKind: copy.kind,
-    importReviewDelimiter: copy.delimiter,
-    importReviewExistingRows: copy.currentRows,
-    importReviewIncomingRows: copy.incomingRows,
-    importReviewSkippedRows: copy.skippedRows,
-    importReviewBackupLabel: copy.backupLabel,
-    importReviewBackupHelp: copy.backupHelp,
-    importReviewAppendTitle: copy.appendTitle,
-    importReviewAppendHelp: copy.appendHelp,
-    importReviewReplaceTitle: copy.replaceTitle,
-    importReviewReplaceHelp: copy.replaceHelp,
-    importReviewAppendAction: copy.appendTitle,
-    importReviewReplaceAction: copy.replaceTitle,
-    importReviewCancel: copy.cancel
+    importReviewBadge: resolvedCopy.reviewBadge,
+    importReviewTitle: resolvedCopy.reviewTitle,
+    importReviewIntro: resolvedCopy.reviewIntro,
+    importReviewFile: resolvedCopy.file,
+    importReviewProfile: resolvedCopy.profile,
+    importReviewMode: resolvedCopy.mode,
+    importReviewKind: resolvedCopy.kind,
+    importReviewDelimiter: resolvedCopy.delimiter,
+    importReviewExistingRows: resolvedCopy.currentRows,
+    importReviewIncomingRows: resolvedCopy.incomingRows,
+    importReviewSkippedRows: resolvedCopy.skippedRows,
+    importReviewBackupLabel: resolvedCopy.backupLabel,
+    importReviewBackupHelp: resolvedCopy.backupHelp,
+    importReviewAppendTitle: resolvedCopy.appendTitle,
+    importReviewAppendHelp: resolvedCopy.appendHelp,
+    importReviewReplaceTitle: resolvedCopy.replaceTitle,
+    importReviewReplaceHelp: resolvedCopy.replaceHelp,
+    importReviewAppendAction: resolvedCopy.appendTitle,
+    importReviewReplaceAction: resolvedCopy.replaceTitle,
+    importReviewCancel: resolvedCopy.cancel,
+    importMissingDataBadge: resolvedCopy.importMissingDataBadge,
+    importMissingDataTitle: resolvedCopy.importMissingDataTitle,
+    importMissingDataIntro: resolvedCopy.importMissingDataIntro,
+    importMissingDataIntroNoApi: resolvedCopy.importMissingDataIntroNoApi,
+    importMissingDataSelectAll: resolvedCopy.importMissingDataSelectAll,
+    importMissingDataClearSelection: resolvedCopy.importMissingDataClearSelection,
+    importMissingDataRowsLabel: resolvedCopy.importMissingDataRowsLabel,
+    importMissingDataRowsShort: resolvedCopy.importMissingDataRowsShort,
+    importMissingDataNamePlaceholder: resolvedCopy.importMissingDataNamePlaceholder,
+    importMissingDataSaveSelected: resolvedCopy.importMissingDataSaveSelected,
+    importMissingDataDeleteSelected: resolvedCopy.importMissingDataDeleteSelected,
+    importMissingDataClose: resolvedCopy.importMissingDataClose,
+    importMissingDataSelectedCount: resolvedCopy.importMissingDataSelectedCount,
+    importMissingDataDeleteConfirm: resolvedCopy.importMissingDataDeleteConfirm
   },
   header: {
-    importProfileLabel: copy.profileSelectorLabel,
-    importModeAutoDetected: copy.autoDetected,
-    importModeManualOverride: copy.manualOverride,
-    importKindTrades: copy.trades,
-    importKindPositions: copy.positions,
-    importApplyModeAppend: copy.appendMode,
-    importApplyModeReplace: copy.replaceMode,
-    importSummaryTitle: copy.lastImport,
-    importSummaryProfile: copy.profile,
-    importSummaryMode: copy.mode,
-    importSummaryApply: copy.applyMode,
-    importSummaryKind: copy.kind,
-    importSummaryDelimiter: copy.delimiter,
-    importSummaryImported: copy.importedRows,
-    importSummarySkipped: copy.skippedRows,
-    importSummaryDuplicates: copy.duplicatesSkipped,
-    importBadgeImported: copy.badgeImported,
-    importBadgeSkipped: copy.badgeSkipped,
-    importPresetGroups: copy.presetGroups,
-    importProfileHelpAuto: copy.helpAuto,
-    importProfileHelpBroker: copy.helpBroker,
-    importProfileHelpGeneric: copy.helpGeneric,
-    importProfileAuto: copy.autoProfile,
-    csvProfiles: buildCsvProfiles(copy.csvProfiles)
+    importProfileLabel: resolvedCopy.profileSelectorLabel,
+    importModeAutoDetected: resolvedCopy.autoDetected,
+    importModeManualOverride: resolvedCopy.manualOverride,
+    importKindTrades: resolvedCopy.trades,
+    importKindPositions: resolvedCopy.positions,
+    importApplyModeAppend: resolvedCopy.appendMode,
+    importApplyModeReplace: resolvedCopy.replaceMode,
+    importSummaryTitle: resolvedCopy.lastImport,
+    importSummaryProfile: resolvedCopy.profile,
+    importSummaryMode: resolvedCopy.mode,
+    importSummaryApply: resolvedCopy.applyMode,
+    importSummaryKind: resolvedCopy.kind,
+    importSummaryDelimiter: resolvedCopy.delimiter,
+    importSummaryImported: resolvedCopy.importedRows,
+    importSummarySkipped: resolvedCopy.skippedRows,
+    importSummaryDuplicates: resolvedCopy.duplicatesSkipped,
+    importBadgeImported: resolvedCopy.badgeImported,
+    importBadgeSkipped: resolvedCopy.badgeSkipped,
+    importPresetGroups: resolvedCopy.presetGroups,
+    importProfileHelpAuto: resolvedCopy.helpAuto,
+    importProfileHelpBroker: resolvedCopy.helpBroker,
+    importProfileHelpGeneric: resolvedCopy.helpGeneric,
+    importProfileAuto: resolvedCopy.autoProfile,
+    csvProfiles: buildCsvProfiles(resolvedCopy.csvProfiles),
+    csvNote3: resolvedCopy.csvNote3,
+    csvDelimiters: {
+      tab: resolvedCopy.csvDelimiterTab
+    },
+    importDetailsToggle: resolvedCopy.detailsToggle,
+    skippedPreviewTitle: resolvedCopy.skippedPreviewTitle,
+    skippedPreviewUnknownSymbol: resolvedCopy.skippedPreviewUnknownSymbol,
+    skippedPreviewRowNumber: resolvedCopy.skippedPreviewRowNumber,
+    skippedPreviewMarket: resolvedCopy.skippedPreviewMarket,
+    skippedPreviewOverflow: resolvedCopy.skippedPreviewOverflow,
+    skippedReasonDerivative: resolvedCopy.skippedReasonDerivative,
+    skippedReasonDuplicate: resolvedCopy.skippedReasonDuplicate,
+    skippedReasonMissingFields: resolvedCopy.skippedReasonMissingFields,
+    skippedReasonQuantity: resolvedCopy.skippedReasonQuantity,
+    skippedReasonAmount: resolvedCopy.skippedReasonAmount,
+    skippedReasonGeneric: resolvedCopy.skippedReasonGeneric
   },
   messages: {
-    csvImportApplyAppend: copy.applyAppend,
-    csvImportApplyReplace: copy.applyReplace,
-    csvImportSuccess: `${copy.importedTrades}（{{profile}} · {{delimiter}}）`,
-    csvImportSuccessSkipped: `${copy.importedTrades}，${copy.skippedRowsMessage}（{{profile}} · {{delimiter}}）`,
-    csvImportSuccessApplied: `${copy.importedTrades}，{{action}}（{{profile}} · {{delimiter}}）`,
-    csvImportSuccessAppliedSkipped: `${copy.importedTrades}，{{action}}，${copy.skippedRowsMessage}（{{profile}} · {{delimiter}}）`,
-    csvImportSuccessPositions: `${copy.importedPositions}（{{profile}} · {{delimiter}}）`,
-    csvImportSuccessPositionsSkipped: `${copy.importedPositions}，${copy.unsupportedRowsMessage}（{{profile}} · {{delimiter}}）`,
-    csvImportSuccessPositionsApplied: `${copy.importedPositions}，{{action}}（{{profile}} · {{delimiter}}）`,
-    csvImportSuccessPositionsAppliedSkipped: `${copy.importedPositions}，{{action}}，${copy.skippedRowsMessage}（{{profile}} · {{delimiter}}）`,
-    csvImportFailedNoData: copy.failedNoData,
-    csvImportFailedHeaders: copy.failedHeaders,
-    csvImportFailedRowWidth: copy.failedRowWidth
+    csvImportApplyAppend: resolvedCopy.applyAppend,
+    csvImportApplyReplace: resolvedCopy.applyReplace,
+    csvImportSuccess: `${resolvedCopy.importedTrades}（{{profile}} · {{delimiter}}）`,
+    csvImportSuccessSkipped: `${resolvedCopy.importedTrades}，${resolvedCopy.skippedRowsMessage}（{{profile}} · {{delimiter}}）`,
+    csvImportSuccessApplied: `${resolvedCopy.importedTrades}，{{action}}（{{profile}} · {{delimiter}}）`,
+    csvImportSuccessAppliedSkipped: `${resolvedCopy.importedTrades}，{{action}}，${resolvedCopy.skippedRowsMessage}（{{profile}} · {{delimiter}}）`,
+    csvImportSuccessPositions: `${resolvedCopy.importedPositions}（{{profile}} · {{delimiter}}）`,
+    csvImportSuccessPositionsSkipped: `${resolvedCopy.importedPositions}，${resolvedCopy.unsupportedRowsMessage}（{{profile}} · {{delimiter}}）`,
+    csvImportSuccessPositionsApplied: `${resolvedCopy.importedPositions}，{{action}}（{{profile}} · {{delimiter}}）`,
+    csvImportSuccessPositionsAppliedSkipped: `${resolvedCopy.importedPositions}，{{action}}，${resolvedCopy.skippedRowsMessage}（{{profile}} · {{delimiter}}）`,
+    csvImportFailedNoData: resolvedCopy.failedNoData,
+    csvImportFailedHeaders: resolvedCopy.failedHeaders,
+    csvImportFailedRowWidth: resolvedCopy.failedRowWidth,
+    importMissingDataNeedPrice: resolvedCopy.importMissingDataNeedPrice,
+    importMissingDataSaved: resolvedCopy.importMissingDataSaved,
+    importMissingDataDeleted: resolvedCopy.importMissingDataDeleted
   }
-});
+  };
+};
 
 const manualPatches = {
   'ko-KR': createImportPatch({
@@ -2472,6 +2603,255 @@ const manualPatches = {
   })
 };
 
+const fallbackImportPatches = {
+  'zh-TW': {
+    header: {
+      csvNote3: '註 3：App 會自動偵測常見券商 CSV，也吃分號和 tab 分隔檔。匯入後，偵測到的版型會顯示在右上角。',
+      csvDelimiters: {
+        tab: 'tab'
+      },
+      importDetailsToggle: '查看略過摘要',
+      skippedPreviewTitle: '解析略過預覽',
+      skippedPreviewUnknownSymbol: '未知代號',
+      skippedPreviewRowNumber: '第 {{row}} 列',
+      skippedPreviewMarket: '市場：{{value}}',
+      skippedPreviewOverflow: '另外還有 {{count}} 列略過資料沒有列在這裡。',
+      skippedReasonDerivative: '看起來像期權或其他衍生商品',
+      skippedReasonDuplicate: '和既有交易完全重複',
+      skippedReasonMissingFields: '缺日期、代號或買賣方向',
+      skippedReasonQuantity: '數量缺失或格式不對',
+      skippedReasonAmount: '單價和總金額都無法使用',
+      skippedReasonGeneric: '這列資料不完整，或目前還不支援'
+    },
+    app: {
+      importMissingDataBadge: '待補行情',
+      importMissingDataTitle: '有些匯入標的還缺報價',
+      importMissingDataIntro: 'Trade Lens 已先替剛匯入的新標的打過一次報價 API。底下這些還沒補起來，請直接補名稱和價格，或整批刪掉它們的交易列。',
+      importMissingDataIntroNoApi: '這些剛匯入的標的目前沒有快取報價。你可以現在直接補名稱和價格，或刪掉它們的交易列；之後補上 API Key，再回來抓也可以。',
+      importMissingDataSelectAll: '全選',
+      importMissingDataClearSelection: '清除選取',
+      importMissingDataRowsLabel: '{{count}} 列',
+      importMissingDataRowsShort: '列數',
+      importMissingDataNamePlaceholder: '選填顯示名稱',
+      importMissingDataSaveSelected: '儲存選取項目',
+      importMissingDataDeleteSelected: '刪除選取列',
+      importMissingDataClose: '先關掉',
+      importMissingDataSelectedCount: '已選 {{count}} 檔',
+      importMissingDataDeleteConfirm: '要刪掉這些標的，以及它們全部匯入進來的交易列嗎？'
+    },
+    messages: {
+      importMissingDataNeedPrice: '選到的標的還缺有效的手動價格。',
+      importMissingDataSaved: '已替 {{count}} 檔標的存好手動行情。',
+      importMissingDataDeleted: '已刪除 {{count}} 檔抓不到行情的標的，以及它們的交易列。'
+    }
+  },
+  'yue-Hant-HK': {
+    header: {
+      csvNote3: '註 3：App 會自動偵測常見券商 CSV，分號同 tab 分隔都食到。匯入之後，偵測到嘅版型會顯示喺右上角。',
+      csvDelimiters: {
+        tab: 'tab'
+      },
+      importDetailsToggle: '睇略過摘要',
+      skippedPreviewTitle: '略過資料預覽',
+      skippedPreviewUnknownSymbol: '未知代號',
+      skippedPreviewRowNumber: '第 {{row}} 行',
+      skippedPreviewMarket: '市場：{{value}}',
+      skippedPreviewOverflow: '仲有 {{count}} 行略過資料未喺度列晒。',
+      skippedReasonDerivative: '睇落似係期權或者其他衍生產品',
+      skippedReasonDuplicate: '同現有交易完全重複',
+      skippedReasonMissingFields: '欠咗日期、代號或者買賣方向',
+      skippedReasonQuantity: '數量缺失或者格式唔啱',
+      skippedReasonAmount: '單價同總金額都用唔到',
+      skippedReasonGeneric: '呢行資料唔完整，或者而家仲未支援'
+    },
+    app: {
+      importMissingDataBadge: '待補報價',
+      importMissingDataTitle: '有啲匯入標的仲未有報價',
+      importMissingDataIntro: 'Trade Lens 已經幫新匯入標的試過自動拉一次報價。下面呢批仲未補到，你可以而家直接補名稱同價格，或者成批刪走佢哋啲交易行。',
+      importMissingDataIntroNoApi: '呢批新匯入標的而家冇快取報價。你可以即刻補名稱同價格，或者刪走佢哋啲交易行；之後補返 API Key 再嚟拉都得。',
+      importMissingDataSelectAll: '全選',
+      importMissingDataClearSelection: '清除選取',
+      importMissingDataRowsLabel: '{{count}} 行',
+      importMissingDataRowsShort: '行數',
+      importMissingDataNamePlaceholder: '可選顯示名稱',
+      importMissingDataSaveSelected: '儲存已選項目',
+      importMissingDataDeleteSelected: '刪除已選行',
+      importMissingDataClose: '遲啲先處理',
+      importMissingDataSelectedCount: '已選 {{count}} 隻',
+      importMissingDataDeleteConfirm: '要刪走呢批標的，同埋佢哋全部匯入咗嘅交易行嗎？'
+    },
+    messages: {
+      importMissingDataNeedPrice: '你揀嘅標的仲未填有效手動價格。',
+      importMissingDataSaved: '已幫 {{count}} 隻標的存好手動報價。',
+      importMissingDataDeleted: '已刪除 {{count}} 隻冇報價標的，同埋佢哋嘅交易行。'
+    }
+  },
+  'zh-CN': {
+    header: {
+      csvNote3: '注 3：App 会自动识别常见券商 CSV，也支持分号和 tab 分隔文件。导入后，识别到的版型会显示在右上角。',
+      csvDelimiters: {
+        tab: 'tab'
+      },
+      importDetailsToggle: '查看略过摘要',
+      skippedPreviewTitle: '解析略过预览',
+      skippedPreviewUnknownSymbol: '未知代码',
+      skippedPreviewRowNumber: '第 {{row}} 行',
+      skippedPreviewMarket: '市场：{{value}}',
+      skippedPreviewOverflow: '另外还有 {{count}} 行略过数据没有展示在这里。',
+      skippedReasonDerivative: '看起来像期权或其他衍生品',
+      skippedReasonDuplicate: '和现有交易完全重复',
+      skippedReasonMissingFields: '缺少日期、代码或买卖方向',
+      skippedReasonQuantity: '数量缺失或格式无效',
+      skippedReasonAmount: '单价和总金额都无法使用',
+      skippedReasonGeneric: '这行数据不完整，或暂时还不支持'
+    },
+    app: {
+      importMissingDataBadge: '待补行情',
+      importMissingDataTitle: '有些导入标的还缺报价',
+      importMissingDataIntro: 'Trade Lens 已经先帮新导入的标的打过一次报价 API。下面这些还没补起来，请直接补名称和价格，或者整批删掉它们的交易行。',
+      importMissingDataIntroNoApi: '这些新导入的标的目前没有缓存报价。你可以现在直接补名称和价格，或者删掉它们的交易行；之后补上 API Key 再回来抓也行。',
+      importMissingDataSelectAll: '全选',
+      importMissingDataClearSelection: '清除选择',
+      importMissingDataRowsLabel: '{{count}} 行',
+      importMissingDataRowsShort: '行数',
+      importMissingDataNamePlaceholder: '选填显示名称',
+      importMissingDataSaveSelected: '保存所选项目',
+      importMissingDataDeleteSelected: '删除所选行',
+      importMissingDataClose: '先关闭',
+      importMissingDataSelectedCount: '已选 {{count}} 个',
+      importMissingDataDeleteConfirm: '要删除这些标的，以及它们全部导入进来的交易行吗？'
+    },
+    messages: {
+      importMissingDataNeedPrice: '选中的标的还缺有效的手动价格。',
+      importMissingDataSaved: '已为 {{count}} 个标的保存手动行情。',
+      importMissingDataDeleted: '已删除 {{count}} 个抓不到行情的标的，以及它们的交易行。'
+    }
+  },
+  'en-US': {
+    header: {
+      csvNote3: '* Note 3: The app auto-detects common broker CSV layouts plus semicolon and tab-delimited files. After import, the detected layout shows up on the top right.',
+      csvDelimiters: {
+        tab: 'tab'
+      },
+      importDetailsToggle: 'View skipped details',
+      skippedPreviewTitle: 'Skipped rows preview',
+      skippedPreviewUnknownSymbol: 'Unknown symbol',
+      skippedPreviewRowNumber: 'row {{row}}',
+      skippedPreviewMarket: 'Market: {{value}}',
+      skippedPreviewOverflow: '{{count}} more skipped rows are not shown here.',
+      skippedReasonDerivative: 'Likely option or derivative',
+      skippedReasonDuplicate: 'Exact duplicate of an existing trade',
+      skippedReasonMissingFields: 'Missing date, symbol, or trade side',
+      skippedReasonQuantity: 'Quantity is missing or invalid',
+      skippedReasonAmount: 'Price and amount are both unusable',
+      skippedReasonGeneric: 'Unsupported or incomplete row'
+    },
+    app: {
+      importMissingDataBadge: 'Needs quote review',
+      importMissingDataTitle: 'Some imported symbols still need prices',
+      importMissingDataIntro: 'Trade Lens already tried to fetch quotes for the newly imported symbols. The ones below still need a manual name and price, or you can delete their rows in one shot.',
+      importMissingDataIntroNoApi: 'These imported symbols do not have cached quotes yet. Add a manual name and price now, or delete their rows. You can also open the trade manager to fix the records first.',
+      importMissingDataSelectAll: 'Select all',
+      importMissingDataClearSelection: 'Clear selection',
+      importMissingDataRowsLabel: '{{count}} rows',
+      importMissingDataRowsShort: 'Rows',
+      importMissingDataNamePlaceholder: 'Optional display name',
+      importMissingDataSaveSelected: 'Save selected',
+      importMissingDataDeleteSelected: 'Delete selected rows',
+      importMissingDataClose: 'Close for now',
+      importMissingDataSelectedCount: '{{count}} selected',
+      importMissingDataDeleteConfirm: 'Delete the selected symbols and all of their imported rows?'
+    },
+    messages: {
+      importMissingDataNeedPrice: 'Selected symbols still need a valid manual price.',
+      importMissingDataSaved: 'Saved manual quotes for {{count}} symbols.',
+      importMissingDataDeleted: 'Deleted {{count}} unresolved symbols and their rows.'
+    }
+  },
+  'en-GB': {
+    header: {
+      csvNote3: '* Note 3: The app auto-detects common broker CSV layouts plus semicolon and tab-delimited files. After import, the detected layout shows up on the top right.',
+      csvDelimiters: {
+        tab: 'tab'
+      },
+      importDetailsToggle: 'View skipped details',
+      skippedPreviewTitle: 'Skipped rows preview',
+      skippedPreviewUnknownSymbol: 'Unknown symbol',
+      skippedPreviewRowNumber: 'row {{row}}',
+      skippedPreviewMarket: 'Market: {{value}}',
+      skippedPreviewOverflow: '{{count}} more skipped rows are not shown here.',
+      skippedReasonDerivative: 'Likely option or derivative',
+      skippedReasonDuplicate: 'Exact duplicate of an existing trade',
+      skippedReasonMissingFields: 'Missing date, symbol, or trade side',
+      skippedReasonQuantity: 'Quantity is missing or invalid',
+      skippedReasonAmount: 'Price and amount are both unusable',
+      skippedReasonGeneric: 'Unsupported or incomplete row'
+    },
+    app: {
+      importMissingDataBadge: 'Needs quote review',
+      importMissingDataTitle: 'Some imported symbols still need prices',
+      importMissingDataIntro: 'Trade Lens has already tried to fetch quotes for the newly imported symbols. The ones below still need a manual name and price, or you can delete their rows in one go.',
+      importMissingDataIntroNoApi: 'These imported symbols do not have cached quotes yet. Add a manual name and price now, or delete their rows. You can also open the trade manager to fix the records first.',
+      importMissingDataSelectAll: 'Select all',
+      importMissingDataClearSelection: 'Clear selection',
+      importMissingDataRowsLabel: '{{count}} rows',
+      importMissingDataRowsShort: 'Rows',
+      importMissingDataNamePlaceholder: 'Optional display name',
+      importMissingDataSaveSelected: 'Save selected',
+      importMissingDataDeleteSelected: 'Delete selected rows',
+      importMissingDataClose: 'Close for now',
+      importMissingDataSelectedCount: '{{count}} selected',
+      importMissingDataDeleteConfirm: 'Delete the selected symbols and all of their imported rows?'
+    },
+    messages: {
+      importMissingDataNeedPrice: 'Selected symbols still need a valid manual price.',
+      importMissingDataSaved: 'Saved manual quotes for {{count}} symbols.',
+      importMissingDataDeleted: 'Deleted {{count}} unresolved symbols and their rows.'
+    }
+  },
+  'ja-JP': {
+    header: {
+      csvNote3: '注 3: アプリはよくある証券会社CSVに加えて、セミコロン区切りや tab 区切りも自動判定します。取り込み後、判定した形式は右上に表示されます。',
+      csvDelimiters: {
+        tab: 'tab'
+      },
+      importDetailsToggle: 'スキップ詳細を見る',
+      skippedPreviewTitle: 'スキップ予定の行',
+      skippedPreviewUnknownSymbol: '不明な銘柄',
+      skippedPreviewRowNumber: '{{row}} 行目',
+      skippedPreviewMarket: '市場: {{value}}',
+      skippedPreviewOverflow: 'ここに出していないスキップ行が、ほかに {{count}} 件あります。',
+      skippedReasonDerivative: 'オプションやデリバティブの可能性があります',
+      skippedReasonDuplicate: '既存の取引と完全に重複しています',
+      skippedReasonMissingFields: '日付、銘柄、売買区分のどれかが欠けています',
+      skippedReasonQuantity: '数量が空か、形式が不正です',
+      skippedReasonAmount: '単価と金額のどちらも使えません',
+      skippedReasonGeneric: '未対応か、不完全な行です'
+    },
+    app: {
+      importMissingDataBadge: '要確認の価格',
+      importMissingDataTitle: '一部の取り込み銘柄は価格補完が必要です',
+      importMissingDataIntro: 'Trade Lens は、新しく取り込んだ銘柄の価格を自動取得しようとしました。下の銘柄はまだ埋まっていないので、名前と価格を手動で入れるか、まとめて行ごと削除してください。',
+      importMissingDataIntroNoApi: 'この取り込み銘柄には、まだキャッシュ済みの価格がありません。今ここで名前と価格を手入力するか、行ごと削除できます。あとで API キーを入れてから取り直しても大丈夫です。',
+      importMissingDataSelectAll: 'すべて選択',
+      importMissingDataClearSelection: '選択をクリア',
+      importMissingDataRowsLabel: '{{count}} 行',
+      importMissingDataRowsShort: '行数',
+      importMissingDataNamePlaceholder: '表示名は任意',
+      importMissingDataSaveSelected: '選択分を保存',
+      importMissingDataDeleteSelected: '選択行を削除',
+      importMissingDataClose: '今は閉じる',
+      importMissingDataSelectedCount: '{{count}} 件選択中',
+      importMissingDataDeleteConfirm: '選択した銘柄と、その取り込み行をまとめて削除しますか？'
+    },
+    messages: {
+      importMissingDataNeedPrice: '選択した銘柄には有効な手動価格がまだ必要です。',
+      importMissingDataSaved: '{{count}} 件の銘柄に手動価格を保存しました。',
+      importMissingDataDeleted: '価格未解決の {{count}} 件の銘柄と、その行を削除しました。'
+    }
+  }
+};
+
 const localePatchSources = {
   'zh-TW': 'zh-TW',
   'yue-Hant-HK': 'yue-Hant-HK',
@@ -2552,13 +2932,25 @@ export const applyImportTranslationCoverage = (localeMap) => {
   return Object.fromEntries(
     Object.entries(localeMap).map(([locale, translation]) => {
       const patchSource = localePatchSources[locale];
-      const patch = manualPatches[patchSource] || extractedPatches[patchSource];
+      const extractedPatch = extractedPatches[patchSource];
+      const manualPatch = manualPatches[patchSource];
+      const fallbackPatch = fallbackImportPatches[patchSource];
 
-      if (!patch) {
-        return [locale, translation];
+      let nextTranslation = translation;
+
+      if (extractedPatch) {
+        nextTranslation = mergeLocale(nextTranslation, extractedPatch);
       }
 
-      return [locale, mergeLocale(translation, patch)];
+      if (manualPatch) {
+        nextTranslation = mergeLocale(nextTranslation, manualPatch);
+      }
+
+      if (fallbackPatch) {
+        nextTranslation = fillMissingLocale(nextTranslation, fallbackPatch);
+      }
+
+      return [locale, nextTranslation];
     })
   );
 };

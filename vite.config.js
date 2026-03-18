@@ -9,7 +9,18 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('src/locales/resources.js')) {
-            return 'locale-resources'
+            return 'locale-base'
+          }
+
+          if (id.includes('src/locales/importTranslations.js')) {
+            return 'locale-import-coverage'
+          }
+
+          if (
+            id.includes('src/locales/voiceRefinements.js') ||
+            id.includes('src/locales/deepVoiceRefinements.js')
+          ) {
+            return 'locale-voice'
           }
 
           if (id.includes('/node_modules/react/') || id.includes('/node_modules/react-dom/')) {

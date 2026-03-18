@@ -155,6 +155,12 @@ export default function Header({
           defaultValue: 'Leave this on auto detect unless a specific broker export keeps getting guessed wrong. For most files, auto is the safest first shot.'
         })
   );
+  const importProfileMeta = [
+    selectedImportProfileGroup && getLocalizedImportGroupLabel(selectedImportProfileGroup),
+    selectedImportProfileOption.presetKind === 'auto'
+      ? t('header.importProfileAuto', { defaultValue: 'Auto detect' })
+      : getLocalizedImportKindLabel(selectedImportProfileOption.importKind)
+  ].filter(Boolean).join(' · ');
 
   const liveStatus = isDemo && demoLastUpdate
     ? {
@@ -310,20 +316,25 @@ export default function Header({
               </p>
             </div>
 
-            <div className="grid w-full gap-3 lg:max-w-2xl lg:grid-cols-[minmax(0,1fr)_auto]">
+            <div className="grid w-full gap-3 2xl:grid-cols-[minmax(0,1.2fr)_minmax(13rem,14rem)]">
               <label
-                className="relative flex min-h-[3.25rem] items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/80"
+                className="relative flex min-h-[5rem] rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/80"
                 title={importProfileLabel}
               >
-                <div className="pointer-events-none flex min-w-0 flex-1 items-center gap-3">
-                  <span className="whitespace-nowrap text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+                <div className="pointer-events-none flex min-w-0 flex-1 flex-col justify-between gap-3 pr-8">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
                     {importProfileLabel}
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-700 dark:text-slate-200">
-                    {getLocalizedProfileLabel(selectedImportProfileOption)}
-                  </span>
-                  <ChevronDown size={16} className="shrink-0 text-slate-400 dark:text-slate-500" />
+                  <div className="min-w-0">
+                    <div className="line-clamp-2 break-words text-sm font-semibold leading-6 text-slate-800 dark:text-slate-100">
+                      {getLocalizedProfileLabel(selectedImportProfileOption)}
+                    </div>
+                    <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                      {importProfileMeta}
+                    </div>
+                  </div>
                 </div>
+                <ChevronDown size={18} className="pointer-events-none absolute right-4 top-4 shrink-0 text-slate-400 dark:text-slate-500" />
                 <select
                   value={csvImportProfile}
                   onChange={(event) => setCsvImportProfile(event.target.value)}

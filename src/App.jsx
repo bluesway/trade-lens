@@ -8,6 +8,7 @@ import { isRtlLocale, normalizeLocale } from './locales/config';
 import ChartsSection from './components/ChartsSection';
 import DataTable from './components/DataTable';
 import Header from './components/Header';
+import ImportMissingDataDialog from './components/ImportMissingDataDialog';
 import ImportReviewDialog from './components/ImportReviewDialog';
 import ManagerPanel from './components/ManagerPanel';
 import SummaryCards from './components/SummaryCards';
@@ -71,10 +72,14 @@ export default function App() {
     overallRealizedPercent,
     overallUnrealizedPercent,
     applyPreparedCsvImport,
+    deletePendingImportSymbolRecords,
+    dismissPendingImportSymbolReview,
     prepareCsvImport,
+    pendingImportSymbolReview,
     rawData,
     resolvedTradeRows,
     requestSort,
+    savePendingImportSymbolReview,
     setApiKey,
     setCsvImportProfile,
     setExpandedStock,
@@ -166,7 +171,7 @@ export default function App() {
 
       const hasExistingUserData = rawData.length > 0 && !isDemo;
       if (!hasExistingUserData) {
-        applyPreparedCsvImport(preparedImport, { mode: 'replace', announceMode: false });
+        void applyPreparedCsvImport(preparedImport, { mode: 'replace', announceMode: false });
         return;
       }
 
@@ -189,15 +194,17 @@ export default function App() {
       return;
     }
 
+    const importToApply = pendingImport;
+
     if (backupBeforeImport && rawData.length > 0 && !isDemo) {
       handleExportCSV();
     }
 
-    applyPreparedCsvImport(pendingImport, {
+    closeImportReview();
+    void applyPreparedCsvImport(importToApply, {
       mode,
       announceMode: true
     });
-    closeImportReview();
   };
 
   const handleExportCSV = () => {
@@ -253,6 +260,16 @@ export default function App() {
         onReplace={() => applyPendingImport('replace')}
         pendingImport={pendingImport}
         setBackupBeforeApply={setBackupBeforeImport}
+      />
+      <ImportMissingDataDialog
+        onClose={dismissPendingImportSymbolReview}
+        onDeleteSelected={deletePendingImportSymbolRecords}
+        onOpenManager={() => {
+          dismissPendingImportSymbolReview();
+          setShowManager(true);
+        }}
+        onSaveSelected={savePendingImportSymbolReview}
+        pendingReview={pendingImportSymbolReview}
       />
 
       {toastMsg && (
