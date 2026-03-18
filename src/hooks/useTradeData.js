@@ -444,6 +444,23 @@ const isFreshSnapshotTimestamp = (timestamp, now) => (
   Number.isFinite(timestamp) && timestamp > 0 && now - timestamp <= ONE_DAY
 );
 
+const getSnapshotAttemptTimestamp = (snapshot) => (
+  getSnapshotTimestamp(snapshot?.attemptedAt) || getSnapshotTimestamp(snapshot?.timestamp)
+);
+
+const getRateSnapshotStatus = (rateSnapshot, now = Date.now()) => {
+  const numericRate = Number(rateSnapshot?.rate);
+  const rateTimestamp = getSnapshotTimestamp(rateSnapshot?.timestamp);
+  const attemptTimestamp = getSnapshotAttemptTimestamp(rateSnapshot);
+  const hasRate = Number.isFinite(numericRate) && numericRate > 0;
+
+  return {
+    hasRate,
+    isFresh: hasRate && isFreshSnapshotTimestamp(rateTimestamp, now),
+    hasRecentAttempt: isFreshSnapshotTimestamp(attemptTimestamp, now)
+  };
+};
+
 const getResolvedQuoteSnapshotStatus = (symbol, liveSnapshot, manualSnapshot, now = Date.now()) => {
   const manualEntry = manualSnapshot?.[symbol];
   const manualPrice = Number.parseFloat(manualEntry?.price);
@@ -453,6 +470,7 @@ const getResolvedQuoteSnapshotStatus = (symbol, liveSnapshot, manualSnapshot, no
     return {
       hasQuote: true,
       isFresh: isFreshSnapshotTimestamp(manualTimestamp, now),
+      hasRecentAttempt: isFreshSnapshotTimestamp(manualTimestamp, now),
       source: 'manual'
     };
   }
@@ -463,11 +481,13 @@ const getResolvedQuoteSnapshotStatus = (symbol, liveSnapshot, manualSnapshot, no
     liveQuote?.price
   );
   const liveTimestamp = getSnapshotTimestamp(liveQuote?.timestamp);
+  const attemptTimestamp = getSnapshotAttemptTimestamp(liveQuote);
   const hasQuote = Number.isFinite(normalizedQuote.price) && Math.abs(normalizedQuote.price) > POSITION_EPSILON;
 
   return {
     hasQuote,
     isFresh: hasQuote && isFreshSnapshotTimestamp(liveTimestamp, now),
+    hasRecentAttempt: isFreshSnapshotTimestamp(attemptTimestamp, now),
     source: hasQuote ? 'api' : 'missing'
   };
 };
@@ -757,7 +777,9 @@ export function useTradeData(showToast) {
       const quoteStatus = getResolvedQuoteSnapshotStatus(symbol, liveData, manualStockData, now);
       const cachedQuote = liveData[symbol];
       if (!quoteStatus.hasQuote) {
-        missingQuoteCount += 1;
+        if (!quoteStatus.hasRecentAttempt) {
+          missingQuoteCount += 1;
+        }
       } else if (!quoteStatus.isFresh) {
         staleQuoteCount += 1;
       }
@@ -770,12 +792,15 @@ export function useTradeData(showToast) {
 
       getFxRateSymbols(currency, targetBaseCurrency).forEach((rateKey) => {
         const cachedRate = exchangeRates[rateKey];
-        if (!cachedRate) {
-          missingRateKeys.add(rateKey);
+        const rateStatus = getRateSnapshotStatus(cachedRate, now);
+        if (!rateStatus.hasRate) {
+          if (!rateStatus.hasRecentAttempt) {
+            missingRateKeys.add(rateKey);
+          }
           return;
         }
 
-        if (!cachedRate.timestamp || now - cachedRate.timestamp > ONE_DAY) {
+        if (!rateStatus.isFresh) {
           staleRateKeys.add(rateKey);
         }
       });
@@ -784,7 +809,7 @@ export function useTradeData(showToast) {
     const codesToFetch = uniqueSymbols.filter((symbol) => {
       if (isForce) return true;
       const quoteStatus = getResolvedQuoteSnapshotStatus(symbol, liveData, manualStockData, now);
-      return !quoteStatus.hasQuote || !quoteStatus.isFresh;
+      return !quoteStatus.hasRecentAttempt;
     });
 
     const currenciesToFetch = new Set();
@@ -795,8 +820,8 @@ export function useTradeData(showToast) {
 
       if (currency && currency !== targetBaseCurrency) {
         getFxRateSymbols(currency, targetBaseCurrency).forEach((rateKey) => {
-          const cachedRate = exchangeRates[rateKey];
-          if (isForce || !cachedRate || !cachedRate.timestamp || now - cachedRate.timestamp > ONE_DAY) {
+          const rateStatus = getRateSnapshotStatus(exchangeRates[rateKey], now);
+          if (isForce || !rateStatus.hasRecentAttempt) {
             currenciesToFetch.add(rateKey);
           }
         });
@@ -919,14 +944,23 @@ export function useTradeData(showToast) {
         }
 
         const json = await response.json();
+        chunk.forEach((symbol) => {
+          updatedLiveData[symbol] = {
+            ...updatedLiveData[symbol],
+            currency: updatedLiveData[symbol]?.currency || getCurrencyBySymbolOrMarket(symbol, marketBySymbol.get(symbol)),
+            attemptedAt: now
+          };
+        });
         if (json?.quoteResponse?.result) {
           json.quoteResponse.result.forEach((item) => {
             const normalizedQuote = normalizeQuoteCurrencyData(item.currency, item.regularMarketPrice);
             updatedLiveData[item.symbol] = {
+              ...updatedLiveData[item.symbol],
               price: normalizedQuote.price,
               name: item.longName || item.shortName || STOCK_MAPPING[item.symbol]?.name,
               currency: normalizedQuote.currency || getCurrencyBySymbolOrMarket(item.symbol, marketBySymbol.get(item.symbol)),
-              timestamp: now
+              timestamp: now,
+              attemptedAt: now
             };
             fetchedSymbols.add(item.symbol);
             fetchedCount += 1;
@@ -970,12 +1004,20 @@ export function useTradeData(showToast) {
         );
 
         if (response.ok) {
+          chunk.forEach((rateSymbol) => {
+            updatedExchangeRates[rateSymbol] = {
+              ...updatedExchangeRates[rateSymbol],
+              attemptedAt: now
+            };
+          });
           const json = await response.json();
           if (json?.quoteResponse?.result) {
             json.quoteResponse.result.forEach((item) => {
               updatedExchangeRates[item.symbol] = {
+                ...updatedExchangeRates[item.symbol],
                 rate: item.regularMarketPrice,
-                timestamp: now
+                timestamp: now,
+                attemptedAt: now
               };
             });
           }
