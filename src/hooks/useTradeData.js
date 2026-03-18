@@ -2142,6 +2142,11 @@ export function useTradeData(showToast) {
     [processedData]
   );
 
+  const trackedSymbols = useMemo(
+    () => buildTrackedSymbolEntries(rawData).map((entry) => entry.symbol),
+    [rawData]
+  );
+
   const overallRealizedPercent = summary.totalRealizedCost > 0
     ? (summary.totalRealizedPnl / summary.totalRealizedCost) * 100
     : 0;
@@ -2220,6 +2225,7 @@ export function useTradeData(showToast) {
     startEditingStock,
     summary,
     tempStockEdit,
+    trackedSymbols,
     trendData,
     trendTimeRange,
     dismissPendingImportSymbolReview,

@@ -93,6 +93,7 @@ export default function App() {
     startEditingStock,
     summary,
     tempStockEdit,
+    trackedSymbols,
     trendData,
     trendTimeRange,
     updateNewRecAmount,
@@ -269,6 +270,7 @@ export default function App() {
           dismissPendingImportSymbolReview();
           setShowManager(true);
         }}
+        existingSymbols={trackedSymbols}
         onSaveSelected={savePendingImportSymbolReview}
         onSkipSelected={skipPendingImportSymbolReview}
         pendingReview={pendingImportSymbolReview}

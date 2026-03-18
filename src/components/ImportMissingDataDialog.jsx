@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, CheckSquare, Database, Trash2, X } from 'lucide-react';
 import { normalizeLocale } from '../locales/config';
 import { formatLocalizedNumber } from '../utils/localization';
-import { getMarketLabel } from '../utils/helpers';
+import { formatSymbol, getMarketLabel } from '../utils/helpers';
 
 const buildDrafts = (entries) => Object.fromEntries(
   entries.map((entry) => [
@@ -17,6 +17,7 @@ const buildDrafts = (entries) => Object.fromEntries(
 );
 
 export default function ImportMissingDataDialog({
+  existingSymbols = [],
   onClose,
   onDeleteSelected,
   onOpenManager,
@@ -61,6 +62,35 @@ export default function ImportMissingDataDialog({
 
     previousEntrySymbolsRef.current = nextEntrySymbols;
   }, [entries]);
+
+  const currentReviewSymbols = useMemo(
+    () => new Set(entries.map((entry) => entry.symbol)),
+    [entries]
+  );
+
+  const stableExistingSymbols = useMemo(
+    () => new Set(
+      existingSymbols.filter((symbol) => symbol && !currentReviewSymbols.has(symbol))
+    ),
+    [currentReviewSymbols, existingSymbols]
+  );
+
+  const nextSymbolsByEntry = useMemo(
+    () => new Map(entries.map((entry) => {
+      const nextRawCode = String(drafts[entry.symbol]?.code ?? entry.rawCode ?? '').trim().toUpperCase();
+      const nextSymbol = formatSymbol(nextRawCode, entry.market) || entry.symbol;
+      return [entry.symbol, nextSymbol];
+    })),
+    [drafts, entries]
+  );
+
+  const nextSymbolCounts = useMemo(() => {
+    const counts = new Map();
+    nextSymbolsByEntry.forEach((symbol) => {
+      counts.set(symbol, (counts.get(symbol) || 0) + 1);
+    });
+    return counts;
+  }, [nextSymbolsByEntry]);
 
   const selectedEntries = entries
     .filter((entry) => selectedSymbols.has(entry.symbol))
@@ -210,6 +240,10 @@ export default function ImportMissingDataDialog({
             {entries.map((entry) => {
               const isSelected = selectedSymbols.has(entry.symbol);
               const draft = drafts[entry.symbol] || { code: '', name: '', price: '' };
+              const nextSymbol = nextSymbolsByEntry.get(entry.symbol) || entry.symbol;
+              const willMergeWithExisting = stableExistingSymbols.has(nextSymbol);
+              const willMergeWithinReview = (nextSymbolCounts.get(nextSymbol) || 0) > 1;
+              const shouldShowMergeWarning = willMergeWithExisting || willMergeWithinReview;
 
               return (
                 <div
@@ -312,6 +346,15 @@ export default function ImportMissingDataDialog({
                       />
                     </div>
                   </div>
+
+                  {shouldShowMergeWarning && (
+                    <div className="rounded-xl border border-amber-200 bg-amber-50/80 px-3 py-2 text-sm text-amber-800 dark:border-amber-800/80 dark:bg-amber-900/20 dark:text-amber-200">
+                      {t('app.importMissingDataMergeWarning', {
+                        defaultValue: 'Saving this ticker will combine these rows under {{symbol}} in holdings and P/L.',
+                        symbol: nextSymbol
+                      })}
+                    </div>
+                  )}
                 </div>
               );
             })}
