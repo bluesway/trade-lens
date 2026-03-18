@@ -273,9 +273,11 @@ export default function App() {
       />
 
       {toastMsg && (
-        <div className="fixed bottom-6 right-6 bg-slate-800 dark:bg-blue-600 text-white px-5 py-3 rounded-xl shadow-2xl z-50 animate-fade-in-up border border-white/10 flex items-center gap-2">
-          <ShieldCheck size={18} />
-          {toastMsg}
+        <div className="pointer-events-none fixed inset-x-4 bottom-6 z-[90] flex justify-end sm:inset-x-6">
+          <div className="flex max-w-md items-center gap-2 rounded-xl border border-white/10 bg-slate-800 px-5 py-3 text-white shadow-2xl animate-fade-in-up dark:bg-blue-600">
+            <ShieldCheck size={18} className="shrink-0" />
+            <span className="text-sm leading-6">{toastMsg}</span>
+          </div>
         </div>
       )}
 
