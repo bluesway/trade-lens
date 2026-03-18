@@ -1285,6 +1285,14 @@ const formatAbsoluteNumber = (value) => (
     : ''
 );
 
+const normalizeCorporateActionFactor = (factor) => (
+  Number.isFinite(factor)
+  && factor > 0
+  && Math.abs(factor - 1) > 1e-9
+    ? factor
+    : null
+);
+
 const extractSplitFactorFromText = (rawValue) => {
   const normalizedText = String(rawValue || '')
     .replace(/[－–—]/g, '-')
@@ -1309,7 +1317,7 @@ const extractSplitFactorFromText = (rawValue) => {
     const numerator = Number.parseFloat(match[1]);
     const denominator = Number.parseFloat(match[2]);
     if (Number.isFinite(numerator) && Number.isFinite(denominator) && denominator > 0) {
-      return numerator / denominator;
+      return normalizeCorporateActionFactor(numerator / denominator);
     }
   }
 
@@ -1824,7 +1832,8 @@ const isImportableTradeRow = (row) => {
   const quantityValue = Number.parseFloat(row['數量']);
   const priceValue = Number.parseFloat(row['單價']);
   const amountValue = Number.parseFloat(row['總金額']);
-  const splitFactor = extractSplitFactorFromText(`${row['原始類型'] || ''} ${row['說明'] || ''}`);
+  const explicitSplitFactor = normalizeCorporateActionFactor(Number.parseFloat(String(row['拆股比例'] || '')));
+  const splitFactor = explicitSplitFactor || extractSplitFactorFromText(`${row['原始類型'] || ''} ${row['說明'] || ''}`);
   const isCorporateAction = row['類型'] === '拆股' || row['類型'] === '反向拆股';
 
   if (isCorporateAction) {
@@ -1930,6 +1939,103 @@ const buildSkippedRowPreview = ({ rawRow, normalizedRow, rowNumber, reasonCode }
   description: String(rawRow?.['說明'] || '').trim()
 });
 
+const normalizeCorporateActionDescriptor = (rawValue) => String(rawValue || '')
+  .toUpperCase()
+  .replace(/XXX.*$/, '')
+  .replace(/\b(?:REVERSE|STOCK)\s+SPLIT\b.*$/, '')
+  .replace(/\bEFF:.*$/, '')
+  .replace(/[^A-Z0-9]+/g, '');
+
+const buildCorporateActionFactorLookup = (entries, preferredDecimalSeparator) => {
+  const factorLookup = new Map();
+  const corporateActionEntries = entries.filter(({ normalizedRow }) => (
+    normalizedRow
+    && (normalizedRow['類型'] === '拆股' || normalizedRow['類型'] === '反向拆股')
+  ));
+
+  corporateActionEntries.forEach((entry) => {
+    const explicitTextFactor = extractSplitFactorFromText(
+      `${entry.normalizedRow['原始類型'] || ''} ${entry.rawRow['說明'] || entry.normalizedRow['說明'] || ''}`
+    );
+
+    if (explicitTextFactor) {
+      factorLookup.set(entry.rowNumber, formatParsedNumber(explicitTextFactor));
+    }
+  });
+
+  corporateActionEntries.forEach((entry) => {
+    if (factorLookup.has(entry.rowNumber)) {
+      return;
+    }
+
+    const quantityValue = parseNumericCellValue(entry.normalizedRow['數量'], preferredDecimalSeparator);
+    if (!Number.isFinite(quantityValue) || quantityValue <= 0) {
+      return;
+    }
+
+    const entryDescriptor = normalizeCorporateActionDescriptor(entry.rawRow['說明'] || entry.normalizedRow['說明'] || '');
+
+    const pairedNegativeEntry = corporateActionEntries.reduce((bestMatch, candidate) => {
+      if (
+        candidate.rowNumber === entry.rowNumber
+        || candidate.normalizedRow['類型'] !== entry.normalizedRow['類型']
+        || candidate.normalizedRow['日期'] !== entry.normalizedRow['日期']
+      ) {
+        return bestMatch;
+      }
+
+      const candidateQuantity = parseNumericCellValue(candidate.normalizedRow['數量'], preferredDecimalSeparator);
+      if (!Number.isFinite(candidateQuantity) || candidateQuantity >= 0) {
+        return bestMatch;
+      }
+
+      const candidateDescriptor = normalizeCorporateActionDescriptor(
+        candidate.rawRow['說明'] || candidate.normalizedRow['說明'] || ''
+      );
+      if (!entryDescriptor || !candidateDescriptor) {
+        return bestMatch;
+      }
+
+      const descriptorsRelated = entryDescriptor.startsWith(candidateDescriptor)
+        || candidateDescriptor.startsWith(entryDescriptor);
+
+      if (!descriptorsRelated) {
+        return bestMatch;
+      }
+
+      const matchScore = (
+        Math.min(entryDescriptor.length, candidateDescriptor.length)
+        + (/^\d+$/.test(String(candidate.normalizedRow['代號'] || '').trim()) ? 4 : 0)
+      );
+
+      if (!bestMatch || matchScore > bestMatch.matchScore) {
+        return {
+          candidate,
+          matchScore
+        };
+      }
+
+      return bestMatch;
+    }, null);
+
+    if (!pairedNegativeEntry) {
+      return;
+    }
+
+    const pairedQuantity = Math.abs(parseNumericCellValue(
+      pairedNegativeEntry.candidate.normalizedRow['數量'],
+      preferredDecimalSeparator
+    ));
+    const inferredFactor = normalizeCorporateActionFactor(quantityValue / pairedQuantity);
+
+    if (inferredFactor) {
+      factorLookup.set(entry.rowNumber, formatParsedNumber(inferredFactor));
+    }
+  });
+
+  return factorLookup;
+};
+
 export const parseCSVWithMeta = (text, options = {}) => {
   const normalizedText = String(text || '').replace(/\r\n?/g, '\n');
   const lines = normalizedText.split('\n').filter((line) => line.trim() !== '');
@@ -1982,6 +2088,7 @@ export const parseCSVWithMeta = (text, options = {}) => {
   let derivativeSkippedRowCount = 0;
   const skippedPreviewRows = [];
   const problematicRowNumbers = [];
+  const parsedEntries = [];
 
   for (let index = (layout?.headerIndex ?? 0) + 1; index < lines.length; index += 1) {
     const cells = splitDelimitedLine(lines[index], delimiter);
@@ -2003,25 +2110,44 @@ export const parseCSVWithMeta = (text, options = {}) => {
 
     const normalizedRow = normalizeRowForProfile(rawRow, inspection.profile, preferredDecimalSeparator);
     const isOptionRow = isLikelyOptionRow(rawRow, normalizedRow);
-
-    if (normalizedRow && isImportableTradeRow(normalizedRow) && !isOptionRow) {
-      result.push(normalizedRow);
-    } else {
-      skippedRowCount += 1;
-      if (isOptionRow) {
-        derivativeSkippedRowCount += 1;
-      }
-
-      if (skippedPreviewRows.length < MAX_SKIPPED_PREVIEW_ROWS) {
-        skippedPreviewRows.push(buildSkippedRowPreview({
-          rawRow,
-          normalizedRow,
-          rowNumber: index + 1,
-          reasonCode: getSkippedRowReasonCode(rawRow, normalizedRow, isOptionRow)
-        }));
-      }
-    }
+    parsedEntries.push({
+      rawRow,
+      normalizedRow,
+      isOptionRow,
+      rowNumber: index + 1
+    });
   }
+
+  const corporateActionFactorLookup = buildCorporateActionFactorLookup(parsedEntries, preferredDecimalSeparator);
+
+  parsedEntries.forEach(({ rawRow, normalizedRow, isOptionRow, rowNumber }) => {
+    const inferredSplitFactor = corporateActionFactorLookup.get(rowNumber);
+    const normalizedRowWithFactor = inferredSplitFactor && normalizedRow
+      ? {
+        ...normalizedRow,
+        拆股比例: inferredSplitFactor
+      }
+      : normalizedRow;
+
+    if (normalizedRowWithFactor && isImportableTradeRow(normalizedRowWithFactor) && !isOptionRow) {
+      result.push(normalizedRowWithFactor);
+      return;
+    }
+
+    skippedRowCount += 1;
+    if (isOptionRow) {
+      derivativeSkippedRowCount += 1;
+    }
+
+    if (skippedPreviewRows.length < MAX_SKIPPED_PREVIEW_ROWS) {
+      skippedPreviewRows.push(buildSkippedRowPreview({
+        rawRow,
+        normalizedRow: normalizedRowWithFactor,
+        rowNumber,
+        reasonCode: getSkippedRowReasonCode(rawRow, normalizedRowWithFactor, isOptionRow)
+      }));
+    }
+  });
 
   if (problematicRowNumbers.length > 0) {
     return {

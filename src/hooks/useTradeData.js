@@ -182,6 +182,11 @@ const extractSplitFactorFromText = (rawValue) => {
 };
 
 const resolveSplitFactor = (row, openLots) => {
+  const explicitRowFactor = normalizeSplitFactor(getNumericValue(row['拆股比例']));
+  if (explicitRowFactor) {
+    return explicitRowFactor;
+  }
+
   const textFactor = extractSplitFactorFromText(`${row['原始類型'] || ''} ${row['說明'] || ''}`);
   if (textFactor) {
     return textFactor;
