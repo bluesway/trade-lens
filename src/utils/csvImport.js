@@ -767,27 +767,35 @@ const tokenizeHeaderLabel = (value) => String(value || '')
 
 const normalizeHeaderLabel = (value) => tokenizeHeaderLabel(value).join('');
 
-const matchesHeaderLabel = (rawHeader, keyword) => {
+const getHeaderMatchStrength = (rawHeader, keyword) => {
   const headerTokens = tokenizeHeaderLabel(rawHeader);
   const keywordTokens = tokenizeHeaderLabel(keyword);
   const normalizedHeader = normalizeHeaderLabel(rawHeader);
   const normalizedKeyword = normalizeHeaderLabel(keyword);
 
   if (!normalizedHeader || !normalizedKeyword) {
-    return false;
+    return 0;
   }
 
   if (normalizedHeader === normalizedKeyword) {
-    return true;
+    return 2;
   }
 
   if (headerTokens.length > 1 || keywordTokens.length > 1) {
-    return keywordTokens.every((token) => headerTokens.includes(token));
+    return keywordTokens.every((token) => headerTokens.includes(token))
+      ? 1
+      : 0;
   }
 
-  return normalizedHeader.includes(normalizedKeyword)
-    || normalizedKeyword.includes(normalizedHeader);
+  return (
+    normalizedHeader.includes(normalizedKeyword)
+    || normalizedKeyword.includes(normalizedHeader)
+  )
+    ? 1
+    : 0;
 };
+
+const matchesHeaderLabel = (rawHeader, keyword) => getHeaderMatchStrength(rawHeader, keyword) > 0;
 
 const splitDelimitedLine = (line, delimiter) => {
   const cells = [];
@@ -826,9 +834,16 @@ const scoreProfileAgainstHeaders = (rawHeaders, profile) => {
   const matchedFields = [];
 
   Object.entries(profile.signatureHeaders).forEach(([field, keywords]) => {
-    const matched = rawHeaders.some((header) => keywords.some((keyword) => matchesHeaderLabel(header, keyword)));
-    if (matched) {
-      score += 14;
+    const bestMatchStrength = rawHeaders.reduce((currentBestStrength, header) => {
+      const headerBestStrength = keywords.reduce((currentKeywordBest, keyword) => (
+        Math.max(currentKeywordBest, getHeaderMatchStrength(header, keyword))
+      ), 0);
+
+      return Math.max(currentBestStrength, headerBestStrength);
+    }, 0);
+
+    if (bestMatchStrength > 0) {
+      score += bestMatchStrength >= 2 ? 18 : 14;
       matchedFields.push(field);
     }
   });
