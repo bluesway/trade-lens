@@ -208,7 +208,7 @@ export default function Header({
 
   return (
     <div className="grid gap-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 xl:grid-cols-[minmax(0,1fr)_minmax(520px,1.08fr)]">
-      <div className="flex flex-col justify-between gap-5">
+      <div className="flex flex-col gap-5">
         <div className="space-y-3">
           <h1 className="flex items-start gap-3 text-2xl font-bold text-slate-900 dark:text-white xl:text-[2rem] xl:leading-tight">
             <Activity className="mt-1 shrink-0 text-blue-600" />
@@ -293,7 +293,7 @@ export default function Header({
         </button>
 
         <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-700 dark:bg-slate-800/60">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+          <div className="grid gap-4">
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
@@ -316,9 +316,9 @@ export default function Header({
               </p>
             </div>
 
-            <div className="grid w-full gap-3 2xl:grid-cols-[minmax(0,1.2fr)_minmax(13rem,14rem)]">
+            <div className="grid w-full gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(13rem,15rem)]">
               <label
-                className="relative flex min-h-[5rem] rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/80"
+                className="relative flex min-h-[5.25rem] rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/80"
                 title={importProfileLabel}
               >
                 <div className="pointer-events-none flex min-w-0 flex-1 flex-col justify-between gap-3 pr-8">
@@ -329,7 +329,7 @@ export default function Header({
                     <div className="line-clamp-2 break-words text-sm font-semibold leading-6 text-slate-800 dark:text-slate-100">
                       {getLocalizedProfileLabel(selectedImportProfileOption)}
                     </div>
-                    <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    <div className="mt-1 line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
                       {importProfileMeta}
                     </div>
                   </div>
@@ -384,7 +384,7 @@ export default function Header({
                   onChange={handleFileUpload}
                   className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
                 />
-                <button className="flex min-h-[3.25rem] w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-medium text-white shadow-sm transition-colors hover:bg-blue-700 lg:min-w-[10rem]">
+                <button className="flex min-h-[5.25rem] w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 font-medium text-white shadow-sm transition-colors hover:bg-blue-700">
                   <Upload size={18} />
                   {t('common.importCsv', { defaultValue: 'Import CSV' })}
                 </button>
