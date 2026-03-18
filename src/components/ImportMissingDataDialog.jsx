@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, CheckSquare, Database, Trash2, X } from 'lucide-react';
 import { normalizeLocale } from '../locales/config';
@@ -27,10 +27,36 @@ export default function ImportMissingDataDialog({
   const entries = pendingReview?.entries || [];
   const [selectedSymbols, setSelectedSymbols] = useState(() => new Set(entries.map((entry) => entry.symbol)));
   const [drafts, setDrafts] = useState(() => buildDrafts(entries));
+  const previousEntrySymbolsRef = useRef([]);
 
   useEffect(() => {
-    setSelectedSymbols(new Set(entries.map((entry) => entry.symbol)));
-    setDrafts(buildDrafts(entries));
+    const nextEntrySymbols = entries.map((entry) => entry.symbol);
+    const previousEntrySymbols = previousEntrySymbolsRef.current;
+    const hasOverlapWithPreviousEntries = nextEntrySymbols.some((symbol) => previousEntrySymbols.includes(symbol));
+
+    setSelectedSymbols((currentSelection) => {
+      if (nextEntrySymbols.length === 0) {
+        return new Set();
+      }
+
+      if (!hasOverlapWithPreviousEntries) {
+        return new Set(nextEntrySymbols);
+      }
+
+      return new Set(nextEntrySymbols.filter((symbol) => currentSelection.has(symbol)));
+    });
+
+    setDrafts((currentDrafts) => Object.fromEntries(
+      entries.map((entry) => [
+        entry.symbol,
+        {
+          name: currentDrafts[entry.symbol]?.name ?? entry.suggestedName ?? '',
+          price: currentDrafts[entry.symbol]?.price ?? entry.suggestedPrice ?? ''
+        }
+      ])
+    ));
+
+    previousEntrySymbolsRef.current = nextEntrySymbols;
   }, [entries]);
 
   const selectedEntries = entries

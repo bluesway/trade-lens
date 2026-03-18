@@ -136,6 +136,20 @@ export default function DataTable({
     });
   };
 
+  const formatStockUpdateValue = (timestamp) => (
+    timestamp
+      ? [
+        formatLocalizedDateTime(timestamp, activeLocale),
+        showGregorianReference ? `(${formatGregorianReferenceDateTime(timestamp)})` : ''
+      ].filter(Boolean).join(' ')
+      : t('table.notUpdatedYet')
+  );
+
+  const getStockUpdateSummary = (isManualOverride, timestamp) => t(
+    isManualOverride ? 'table.manualUpdatedAt' : 'table.apiUpdatedAt',
+    { value: formatStockUpdateValue(timestamp) }
+  );
+
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
       <div className="p-4 md:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -166,12 +180,12 @@ export default function DataTable({
       </div>
 
       <div className="hidden md:block overflow-auto max-h-[calc(100vh-100px)] custom-scrollbar">
-        <table className="w-full text-left text-sm whitespace-nowrap">
+        <table className="w-full min-w-[980px] text-left text-sm">
           <thead className="bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 z-30 shadow-sm">
             <tr>
               <th className="w-10 sticky top-0 bg-slate-50 dark:bg-slate-800 z-30" />
               <th
-                className="px-6 py-4 font-semibold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors sticky top-0 bg-slate-50 dark:bg-slate-800 z-30"
+                className="min-w-[17rem] w-[17rem] px-6 py-4 font-semibold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors sticky top-0 bg-slate-50 dark:bg-slate-800 z-30"
                 onClick={() => requestSort('代號')}
               >
                 <div className="flex items-center gap-1">
@@ -250,87 +264,92 @@ export default function DataTable({
                     <td className="pl-4 text-slate-400">
                       {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2" onClick={(event) => event.stopPropagation()}>
+                    <td className="w-[17rem] min-w-[17rem] max-w-[17rem] px-6 py-4 align-top">
+                      <div
+                        className="min-w-0 font-bold text-slate-800 dark:text-slate-200"
+                        onClick={(event) => event.stopPropagation()}
+                      >
                         {editingStockSymbol === stock.symbol ? (
-                          <div className="flex flex-col gap-1">
+                          <div className="max-w-full space-y-2">
                             <input
                               type="text"
-                              value={tempStockEdit.name}
-                              onChange={(event) => setTempStockEdit({ ...tempStockEdit, name: event.target.value })}
-                              className="px-2 py-1 border border-slate-300 dark:border-slate-600 rounded text-xs w-28 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                              placeholder={t('table.manualNamePlaceholder')}
+                              value={tempStockEdit.code}
+                              onChange={(event) => setTempStockEdit({ ...tempStockEdit, code: event.target.value.toUpperCase() })}
+                              className="w-full rounded border border-slate-300 bg-white px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                              placeholder={t('manager.fields.symbol')}
                             />
-                            <div className="flex gap-1">
-                              <button onClick={() => handleSaveManualStock(stock.symbol)} className="bg-blue-600 text-white p-1 rounded hover:bg-blue-700" title={t('common.save')}>
-                                <Save size={14} />
-                              </button>
-                              <button
-                                onClick={cancelEditingStock}
-                                className="bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 p-1 rounded hover:bg-slate-300 dark:hover:bg-slate-600"
-                                title={t('common.cancel')}
-                              >
-                                <X size={14} />
-                              </button>
+                            <div className="flex items-start gap-2">
+                              <input
+                                type="text"
+                                value={tempStockEdit.name}
+                                onChange={(event) => setTempStockEdit({ ...tempStockEdit, name: event.target.value })}
+                                className="min-w-0 flex-1 rounded border border-slate-300 bg-white px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                                placeholder={t('table.manualNamePlaceholder')}
+                              />
+                              <div className="flex shrink-0 gap-1">
+                                <button onClick={() => handleSaveManualStock(stock.symbol)} className="rounded bg-blue-600 p-1 text-white hover:bg-blue-700" title={t('common.save')}>
+                                  <Save size={14} />
+                                </button>
+                                <button
+                                  onClick={cancelEditingStock}
+                                  className="rounded bg-slate-200 p-1 text-slate-600 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
+                                  title={t('common.cancel')}
+                                >
+                                  <X size={14} />
+                                </button>
+                              </div>
+                            </div>
+                            <div className="text-[10px] font-medium text-slate-400 dark:text-slate-500">
+                              {getMarketLabel(stock.market, activeLocale, t)} &middot; {stock.currency}
                             </div>
                           </div>
                         ) : (
                           <>
-                            {stock.symbol}
-                            <span className="text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded">
-                              {getMarketLabel(stock.market, activeLocale, t)} &middot; {stock.currency}
-                            </span>
-                            <button onClick={(event) => {
-                              event.stopPropagation();
-                              startEditingStock(stock);
-                            }}
-                            className="text-slate-300 hover:text-blue-500 ml-1"
-                            title={t('common.edit')}
-                            >
-                              <Edit2 size={12} />
-                            </button>
+                            <div className="flex min-w-0 items-center gap-2">
+                              <span className="truncate" title={stock.symbol}>{stock.symbol}</span>
+                              <span className="shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                                {getMarketLabel(stock.market, activeLocale, t)} &middot; {stock.currency}
+                              </span>
+                              {stock.isManualName && (
+                                <span className="shrink-0 rounded bg-amber-100 px-1 py-0.5 text-[10px] text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
+                                  {t('table.manualBadge')}
+                                </span>
+                              )}
+                              <button
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  startEditingStock(stock);
+                                }}
+                                className="ml-auto shrink-0 text-slate-300 hover:text-blue-500"
+                                title={t('common.edit')}
+                              >
+                                <Edit2 size={12} />
+                              </button>
+                            </div>
+                            <div className="group/name relative mt-1 max-w-full cursor-help" title={stock.name}>
+                              <div className="line-clamp-2 break-words text-xs leading-5 text-slate-500 dark:text-slate-400">
+                                {stock.name}
+                              </div>
+                              <div className="absolute left-0 bottom-full z-50 mb-2 hidden w-72 max-w-[calc(100vw-8rem)] rounded-lg border border-white/10 bg-slate-800 px-3 py-2 text-left text-[11px] text-white shadow-lg group-hover/name:block dark:bg-slate-700">
+                                <div className="break-words font-semibold text-slate-100">{stock.name}</div>
+                                <div className="mt-1 text-[10px] leading-4 text-slate-200">
+                                  {getStockUpdateSummary(stock.isManualName, stock.nameUpdateTimestamp)}
+                                </div>
+                              </div>
+                            </div>
                           </>
                         )}
                       </div>
-                      {editingStockSymbol !== stock.symbol && (
-                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1 group/name relative cursor-help">
-                          {stock.name}
-                          {stock.isManualName && (
-                            <span className="px-1 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded text-[10px]">
-                              {t('table.manualBadge')}
-                            </span>
-                          )}
-                          <div className="absolute left-0 bottom-full mb-1 hidden group-hover/name:block bg-slate-800 dark:bg-slate-700 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap z-50 shadow-lg border border-white/10">
-                            {stock.isManualName
-                              ? t('table.manualUpdatedAt', {
-                                value: stock.lastUpdateTimestamp
-                                  ? [
-                                    formatLocalizedDateTime(stock.lastUpdateTimestamp, activeLocale),
-                                    showGregorianReference ? `(${formatGregorianReferenceDateTime(stock.lastUpdateTimestamp)})` : ''
-                                  ].filter(Boolean).join(' ')
-                                  : t('table.notUpdatedYet')
-                              })
-                              : t('table.apiUpdatedAt', {
-                                value: stock.lastUpdateTimestamp
-                                  ? [
-                                    formatLocalizedDateTime(stock.lastUpdateTimestamp, activeLocale),
-                                    showGregorianReference ? `(${formatGregorianReferenceDateTime(stock.lastUpdateTimestamp)})` : ''
-                                  ].filter(Boolean).join(' ')
-                                  : t('table.notUpdatedYet')
-                              })}
-                          </div>
-                        </div>
-                      )}
                     </td>
-                    <td className="px-6 py-4 text-right font-medium text-slate-700 dark:text-slate-300">
+                    <td className="px-6 py-4 text-right font-medium text-slate-700 dark:text-slate-300 whitespace-nowrap">
                       {formatLocalizedNumber(stock.holdingQty, activeLocale, { maximumFractionDigits: 4 })}
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-right whitespace-nowrap">
                       <div className="font-medium text-slate-800 dark:text-slate-200">
                         {hasCurrentValue ? formatOriginalCurrency(stock.currentValueOriginal, currencyCode, { signed: stock.currentValueOriginal < 0 }) : '-'}
                       </div>
                       <div
-                        className="text-xs text-slate-400 dark:text-slate-500 mt-1 flex items-center justify-end gap-1 group/price relative cursor-help"
+                        className="group/price relative mt-1 flex items-center justify-end gap-1 text-xs text-slate-400 dark:text-slate-500"
                         onClick={(event) => event.stopPropagation()}
                       >
                         {editingStockSymbol === stock.symbol ? (
@@ -338,41 +357,25 @@ export default function DataTable({
                             type="number"
                             value={tempStockEdit.price}
                             onChange={(event) => setTempStockEdit({ ...tempStockEdit, price: event.target.value })}
-                            className="px-1 py-1 border border-slate-300 dark:border-slate-600 rounded w-20 text-right text-xs bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className="w-24 rounded border border-slate-300 bg-white px-1 py-1 text-right text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                             placeholder={t('table.currentPricePlaceholder')}
                           />
                         ) : (
                           <>
                             {stock.isManualPrice && (
-                              <span className="px-1 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded text-[10px] mr-1">
+                              <span className="mr-1 rounded bg-amber-100 px-1 text-[10px] text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
                                 {t('table.manualBadge')}
                               </span>
                             )}
                             <span>{stock.currentPrice > 0 ? t('table.atPrice', { price: formatOriginalCurrency(stock.currentPrice, currencyCode) }) : '-'}</span>
-                            <div className="absolute right-0 bottom-full mb-1 hidden group-hover/price:block bg-slate-800 dark:bg-slate-700 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap z-50 shadow-lg border border-white/10">
-                              {stock.isManualPrice
-                                ? t('table.manualUpdatedAt', {
-                                  value: stock.lastUpdateTimestamp
-                                    ? [
-                                      formatLocalizedDateTime(stock.lastUpdateTimestamp, activeLocale),
-                                      showGregorianReference ? `(${formatGregorianReferenceDateTime(stock.lastUpdateTimestamp)})` : ''
-                                    ].filter(Boolean).join(' ')
-                                    : t('table.notUpdatedYet')
-                                })
-                                : t('table.apiUpdatedAt', {
-                                  value: stock.lastUpdateTimestamp
-                                    ? [
-                                      formatLocalizedDateTime(stock.lastUpdateTimestamp, activeLocale),
-                                      showGregorianReference ? `(${formatGregorianReferenceDateTime(stock.lastUpdateTimestamp)})` : ''
-                                    ].filter(Boolean).join(' ')
-                                    : t('table.notUpdatedYet')
-                                })}
+                            <div className="absolute right-0 bottom-full z-50 mb-1 hidden rounded border border-white/10 bg-slate-800 px-2 py-1 text-[10px] text-white shadow-lg group-hover/price:block dark:bg-slate-700">
+                              {getStockUpdateSummary(stock.isManualPrice, stock.priceUpdateTimestamp)}
                             </div>
                           </>
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-right whitespace-nowrap">
                       {hasOpenPosition ? (
                         <div className={`flex flex-col items-end ${
                           stock.unrealizedPnlOriginal > 0
@@ -385,13 +388,13 @@ export default function DataTable({
                           <span className="font-bold">
                             {formatOriginalCurrency(stock.unrealizedPnlOriginal, currencyCode, { signed: true })}
                           </span>
-                          <span className="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded mt-1">
+                          <span className="mt-1 rounded bg-slate-100 px-1.5 py-0.5 text-xs dark:bg-slate-800">
                             {formatPercent(stock.unrealizedPnlPercent)}
                           </span>
                         </div>
                       ) : '-'}
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-right whitespace-nowrap">
                       {(stock.realizedPnlOriginal !== 0 || stock.tradeCount > 0) ? (
                         <div className={`flex flex-col items-end ${
                           stock.realizedPnlOriginal > 0
@@ -405,14 +408,14 @@ export default function DataTable({
                             {stock.realizedPnlOriginal !== 0 ? formatOriginalCurrency(stock.realizedPnlOriginal, currencyCode, { signed: true }) : '-'}
                           </span>
                           {stock.realizedPnlPercent !== 0 && (
-                            <span className="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded mt-1">
+                            <span className="mt-1 rounded bg-slate-100 px-1.5 py-0.5 text-xs dark:bg-slate-800">
                               {formatPercent(stock.realizedPnlPercent)}
                             </span>
                           )}
                         </div>
                       ) : '-'}
                     </td>
-                    <td className="px-6 py-4 text-right border-l border-slate-200 dark:border-slate-700">
+                    <td className="px-6 py-4 text-right border-l border-slate-200 dark:border-slate-700 whitespace-nowrap">
                       {hasSold ? (
                         <div className={`flex flex-col items-end ${
                           stock.ifSoldTodayPnlOriginal > 0
@@ -427,11 +430,11 @@ export default function DataTable({
                           </span>
                           <div className="mt-1 flex items-center gap-1">
                             {percentDiff > 7 ? (
-                              <span className="text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.5 rounded font-medium whitespace-nowrap">
+                              <span className="whitespace-nowrap rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
                                 {t('table.hedgeSuccess', { value: formatPercent(percentDiff) })}
                               </span>
                             ) : percentDiff < -7 ? (
-                              <span className="text-[10px] bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 px-1.5 py-0.5 rounded font-medium whitespace-nowrap">
+                              <span className="whitespace-nowrap rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-medium text-rose-700 dark:bg-rose-900/30 dark:text-rose-300">
                                 {t('table.soldTooEarly', { value: formatPercent(percentDiff) })}
                               </span>
                             ) : null}

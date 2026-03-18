@@ -500,7 +500,12 @@ export function useTradeData(showToast) {
   const [expandedStock, setExpandedStock] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingStockSymbol, setEditingStockSymbol] = useState(null);
-  const [tempStockEdit, setTempStockEdit] = useState({ name: '', price: '' });
+  const [tempStockEdit, setTempStockEdit] = useState({
+    code: '',
+    market: '',
+    name: '',
+    price: ''
+  });
   const [newRec, setNewRec] = useState(DEFAULT_NEW_RECORD);
   const [isLoadingPrices, setIsLoadingPrices] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(null);
@@ -623,18 +628,80 @@ export function useTradeData(showToast) {
   };
 
   const handleSaveManualStock = (symbol) => {
-    const updatedManualStockData = {
-      ...manualStockData,
-      [symbol]: {
-        name: tempStockEdit.name,
-        price: parseFloat(tempStockEdit.price) || 0,
-        timestamp: Date.now()
+    const trimmedCode = String(tempStockEdit.code || '').trim().toUpperCase();
+    const targetMarket = tempStockEdit.market || processedData.find((stock) => stock.symbol === symbol)?.market || '';
+    const nextSymbol = trimmedCode ? formatSymbol(trimmedCode, targetMarket) : symbol;
+    const trimmedName = String(tempStockEdit.name || '').trim();
+    const parsedManualPrice = getOptionalNumericValue(tempStockEdit.price);
+    const existingManualEntry = manualStockData[symbol] || {};
+    const timestamp = Date.now();
+
+    if (nextSymbol !== symbol) {
+      const updatedRawData = rawData.map((row) => {
+        const rawCode = String(row['代號'] || '').trim();
+        if (!rawCode) {
+          return row;
+        }
+
+        const rowSymbol = formatSymbol(rawCode, resolveMarket(rawCode, row['市場']));
+        if (rowSymbol !== symbol) {
+          return row;
+        }
+
+        return {
+          ...row,
+          代號: trimmedCode
+        };
+      });
+
+      persistRawData(updatedRawData);
+
+      if (expandedStock === symbol) {
+        setExpandedStock(nextSymbol);
       }
-    };
+    }
+
+    const updatedManualStockData = { ...manualStockData };
+    if (nextSymbol !== symbol && updatedManualStockData[symbol]) {
+      delete updatedManualStockData[symbol];
+    }
+
+    const nextManualEntry = {};
+    const resolvedManualName = trimmedName || existingManualEntry.name || '';
+    if (resolvedManualName) {
+      nextManualEntry.name = resolvedManualName;
+    }
+
+    const resolvedManualPrice = parsedManualPrice ?? existingManualEntry.price;
+    if (Number.isFinite(resolvedManualPrice) && Math.abs(resolvedManualPrice) > POSITION_EPSILON) {
+      nextManualEntry.price = resolvedManualPrice;
+    }
+
+    if (Object.keys(nextManualEntry).length > 0) {
+      updatedManualStockData[nextSymbol] = {
+        ...nextManualEntry,
+        timestamp
+      };
+    } else {
+      delete updatedManualStockData[nextSymbol];
+    }
 
     persistManualData(updatedManualStockData);
+
+    if (nextSymbol !== symbol && liveData[symbol]) {
+      const updatedLiveData = { ...liveData };
+      delete updatedLiveData[symbol];
+      persistMarketData(updatedLiveData, exchangeRates);
+    }
+
     setEditingStockSymbol(null);
-    showToast(t('messages.manualStockSaved', { symbol }));
+    setTempStockEdit({
+      code: '',
+      market: '',
+      name: '',
+      price: ''
+    });
+    showToast(t('messages.manualStockSaved', { symbol: nextSymbol }));
   };
 
   const {
@@ -1472,11 +1539,22 @@ export function useTradeData(showToast) {
 
   const startEditingStock = (stock) => {
     setEditingStockSymbol(stock.symbol);
-    setTempStockEdit({ name: stock.name, price: stock.currentPrice });
+    setTempStockEdit({
+      code: stock.rawCode,
+      market: stock.market,
+      name: stock.isManualName ? stock.name : '',
+      price: stock.isManualPrice ? formatNumericValue(stock.currentPrice) : ''
+    });
   };
 
   const cancelEditingStock = () => {
     setEditingStockSymbol(null);
+    setTempStockEdit({
+      code: '',
+      market: '',
+      name: '',
+      price: ''
+    });
   };
 
   const processedData = useMemo(() => {
@@ -1532,7 +1610,9 @@ export function useTradeData(showToast) {
         const normalizedApiQuote = normalizeQuoteCurrencyData(apiData?.currency, apiData?.price);
         const currentPrice = isManualPrice ? manualData.price : normalizedApiQuote.price || stock.currentPrice;
         const currentName = isManualName ? manualData.name : apiData?.name || stock.name;
-        const lastUpdateTimestamp = isManualPrice ? manualData.timestamp : apiData?.timestamp || null;
+        const nameUpdateTimestamp = isManualName ? manualData?.timestamp || null : apiData?.timestamp || null;
+        const priceUpdateTimestamp = isManualPrice ? manualData?.timestamp || null : apiData?.timestamp || null;
+        const lastUpdateTimestamp = priceUpdateTimestamp || nameUpdateTimestamp;
         const currency = normalizedApiQuote.currency || getCurrencyBySymbolOrMarket(stock.symbol, stock.market);
         const exchangeRate = getExchangeRate(currency, baseCurrency);
 
@@ -1568,6 +1648,8 @@ export function useTradeData(showToast) {
           currentPrice,
           isManualPrice,
           isManualName,
+          nameUpdateTimestamp,
+          priceUpdateTimestamp,
           lastUpdateTimestamp,
           currency,
           exchangeRate,
