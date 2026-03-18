@@ -9,6 +9,7 @@ const buildDrafts = (entries) => Object.fromEntries(
   entries.map((entry) => [
     entry.symbol,
     {
+      code: entry.rawCode || '',
       name: entry.suggestedName || '',
       price: entry.suggestedPrice || ''
     }
@@ -20,6 +21,7 @@ export default function ImportMissingDataDialog({
   onDeleteSelected,
   onOpenManager,
   onSaveSelected,
+  onSkipSelected,
   pendingReview
 }) {
   const { t, i18n } = useTranslation();
@@ -50,6 +52,7 @@ export default function ImportMissingDataDialog({
       entries.map((entry) => [
         entry.symbol,
         {
+          code: currentDrafts[entry.symbol]?.code ?? entry.rawCode ?? '',
           name: currentDrafts[entry.symbol]?.name ?? entry.suggestedName ?? '',
           price: currentDrafts[entry.symbol]?.price ?? entry.suggestedPrice ?? ''
         }
@@ -63,6 +66,7 @@ export default function ImportMissingDataDialog({
     .filter((entry) => selectedSymbols.has(entry.symbol))
     .map((entry) => ({
       ...entry,
+      code: drafts[entry.symbol]?.code || entry.rawCode || '',
       name: drafts[entry.symbol]?.name || '',
       price: drafts[entry.symbol]?.price || ''
     }));
@@ -100,7 +104,15 @@ export default function ImportMissingDataDialog({
       return;
     }
 
-    onSaveSelected(selectedEntries);
+    void onSaveSelected(selectedEntries);
+  };
+
+  const handleSkipSelected = () => {
+    if (selectedEntries.length === 0) {
+      return;
+    }
+
+    void onSkipSelected(selectedEntries.map((entry) => entry.symbol));
   };
 
   const handleDeleteSelected = () => {
@@ -116,7 +128,7 @@ export default function ImportMissingDataDialog({
       return;
     }
 
-    onDeleteSelected(selectedEntries.map((entry) => entry.symbol));
+    onDeleteSelected(selectedEntries);
   };
 
   return (
@@ -134,10 +146,10 @@ export default function ImportMissingDataDialog({
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500 dark:text-slate-400">
               {pendingReview.missingApiKey
                 ? t('app.importMissingDataIntroNoApi', {
-                  defaultValue: 'These imported symbols do not have cached quotes yet. Add a manual name and price now, or delete their rows. You can also open the trade manager to fix the records first.'
+                  defaultValue: 'These imported symbols do not have cached quotes yet. Update the ticker, add a manual name and price now, skip them for later, or delete their rows. You can also open the trade manager to fix the records first.'
                 })
                 : t('app.importMissingDataIntro', {
-                  defaultValue: 'Trade Lens already tried to fetch quotes for the newly imported symbols. The ones below still need a manual name and price, or you can delete their rows in one shot.'
+                  defaultValue: 'Trade Lens already tried to fetch quotes for the newly imported symbols. The ones below still need help, so you can update the ticker, save a manual name and price, skip them for now, or delete their rows in one shot.'
                 })}
             </p>
           </div>
@@ -197,7 +209,7 @@ export default function ImportMissingDataDialog({
           <div className="grid gap-3">
             {entries.map((entry) => {
               const isSelected = selectedSymbols.has(entry.symbol);
-              const draft = drafts[entry.symbol] || { name: '', price: '' };
+              const draft = drafts[entry.symbol] || { code: '', name: '', price: '' };
 
               return (
                 <div
@@ -260,7 +272,19 @@ export default function ImportMissingDataDialog({
                     </div>
                   </div>
 
-                  <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <div>
+                      <label className="block text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+                        {t('manager.fields.symbol')}
+                      </label>
+                      <input
+                        type="text"
+                        value={draft.code}
+                        onChange={(event) => updateDraft(entry.symbol, 'code', event.target.value.toUpperCase())}
+                        placeholder={t('app.importMissingDataCodePlaceholder', { defaultValue: 'Updated ticker symbol' })}
+                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                      />
+                    </div>
                     <div>
                       <label className="block text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
                         {t('table.manualNamePlaceholder', { defaultValue: 'Company name' })}
@@ -302,6 +326,14 @@ export default function ImportMissingDataDialog({
             >
               <Trash2 size={16} />
               {t('app.importMissingDataDeleteSelected', { defaultValue: 'Delete selected rows' })}
+            </button>
+            <button
+              type="button"
+              onClick={handleSkipSelected}
+              disabled={selectedCount === 0}
+              className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+            >
+              {t('app.importMissingDataSkipSelected', { defaultValue: 'Skip selected for now' })}
             </button>
             <button
               type="button"

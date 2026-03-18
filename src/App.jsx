@@ -80,6 +80,7 @@ export default function App() {
     resolvedTradeRows,
     requestSort,
     savePendingImportSymbolReview,
+    skipPendingImportSymbolReview,
     setApiKey,
     setCsvImportProfile,
     setExpandedStock,
@@ -269,6 +270,7 @@ export default function App() {
           setShowManager(true);
         }}
         onSaveSelected={savePendingImportSymbolReview}
+        onSkipSelected={skipPendingImportSymbolReview}
         pendingReview={pendingImportSymbolReview}
       />
 

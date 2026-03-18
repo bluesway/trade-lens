@@ -1180,6 +1180,41 @@ export function useTradeData(showToast) {
     })
     .join('\u241f');
 
+  const buildPendingImportReviewEntries = (rows) => {
+    const entriesBySymbol = new Map();
+
+    rows.forEach((row) => {
+      const rawCode = String(row['代號'] || '').trim();
+      if (!rawCode) {
+        return;
+      }
+
+      const market = resolveMarket(rawCode, row['市場']);
+      const symbol = formatSymbol(rawCode, market);
+      if (!symbol || symbol === '000000' || symbol === '未知') {
+        return;
+      }
+
+      const rowSignature = buildTradeRowSignature(row);
+      const existingEntry = entriesBySymbol.get(symbol);
+      if (existingEntry) {
+        existingEntry.recordCount += 1;
+        existingEntry.rowSignatures.push(rowSignature);
+        return;
+      }
+
+      entriesBySymbol.set(symbol, {
+        symbol,
+        rawCode,
+        market,
+        recordCount: 1,
+        rowSignatures: [rowSignature]
+      });
+    });
+
+    return Array.from(entriesBySymbol.values());
+  };
+
   const buildDuplicatePreviewRow = (row) => ({
     rowNumber: null,
     reasonCode: 'duplicate',
@@ -1210,44 +1245,18 @@ export function useTradeData(showToast) {
     setPendingImportSymbolReview(null);
   };
 
-  const savePendingImportSymbolReview = (entries) => {
-    const normalizedEntries = entries
-      .map((entry) => ({
-        ...entry,
-        parsedPrice: getOptionalNumericValue(entry.price)
-      }))
-      .filter((entry) => Number.isFinite(entry.parsedPrice) && entry.parsedPrice > POSITION_EPSILON);
-
-    if (normalizedEntries.length === 0) {
-      showToast(t('messages.importMissingDataNeedPrice', {
-        defaultValue: 'Selected symbols still need a valid manual price.'
-      }));
-      return { savedCount: 0 };
+  const skipPendingImportSymbolReview = (symbols) => {
+    const selectedSymbols = new Set(symbols.filter(Boolean));
+    if (selectedSymbols.size === 0) {
+      return { skippedCount: 0 };
     }
 
-    const timestamp = Date.now();
-    const updatedManualStockData = { ...manualStockData };
-
-    normalizedEntries.forEach((entry) => {
-      updatedManualStockData[entry.symbol] = {
-        name: String(entry.name || '').trim()
-          || updatedManualStockData[entry.symbol]?.name
-          || STOCK_MAPPING[entry.symbol]?.name
-          || entry.rawCode,
-        price: entry.parsedPrice,
-        timestamp
-      };
-    });
-
-    persistManualData(updatedManualStockData);
-
-    const savedSymbols = new Set(normalizedEntries.map((entry) => entry.symbol));
     setPendingImportSymbolReview((currentReview) => {
       if (!currentReview) {
         return currentReview;
       }
 
-      const remainingEntries = currentReview.entries.filter((entry) => !savedSymbols.has(entry.symbol));
+      const remainingEntries = currentReview.entries.filter((entry) => !selectedSymbols.has(entry.symbol));
       return remainingEntries.length > 0
         ? {
           ...currentReview,
@@ -1256,35 +1265,211 @@ export function useTradeData(showToast) {
         : null;
     });
 
-    showToast(t('messages.importMissingDataSaved', {
-      defaultValue: 'Saved manual quotes for {{count}} symbols.',
-      count: formatLocalizedNumber(normalizedEntries.length, activeLocale)
+    showToast(t('messages.importMissingDataSkipped', {
+      defaultValue: 'Kept {{count}} unresolved symbols for later review.',
+      count: formatLocalizedNumber(selectedSymbols.size, activeLocale)
     }));
 
-    return { savedCount: normalizedEntries.length };
+    return { skippedCount: selectedSymbols.size };
   };
 
-  const deletePendingImportSymbolRecords = (symbols) => {
-    const selectedSymbols = new Set(symbols.filter(Boolean));
+  const savePendingImportSymbolReview = async (entries) => {
+    const normalizedEntries = entries.map((entry) => {
+      const trimmedName = String(entry.name || '').trim();
+      const nextRawCode = String(entry.code || entry.rawCode || '').trim().toUpperCase() || entry.rawCode;
+      const nextSymbol = formatSymbol(nextRawCode, entry.market) || entry.symbol;
+      const parsedPrice = getOptionalNumericValue(entry.price);
+
+      return {
+        ...entry,
+        originalSymbol: entry.symbol,
+        trimmedName,
+        nextRawCode,
+        nextSymbol,
+        parsedPrice,
+        hasValidPrice: Number.isFinite(parsedPrice) && parsedPrice > POSITION_EPSILON,
+        hasCodeChange: nextRawCode !== entry.rawCode,
+        hasNameChange: trimmedName.length > 0
+      };
+    });
+
+    const actionableEntries = normalizedEntries.filter((entry) => (
+      entry.hasCodeChange || entry.hasNameChange || entry.hasValidPrice
+    ));
+
+    if (actionableEntries.length === 0) {
+      showToast(t('messages.importMissingDataNeedAction', {
+        defaultValue: 'Selected symbols do not have a new ticker, name, or valid manual price yet.'
+      }));
+      return { savedCount: 0 };
+    }
+
+    const replacementCodeBySignature = new Map();
+    actionableEntries
+      .filter((entry) => entry.hasCodeChange)
+      .forEach((entry) => {
+        (entry.rowSignatures || []).forEach((signature) => {
+          replacementCodeBySignature.set(signature, entry.nextRawCode);
+        });
+      });
+
+    const nextSignatureByOriginal = new Map();
+    if (replacementCodeBySignature.size > 0) {
+      const updatedRawData = rawData.map((row) => {
+        const rowSignature = buildTradeRowSignature(row);
+        const replacementCode = replacementCodeBySignature.get(rowSignature);
+        if (!replacementCode) {
+          return row;
+        }
+
+        const updatedRow = {
+          ...row,
+          代號: replacementCode
+        };
+        nextSignatureByOriginal.set(rowSignature, buildTradeRowSignature(updatedRow));
+        return updatedRow;
+      });
+
+      persistRawData(updatedRawData);
+    }
+
+    const timestamp = Date.now();
+    let updatedManualStockData = { ...manualStockData };
+    let manualDataChanged = false;
+
+    actionableEntries.forEach((entry) => {
+      if (!entry.hasNameChange && !entry.hasValidPrice) {
+        return;
+      }
+
+      const existingManualEntry = updatedManualStockData[entry.nextSymbol] || {};
+      const nextManualEntry = { ...existingManualEntry };
+
+      if (entry.hasNameChange) {
+        nextManualEntry.name = entry.trimmedName;
+      }
+
+      if (entry.hasValidPrice) {
+        nextManualEntry.price = entry.parsedPrice;
+      }
+
+      updatedManualStockData[entry.nextSymbol] = {
+        ...nextManualEntry,
+        timestamp
+      };
+      manualDataChanged = true;
+    });
+
+    if (manualDataChanged) {
+      persistManualData(updatedManualStockData);
+    }
+
+    const reviewCandidates = actionableEntries.map((entry) => ({
+      ...entry,
+      symbol: entry.nextSymbol,
+      rawCode: entry.nextRawCode,
+      rowSignatures: (entry.rowSignatures || []).map((signature) => nextSignatureByOriginal.get(signature) || signature)
+    }));
+
+    let liveDataSnapshot = liveData;
+    let manualStockDataSnapshot = updatedManualStockData;
+
+    if (apiKey) {
+      const entriesNeedingQuoteRefresh = reviewCandidates.filter((entry) => !entry.hasValidPrice);
+      if (entriesNeedingQuoteRefresh.length > 0) {
+        const refreshResult = await fetchLivePrices(false, baseCurrency, {
+          symbolEntries: entriesNeedingQuoteRefresh,
+          suppressToast: true,
+          suppressFreshToast: true,
+          suppressApiKeyToast: true
+        });
+
+        liveDataSnapshot = refreshResult.liveDataSnapshot || liveDataSnapshot;
+        manualStockDataSnapshot = manualDataChanged
+          ? {
+            ...(refreshResult.manualStockDataSnapshot || {}),
+            ...updatedManualStockData
+          }
+          : (refreshResult.manualStockDataSnapshot || manualStockDataSnapshot);
+
+        if (manualDataChanged) {
+          persistManualData(manualStockDataSnapshot);
+        }
+      }
+    }
+
+    const unresolvedEntries = buildMissingImportedSymbolEntries(
+      reviewCandidates,
+      liveDataSnapshot,
+      manualStockDataSnapshot
+    );
+    const unresolvedEntriesByOriginalSymbol = new Map(
+      unresolvedEntries.map((entry) => [entry.originalSymbol, entry])
+    );
+    const selectedOriginalSymbols = new Set(actionableEntries.map((entry) => entry.originalSymbol));
+
+    setPendingImportSymbolReview((currentReview) => {
+      if (!currentReview) {
+        return currentReview;
+      }
+
+      const nextEntries = currentReview.entries.flatMap((entry) => {
+        if (!selectedOriginalSymbols.has(entry.symbol)) {
+          return [entry];
+        }
+
+        const unresolvedEntry = unresolvedEntriesByOriginalSymbol.get(entry.symbol);
+        return unresolvedEntry ? [unresolvedEntry] : [];
+      });
+
+      return nextEntries.length > 0
+        ? {
+          ...currentReview,
+          entries: nextEntries,
+          missingApiKey: currentReview.missingApiKey || !apiKey
+        }
+        : null;
+    });
+
+    showToast(t('messages.importMissingDataSaved', {
+      defaultValue: 'Saved review changes for {{count}} symbols.',
+      count: formatLocalizedNumber(actionableEntries.length, activeLocale)
+    }));
+
+    return { savedCount: actionableEntries.length };
+  };
+
+  const deletePendingImportSymbolRecords = (entries) => {
+    const normalizedEntries = entries.filter(Boolean);
+    const selectedSymbols = new Set(normalizedEntries.map((entry) => entry.symbol).filter(Boolean));
+    const selectedRowSignatures = new Set(
+      normalizedEntries.flatMap((entry) => entry.rowSignatures || [])
+    );
+
     if (selectedSymbols.size === 0) {
       return { deletedCount: 0 };
     }
 
     const updatedRawData = rawData.filter((row) => {
+      if (selectedRowSignatures.size > 0) {
+        return !selectedRowSignatures.has(buildTradeRowSignature(row));
+      }
+
       const rawCode = String(row['代號'] || '').trim();
       if (!rawCode) {
         return true;
       }
-
       const rowSymbol = formatSymbol(rawCode, resolveMarket(rawCode, row['市場']));
       return !selectedSymbols.has(rowSymbol);
     });
     persistRawData(updatedRawData);
 
+    const remainingSymbols = new Set(buildTrackedSymbolEntries(updatedRawData).map((entry) => entry.symbol));
+
     let updatedManualStockData = manualStockData;
     let manualChanged = false;
     selectedSymbols.forEach((symbol) => {
-      if (updatedManualStockData[symbol]) {
+      if (!remainingSymbols.has(symbol) && updatedManualStockData[symbol]) {
         if (!manualChanged) {
           updatedManualStockData = { ...updatedManualStockData };
           manualChanged = true;
@@ -1299,7 +1484,7 @@ export function useTradeData(showToast) {
     let updatedLiveData = liveData;
     let liveChanged = false;
     selectedSymbols.forEach((symbol) => {
-      if (updatedLiveData[symbol]) {
+      if (!remainingSymbols.has(symbol) && updatedLiveData[symbol]) {
         if (!liveChanged) {
           updatedLiveData = { ...updatedLiveData };
           liveChanged = true;
@@ -1453,7 +1638,7 @@ export function useTradeData(showToast) {
     }));
 
     const missingImportedSymbolEntries = buildMissingImportedSymbolEntries(
-      buildTrackedSymbolEntries(appliedRows),
+      buildPendingImportReviewEntries(appliedRows),
       liveData,
       manualStockData
     );
@@ -2023,6 +2208,7 @@ export function useTradeData(showToast) {
     resolvedTradeRows,
     requestSort,
     savePendingImportSymbolReview,
+    skipPendingImportSymbolReview,
     setApiKey,
     setCsvImportProfile: handleSetCsvImportProfile,
     setExpandedStock,

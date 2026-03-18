@@ -74,8 +74,10 @@ const pickImportPatch = (locale) => ({
     'importMissingDataClearSelection',
     'importMissingDataRowsLabel',
     'importMissingDataRowsShort',
+    'importMissingDataCodePlaceholder',
     'importMissingDataNamePlaceholder',
     'importMissingDataSaveSelected',
+    'importMissingDataSkipSelected',
     'importMissingDataDeleteSelected',
     'importMissingDataClose',
     'importMissingDataSelectedCount',
@@ -139,8 +141,9 @@ const pickImportPatch = (locale) => ({
     'csvImportFailedNoData',
     'csvImportFailedHeaders',
     'csvImportFailedRowWidth',
-    'importMissingDataNeedPrice',
+    'importMissingDataNeedAction',
     'importMissingDataSaved',
+    'importMissingDataSkipped',
     'importMissingDataDeleted'
   ])
 });
@@ -162,20 +165,23 @@ const IMPORT_COPY_DEFAULTS = {
   skippedReasonGeneric: 'Unsupported or incomplete row',
   importMissingDataBadge: 'Needs quote review',
   importMissingDataTitle: 'Some imported symbols still need prices',
-  importMissingDataIntro: 'Trade Lens already tried to fetch quotes for the newly imported symbols. The ones below still need a manual name and price, or you can delete their rows in one shot.',
-  importMissingDataIntroNoApi: 'These imported symbols do not have cached quotes yet. Add a manual name and price now, or delete their rows. You can also open the trade manager to fix the records first.',
+  importMissingDataIntro: 'Trade Lens already tried to fetch quotes for the newly imported symbols. The ones below still need help, so you can update the ticker, save a manual name and price, skip them for now, or delete their rows in one shot.',
+  importMissingDataIntroNoApi: 'These imported symbols do not have cached quotes yet. Update the ticker, add a manual name and price now, skip them for later, or delete their rows. You can also open the trade manager to fix the records first.',
   importMissingDataSelectAll: 'Select all',
   importMissingDataClearSelection: 'Clear selection',
   importMissingDataRowsLabel: '{{count}} rows',
   importMissingDataRowsShort: 'Rows',
+  importMissingDataCodePlaceholder: 'Updated ticker symbol',
   importMissingDataNamePlaceholder: 'Optional display name',
   importMissingDataSaveSelected: 'Save selected',
+  importMissingDataSkipSelected: 'Skip selected for now',
   importMissingDataDeleteSelected: 'Delete selected rows',
   importMissingDataClose: 'Close for now',
   importMissingDataSelectedCount: '{{count}} selected',
   importMissingDataDeleteConfirm: 'Delete the selected symbols and all of their imported rows?',
-  importMissingDataNeedPrice: 'Selected symbols still need a valid manual price.',
-  importMissingDataSaved: 'Saved manual quotes for {{count}} symbols.',
+  importMissingDataNeedAction: 'Selected symbols do not have a new ticker, name, or valid manual price yet.',
+  importMissingDataSaved: 'Saved review changes for {{count}} symbols.',
+  importMissingDataSkipped: 'Kept {{count}} unresolved symbols for later review.',
   importMissingDataDeleted: 'Deleted {{count}} unresolved symbols and their rows.'
 };
 
@@ -252,8 +258,10 @@ const createImportPatch = (copy) => {
     importMissingDataClearSelection: resolvedCopy.importMissingDataClearSelection,
     importMissingDataRowsLabel: resolvedCopy.importMissingDataRowsLabel,
     importMissingDataRowsShort: resolvedCopy.importMissingDataRowsShort,
+    importMissingDataCodePlaceholder: resolvedCopy.importMissingDataCodePlaceholder,
     importMissingDataNamePlaceholder: resolvedCopy.importMissingDataNamePlaceholder,
     importMissingDataSaveSelected: resolvedCopy.importMissingDataSaveSelected,
+    importMissingDataSkipSelected: resolvedCopy.importMissingDataSkipSelected,
     importMissingDataDeleteSelected: resolvedCopy.importMissingDataDeleteSelected,
     importMissingDataClose: resolvedCopy.importMissingDataClose,
     importMissingDataSelectedCount: resolvedCopy.importMissingDataSelectedCount,
@@ -315,8 +323,9 @@ const createImportPatch = (copy) => {
     csvImportFailedNoData: resolvedCopy.failedNoData,
     csvImportFailedHeaders: resolvedCopy.failedHeaders,
     csvImportFailedRowWidth: resolvedCopy.failedRowWidth,
-    importMissingDataNeedPrice: resolvedCopy.importMissingDataNeedPrice,
+    importMissingDataNeedAction: resolvedCopy.importMissingDataNeedAction,
     importMissingDataSaved: resolvedCopy.importMissingDataSaved,
+    importMissingDataSkipped: resolvedCopy.importMissingDataSkipped,
     importMissingDataDeleted: resolvedCopy.importMissingDataDeleted
   }
   };
@@ -2626,22 +2635,25 @@ const fallbackImportPatches = {
     app: {
       importMissingDataBadge: '待補行情',
       importMissingDataTitle: '有些匯入標的還缺報價',
-      importMissingDataIntro: 'Trade Lens 已先替剛匯入的新標的打過一次報價 API。底下這些還沒補起來，請直接補名稱和價格，或整批刪掉它們的交易列。',
-      importMissingDataIntroNoApi: '這些剛匯入的標的目前沒有快取報價。你可以現在直接補名稱和價格，或刪掉它們的交易列；之後補上 API Key，再回來抓也可以。',
+      importMissingDataIntro: 'Trade Lens 已先替剛匯入的新標的打過一次報價 API。底下這些還沒補起來，你可以直接改代號、補名稱和價格、先保留晚點再處理，或整批刪掉它們的交易列。',
+      importMissingDataIntroNoApi: '這些剛匯入的標的目前沒有快取報價。你可以現在直接改代號、補名稱和價格、先保留待會再補，或刪掉它們的交易列；之後補上 API Key，再回來抓也可以。',
       importMissingDataSelectAll: '全選',
       importMissingDataClearSelection: '清除選取',
       importMissingDataRowsLabel: '{{count}} 列',
       importMissingDataRowsShort: '列數',
+      importMissingDataCodePlaceholder: '更新後的代號',
       importMissingDataNamePlaceholder: '選填顯示名稱',
       importMissingDataSaveSelected: '儲存選取項目',
+      importMissingDataSkipSelected: '先保留選取項目',
       importMissingDataDeleteSelected: '刪除選取列',
       importMissingDataClose: '先關掉',
       importMissingDataSelectedCount: '已選 {{count}} 檔',
       importMissingDataDeleteConfirm: '要刪掉這些標的，以及它們全部匯入進來的交易列嗎？'
     },
     messages: {
-      importMissingDataNeedPrice: '選到的標的還缺有效的手動價格。',
-      importMissingDataSaved: '已替 {{count}} 檔標的存好手動行情。',
+      importMissingDataNeedAction: '選到的標的還沒有新的代號、名稱，或有效的手動價格可儲存。',
+      importMissingDataSaved: '已儲存 {{count}} 檔標的的補資料變更。',
+      importMissingDataSkipped: '已先保留 {{count}} 檔未解決標的，之後再處理也可以。',
       importMissingDataDeleted: '已刪除 {{count}} 檔抓不到行情的標的，以及它們的交易列。'
     }
   },
@@ -2667,22 +2679,25 @@ const fallbackImportPatches = {
     app: {
       importMissingDataBadge: '待補報價',
       importMissingDataTitle: '有啲匯入標的仲未有報價',
-      importMissingDataIntro: 'Trade Lens 已經幫新匯入標的試過自動拉一次報價。下面呢批仲未補到，你可以而家直接補名稱同價格，或者成批刪走佢哋啲交易行。',
-      importMissingDataIntroNoApi: '呢批新匯入標的而家冇快取報價。你可以即刻補名稱同價格，或者刪走佢哋啲交易行；之後補返 API Key 再嚟拉都得。',
+      importMissingDataIntro: 'Trade Lens 已經幫新匯入標的試過自動拉一次報價。下面呢批仲未補到，你可以而家直接改代號、補名稱同價格、暫時保留遲啲再處理，或者成批刪走佢哋啲交易行。',
+      importMissingDataIntroNoApi: '呢批新匯入標的而家冇快取報價。你可以即刻改代號、補名稱同價格、暫時保留遲啲再補，或者刪走佢哋啲交易行；之後補返 API Key 再嚟拉都得。',
       importMissingDataSelectAll: '全選',
       importMissingDataClearSelection: '清除選取',
       importMissingDataRowsLabel: '{{count}} 行',
       importMissingDataRowsShort: '行數',
+      importMissingDataCodePlaceholder: '更新後代號',
       importMissingDataNamePlaceholder: '可選顯示名稱',
       importMissingDataSaveSelected: '儲存已選項目',
+      importMissingDataSkipSelected: '暫時保留已選項目',
       importMissingDataDeleteSelected: '刪除已選行',
       importMissingDataClose: '遲啲先處理',
       importMissingDataSelectedCount: '已選 {{count}} 隻',
       importMissingDataDeleteConfirm: '要刪走呢批標的，同埋佢哋全部匯入咗嘅交易行嗎？'
     },
     messages: {
-      importMissingDataNeedPrice: '你揀嘅標的仲未填有效手動價格。',
-      importMissingDataSaved: '已幫 {{count}} 隻標的存好手動報價。',
+      importMissingDataNeedAction: '你揀嘅標的仲未有新代號、名稱，或者有效手動價格可以儲存。',
+      importMissingDataSaved: '已儲存 {{count}} 隻標的嘅補資料變更。',
+      importMissingDataSkipped: '已先保留 {{count}} 隻未解決標的，遲啲再處理都得。',
       importMissingDataDeleted: '已刪除 {{count}} 隻冇報價標的，同埋佢哋嘅交易行。'
     }
   },
@@ -2708,22 +2723,25 @@ const fallbackImportPatches = {
     app: {
       importMissingDataBadge: '待补行情',
       importMissingDataTitle: '有些导入标的还缺报价',
-      importMissingDataIntro: 'Trade Lens 已经先帮新导入的标的打过一次报价 API。下面这些还没补起来，请直接补名称和价格，或者整批删掉它们的交易行。',
-      importMissingDataIntroNoApi: '这些新导入的标的目前没有缓存报价。你可以现在直接补名称和价格，或者删掉它们的交易行；之后补上 API Key 再回来抓也行。',
+      importMissingDataIntro: 'Trade Lens 已经先帮新导入的标的打过一次报价 API。下面这些还没补起来，你可以直接改代码、补名称和价格、先保留晚点再处理，或者整批删掉它们的交易行。',
+      importMissingDataIntroNoApi: '这些新导入的标的目前没有缓存报价。你可以现在直接改代码、补名称和价格、先保留之后再补，或者删掉它们的交易行；之后补上 API Key 再回来抓也行。',
       importMissingDataSelectAll: '全选',
       importMissingDataClearSelection: '清除选择',
       importMissingDataRowsLabel: '{{count}} 行',
       importMissingDataRowsShort: '行数',
+      importMissingDataCodePlaceholder: '更新后的代码',
       importMissingDataNamePlaceholder: '选填显示名称',
       importMissingDataSaveSelected: '保存所选项目',
+      importMissingDataSkipSelected: '先保留所选项目',
       importMissingDataDeleteSelected: '删除所选行',
       importMissingDataClose: '先关闭',
       importMissingDataSelectedCount: '已选 {{count}} 个',
       importMissingDataDeleteConfirm: '要删除这些标的，以及它们全部导入进来的交易行吗？'
     },
     messages: {
-      importMissingDataNeedPrice: '选中的标的还缺有效的手动价格。',
-      importMissingDataSaved: '已为 {{count}} 个标的保存手动行情。',
+      importMissingDataNeedAction: '选中的标的还没有新的代码、名称，或有效的手动价格可保存。',
+      importMissingDataSaved: '已保存 {{count}} 个标的的补资料变更。',
+      importMissingDataSkipped: '已先保留 {{count}} 个未解决标的，之后再处理也可以。',
       importMissingDataDeleted: '已删除 {{count}} 个抓不到行情的标的，以及它们的交易行。'
     }
   },
@@ -2749,22 +2767,25 @@ const fallbackImportPatches = {
     app: {
       importMissingDataBadge: 'Needs quote review',
       importMissingDataTitle: 'Some imported symbols still need prices',
-      importMissingDataIntro: 'Trade Lens already tried to fetch quotes for the newly imported symbols. The ones below still need a manual name and price, or you can delete their rows in one shot.',
-      importMissingDataIntroNoApi: 'These imported symbols do not have cached quotes yet. Add a manual name and price now, or delete their rows. You can also open the trade manager to fix the records first.',
+      importMissingDataIntro: 'Trade Lens already tried to fetch quotes for the newly imported symbols. The ones below still need help, so you can update the ticker, save a manual name and price, skip them for now, or delete their rows in one shot.',
+      importMissingDataIntroNoApi: 'These imported symbols do not have cached quotes yet. Update the ticker, add a manual name and price now, skip them for later, or delete their rows. You can also open the trade manager to fix the records first.',
       importMissingDataSelectAll: 'Select all',
       importMissingDataClearSelection: 'Clear selection',
       importMissingDataRowsLabel: '{{count}} rows',
       importMissingDataRowsShort: 'Rows',
+      importMissingDataCodePlaceholder: 'Updated ticker symbol',
       importMissingDataNamePlaceholder: 'Optional display name',
       importMissingDataSaveSelected: 'Save selected',
+      importMissingDataSkipSelected: 'Skip selected for now',
       importMissingDataDeleteSelected: 'Delete selected rows',
       importMissingDataClose: 'Close for now',
       importMissingDataSelectedCount: '{{count}} selected',
       importMissingDataDeleteConfirm: 'Delete the selected symbols and all of their imported rows?'
     },
     messages: {
-      importMissingDataNeedPrice: 'Selected symbols still need a valid manual price.',
-      importMissingDataSaved: 'Saved manual quotes for {{count}} symbols.',
+      importMissingDataNeedAction: 'Selected symbols do not have a new ticker, name, or valid manual price yet.',
+      importMissingDataSaved: 'Saved review changes for {{count}} symbols.',
+      importMissingDataSkipped: 'Kept {{count}} unresolved symbols for later review.',
       importMissingDataDeleted: 'Deleted {{count}} unresolved symbols and their rows.'
     }
   },
@@ -2790,22 +2811,25 @@ const fallbackImportPatches = {
     app: {
       importMissingDataBadge: 'Needs quote review',
       importMissingDataTitle: 'Some imported symbols still need prices',
-      importMissingDataIntro: 'Trade Lens has already tried to fetch quotes for the newly imported symbols. The ones below still need a manual name and price, or you can delete their rows in one go.',
-      importMissingDataIntroNoApi: 'These imported symbols do not have cached quotes yet. Add a manual name and price now, or delete their rows. You can also open the trade manager to fix the records first.',
+      importMissingDataIntro: 'Trade Lens has already tried to fetch quotes for the newly imported symbols. The ones below still need help, so you can update the ticker, save a manual name and price, skip them for now, or delete their rows in one go.',
+      importMissingDataIntroNoApi: 'These imported symbols do not have cached quotes yet. Update the ticker, add a manual name and price now, skip them for later, or delete their rows. You can also open the trade manager to fix the records first.',
       importMissingDataSelectAll: 'Select all',
       importMissingDataClearSelection: 'Clear selection',
       importMissingDataRowsLabel: '{{count}} rows',
       importMissingDataRowsShort: 'Rows',
+      importMissingDataCodePlaceholder: 'Updated ticker symbol',
       importMissingDataNamePlaceholder: 'Optional display name',
       importMissingDataSaveSelected: 'Save selected',
+      importMissingDataSkipSelected: 'Skip selected for now',
       importMissingDataDeleteSelected: 'Delete selected rows',
       importMissingDataClose: 'Close for now',
       importMissingDataSelectedCount: '{{count}} selected',
       importMissingDataDeleteConfirm: 'Delete the selected symbols and all of their imported rows?'
     },
     messages: {
-      importMissingDataNeedPrice: 'Selected symbols still need a valid manual price.',
-      importMissingDataSaved: 'Saved manual quotes for {{count}} symbols.',
+      importMissingDataNeedAction: 'Selected symbols do not have a new ticker, name, or valid manual price yet.',
+      importMissingDataSaved: 'Saved review changes for {{count}} symbols.',
+      importMissingDataSkipped: 'Kept {{count}} unresolved symbols for later review.',
       importMissingDataDeleted: 'Deleted {{count}} unresolved symbols and their rows.'
     }
   },
@@ -2831,22 +2855,25 @@ const fallbackImportPatches = {
     app: {
       importMissingDataBadge: '要確認の価格',
       importMissingDataTitle: '一部の取り込み銘柄は価格補完が必要です',
-      importMissingDataIntro: 'Trade Lens は、新しく取り込んだ銘柄の価格を自動取得しようとしました。下の銘柄はまだ埋まっていないので、名前と価格を手動で入れるか、まとめて行ごと削除してください。',
-      importMissingDataIntroNoApi: 'この取り込み銘柄には、まだキャッシュ済みの価格がありません。今ここで名前と価格を手入力するか、行ごと削除できます。あとで API キーを入れてから取り直しても大丈夫です。',
+      importMissingDataIntro: 'Trade Lens は、新しく取り込んだ銘柄の価格を自動取得しようとしました。下の銘柄はまだ補完できていないので、ティッカーを直すか、名前と価格を手動で入れるか、いったん保留にするか、まとめて行ごと削除してください。',
+      importMissingDataIntroNoApi: 'この取り込み銘柄には、まだキャッシュ済みの価格がありません。今ここでティッカーを直すか、名前と価格を手入力するか、あとで対応するために保留するか、行ごと削除できます。あとで API キーを入れてから取り直しても大丈夫です。',
       importMissingDataSelectAll: 'すべて選択',
       importMissingDataClearSelection: '選択をクリア',
       importMissingDataRowsLabel: '{{count}} 行',
       importMissingDataRowsShort: '行数',
+      importMissingDataCodePlaceholder: '更新後のティッカー',
       importMissingDataNamePlaceholder: '表示名は任意',
       importMissingDataSaveSelected: '選択分を保存',
+      importMissingDataSkipSelected: '選択分をいったん保留',
       importMissingDataDeleteSelected: '選択行を削除',
       importMissingDataClose: '今は閉じる',
       importMissingDataSelectedCount: '{{count}} 件選択中',
       importMissingDataDeleteConfirm: '選択した銘柄と、その取り込み行をまとめて削除しますか？'
     },
     messages: {
-      importMissingDataNeedPrice: '選択した銘柄には有効な手動価格がまだ必要です。',
-      importMissingDataSaved: '{{count}} 件の銘柄に手動価格を保存しました。',
+      importMissingDataNeedAction: '選択した銘柄には、新しいティッカー、名前、または有効な手動価格がまだありません。',
+      importMissingDataSaved: '{{count}} 件の銘柄の補完内容を保存しました。',
+      importMissingDataSkipped: '{{count}} 件の未解決銘柄を、あとで見直せるようにいったん保留しました。',
       importMissingDataDeleted: '価格未解決の {{count}} 件の銘柄と、その行を削除しました。'
     }
   }
