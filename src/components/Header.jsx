@@ -208,94 +208,115 @@ export default function Header({
   };
 
   return (
-    <div className="grid gap-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 xl:grid-cols-[minmax(0,1.08fr)_minmax(460px,0.92fr)]">
-      <div className="flex flex-col gap-5">
-        <div className="space-y-3">
-          <h1 className="flex items-start gap-3 text-2xl font-bold text-slate-900 dark:text-white xl:text-[2rem] xl:leading-tight">
-            <Activity className="mt-1 shrink-0 text-blue-600" />
-            <span>{t('header.title')}</span>
-          </h1>
-          <p className="max-w-2xl text-base leading-8 text-slate-500 dark:text-slate-400">
-            {isDemo ? t('header.demoDescription') : t('header.recordsLoaded', { count: formatLocalizedNumber(rawDataCount, activeLocale) })}
-          </p>
-        </div>
+    <div className="grid gap-5 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-5 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.35)] dark:border-slate-800 dark:bg-slate-950 xl:grid-cols-[minmax(0,1.14fr)_minmax(430px,0.86fr)]">
+      <div className="rounded-[24px] border border-blue-100/80 bg-gradient-to-br from-blue-50/85 via-white to-slate-50 p-5 shadow-sm dark:border-slate-800 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-900 dark:to-slate-800/70">
+        <div className="flex h-full flex-col justify-between gap-6">
+          <div className="space-y-4">
+            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-blue-100/80 bg-white/80 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-700 shadow-sm dark:border-slate-700 dark:bg-slate-900/80 dark:text-blue-300">
+              <Activity size={14} className="text-blue-600 dark:text-blue-400" />
+              {isDemo
+                ? liveStatus?.label || 'Demo'
+                : t('header.recordsLoaded', { count: formatLocalizedNumber(rawDataCount, activeLocale) })}
+            </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          {liveStatus && (
-            <span
-              className={`inline-flex w-fit items-center gap-2 rounded-2xl border px-3 py-2 text-xs font-medium ${liveStatus.badgeClass}`}
-              title={liveStatus.title}
-            >
-              <Clock size={14} />
-              <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] ${liveStatus.markerClass}`}>
-                {liveStatus.label}
-              </span>
-              <span className="leading-5">
-                {t('header.lastUpdated', { value: formatLocalizedDateTime(liveStatus.timestamp, activeLocale) })}
-              </span>
-            </span>
-          )}
+            <div className="space-y-3">
+              <h1 className="max-w-3xl text-3xl font-bold tracking-tight text-slate-900 dark:text-white xl:text-[2.35rem] xl:leading-[1.12]">
+                {t('header.title')}
+              </h1>
+              <p className="max-w-2xl text-base leading-8 text-slate-600 dark:text-slate-400">
+                {isDemo ? t('header.demoDescription') : t('header.recordsLoaded', { count: formatLocalizedNumber(rawDataCount, activeLocale) })}
+              </p>
+            </div>
+          </div>
 
-          {rawDataCount > 0 && (
-            <button
-              onClick={handleRefreshPrices}
-              disabled={isLoadingPrices || rawDataCount === 0}
-              className={`flex min-h-[3rem] items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 ${refreshButtonClasses}`}
-              title={refreshButtonTitle}
-            >
-              <RefreshCw size={18} className={isLoadingPrices ? 'animate-spin' : ''} />
-              <span>{refreshButtonLabel}</span>
-            </button>
-          )}
+          <div className="rounded-[22px] border border-slate-200/80 bg-white/80 p-4 shadow-sm backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/80">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="flex flex-wrap items-center gap-3">
+                {liveStatus && (
+                  <span
+                    className={`inline-flex w-fit items-center gap-2 rounded-2xl border px-3 py-2 text-xs font-medium ${liveStatus.badgeClass}`}
+                    title={liveStatus.title}
+                  >
+                    <Clock size={14} />
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] ${liveStatus.markerClass}`}>
+                      {liveStatus.label}
+                    </span>
+                  </span>
+                )}
+
+                {liveStatus && (
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                      {t('header.lastUpdated', { value: formatLocalizedDateTime(liveStatus.timestamp, activeLocale) })}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {rawDataCount > 0 && (
+                <button
+                  onClick={handleRefreshPrices}
+                  disabled={isLoadingPrices || rawDataCount === 0}
+                  className={`inline-flex min-h-[3.25rem] items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold shadow-sm transition-colors disabled:opacity-50 ${refreshButtonClasses}`}
+                  title={refreshButtonTitle}
+                >
+                  <RefreshCw size={18} className={isLoadingPrices ? 'animate-spin' : ''} />
+                  <span>{refreshButtonLabel}</span>
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-center gap-3 xl:justify-end">
-          <label
-            className="flex min-w-[17rem] flex-1 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-800 xl:max-w-md xl:flex-none"
-            title="Language"
-          >
-            <Languages size={16} className="shrink-0 text-blue-600 dark:text-blue-300" />
-            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
-              Language
-            </span>
-            <select
-              value={activeLocale}
-              onChange={handleLocaleChange}
-              className="min-w-0 flex-1 bg-transparent text-sm font-medium text-slate-700 outline-none dark:text-slate-200"
+        <div className="rounded-[22px] border border-slate-200/80 bg-white/85 p-3 shadow-sm backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/85">
+          <div className="flex flex-wrap items-center gap-3 xl:justify-end">
+            <label
+              className="flex min-w-[17rem] flex-1 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition-colors hover:border-blue-200 dark:border-slate-700 dark:bg-slate-800 xl:max-w-md xl:flex-none"
               title="Language"
             >
-              {SUPPORTED_LOCALES.map((locale) => (
-                <option key={locale.code} value={locale.code}>
-                  {locale.nativeLabel}
-                </option>
-              ))}
-            </select>
-          </label>
+              <Languages size={16} className="shrink-0 text-blue-600 dark:text-blue-300" />
+              <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+                Language
+              </span>
+              <select
+                value={activeLocale}
+                onChange={handleLocaleChange}
+                className="min-w-0 flex-1 bg-transparent text-sm font-medium text-slate-700 outline-none dark:text-slate-200"
+                title="Language"
+              >
+                {SUPPORTED_LOCALES.map((locale) => (
+                  <option key={locale.code} value={locale.code}>
+                    {locale.nativeLabel}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          <button
-            onClick={toggleDarkMode}
-            className="rounded-xl border border-slate-200 bg-white p-2.5 text-slate-700 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-            title={darkMode ? t('header.switchToLight') : t('header.switchToDark')}
-          >
-            {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
+            <button
+              onClick={toggleDarkMode}
+              className="rounded-xl border border-slate-200 bg-white p-2.5 text-slate-700 shadow-sm transition-colors hover:border-blue-200 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+              title={darkMode ? t('header.switchToLight') : t('header.switchToDark')}
+            >
+              {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
 
-          <button
-            onClick={() => setShowManager(!showManager)}
-            className={`flex min-h-[3rem] items-center gap-2 rounded-xl px-4 py-2.5 font-medium transition-colors shadow-sm ${
-              showManager
-                ? 'bg-slate-800 text-white'
-                : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
-            }`}
-          >
-            <Database size={18} />
-            <span>{t('header.settingsRecords')}</span>
-          </button>
+            <button
+              onClick={() => setShowManager(!showManager)}
+              className={`flex min-h-[3rem] items-center gap-2 rounded-xl px-4 py-2.5 font-medium transition-colors shadow-sm ${
+                showManager
+                  ? 'bg-slate-800 text-white'
+                  : 'border border-slate-200 bg-white text-slate-700 hover:border-blue-200 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+              }`}
+            >
+              <Database size={18} />
+              <span>{t('header.settingsRecords')}</span>
+            </button>
+          </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-700 dark:bg-slate-800/60">
+        <div className="rounded-[24px] border border-slate-200/80 bg-gradient-to-br from-slate-50 via-white to-slate-100/80 p-4 shadow-sm dark:border-slate-700 dark:bg-gradient-to-br dark:from-slate-800/70 dark:via-slate-900 dark:to-slate-900/90">
           <div className="grid gap-4">
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
@@ -321,7 +342,7 @@ export default function Header({
 
             <div className="grid w-full gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(13rem,15rem)]">
               <label
-                className="relative flex min-h-[5.25rem] rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/80"
+                className="relative flex min-h-[5.25rem] rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-colors hover:border-blue-200 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/80"
                 title={importProfileLabel}
               >
                 <div className="pointer-events-none flex min-w-0 flex-1 flex-col justify-between gap-3 pr-8">
@@ -387,7 +408,7 @@ export default function Header({
                   onChange={handleFileUpload}
                   className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
                 />
-                <button className="flex min-h-[5.25rem] w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 font-medium text-white shadow-sm transition-colors hover:bg-blue-700">
+                <button className="flex min-h-[5.25rem] w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-3 font-semibold text-white shadow-sm transition-all hover:from-blue-700 hover:to-blue-600">
                   <Upload size={18} />
                   {t('common.importCsv', { defaultValue: 'Import CSV' })}
                 </button>
