@@ -839,7 +839,6 @@ export function useTradeData(showToast) {
     const nextSymbol = trimmedCode ? formatSymbol(trimmedCode, targetMarket) : symbol;
     const trimmedName = String(tempStockEdit.name || '').trim();
     const parsedManualPrice = getOptionalNumericValue(tempStockEdit.price);
-    const existingManualEntry = manualStockData[symbol] || {};
     const timestamp = Date.now();
 
     if (nextSymbol !== symbol) {
@@ -873,14 +872,12 @@ export function useTradeData(showToast) {
     }
 
     const nextManualEntry = {};
-    const resolvedManualName = trimmedName || existingManualEntry.name || '';
-    if (resolvedManualName) {
-      nextManualEntry.name = resolvedManualName;
+    if (trimmedName) {
+      nextManualEntry.name = trimmedName;
     }
 
-    const resolvedManualPrice = parsedManualPrice ?? existingManualEntry.price;
-    if (Number.isFinite(resolvedManualPrice) && Math.abs(resolvedManualPrice) > POSITION_EPSILON) {
-      nextManualEntry.price = resolvedManualPrice;
+    if (Number.isFinite(parsedManualPrice) && Math.abs(parsedManualPrice) > POSITION_EPSILON) {
+      nextManualEntry.price = parsedManualPrice;
     }
 
     if (Object.keys(nextManualEntry).length > 0) {
