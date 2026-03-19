@@ -165,6 +165,7 @@ export default function Header({
     count: formatLocalizedNumber(rawDataCount, activeLocale)
   });
   const languageLabel = t('header.languageLabel', { defaultValue: 'Language' });
+  const activeLocaleOption = SUPPORTED_LOCALES.find((locale) => locale.code === activeLocale) || SUPPORTED_LOCALES[0];
 
   const liveStatus = isDemo && demoLastUpdate
     ? {
@@ -250,17 +251,17 @@ export default function Header({
                   </span>
                 )}
 
-                <div className="flex items-start gap-3">
-                  <div className="rounded-2xl bg-white/80 p-2.5 text-slate-500 shadow-sm dark:bg-slate-950/50 dark:text-slate-300">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/80 text-slate-500 shadow-sm dark:bg-slate-950/50 dark:text-slate-300">
                     <Clock size={18} />
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     {liveStatus ? (
-                      <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                      <p className="text-base font-semibold leading-6 text-slate-900 dark:text-slate-100">
                         {t('header.lastUpdated', { value: formatLocalizedDateTime(liveStatus.timestamp, activeLocale) })}
                       </p>
                     ) : (
-                      <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                      <p className="text-base font-semibold leading-6 text-slate-900 dark:text-slate-100">
                         {refreshButtonLabel}
                       </p>
                     )}
@@ -289,17 +290,23 @@ export default function Header({
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
             <div className="flex min-w-0 gap-3">
               <label
-                className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition-colors hover:border-blue-200 dark:border-slate-700 dark:bg-slate-800"
+                className="relative flex min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition-colors hover:border-blue-200 dark:border-slate-700 dark:bg-slate-800"
                 title={languageLabel}
               >
-                <Languages size={16} className="shrink-0 text-blue-600 dark:text-blue-300" />
-                <span className="hidden text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400 2xl:block">
-                  {languageLabel}
-                </span>
+                <div className="pointer-events-none flex min-w-0 flex-1 items-center gap-2 pr-7">
+                  <Languages size={16} className="shrink-0 text-blue-600 dark:text-blue-300" />
+                  <span className="hidden text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400 2xl:block">
+                    {languageLabel}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-700 dark:text-slate-200">
+                    {activeLocaleOption.nativeLabel}
+                  </span>
+                </div>
+                <ChevronDown size={18} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                 <select
                   value={activeLocale}
                   onChange={handleLocaleChange}
-                  className="min-w-0 flex-1 truncate bg-transparent pr-4 text-sm font-medium text-slate-700 outline-none dark:text-slate-200"
+                  className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                   title={languageLabel}
                 >
                   {SUPPORTED_LOCALES.map((locale) => (
