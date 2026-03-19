@@ -161,6 +161,10 @@ export default function Header({
       ? t('header.importProfileAuto', { defaultValue: 'Auto detect' })
       : getLocalizedImportKindLabel(selectedImportProfileOption.importKind)
   ].filter(Boolean).join(' · ');
+  const recordsLoadedText = t('header.recordsLoaded', {
+    count: formatLocalizedNumber(rawDataCount, activeLocale)
+  });
+  const languageLabel = t('header.languageLabel', { defaultValue: 'Language' });
 
   const liveStatus = isDemo && demoLastUpdate
     ? {
@@ -210,44 +214,76 @@ export default function Header({
   return (
     <div className="grid gap-5 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-5 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.18)] dark:border-slate-800 dark:bg-slate-950 xl:grid-cols-[minmax(0,1.06fr)_minmax(430px,0.94fr)]">
       <div className="rounded-[24px] border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <div className="space-y-5">
-          <div className="space-y-3">
-            <h1 className="flex items-start gap-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-white xl:text-[2.25rem] xl:leading-[1.12]">
-              <Activity className="mt-1 shrink-0 text-blue-600 dark:text-blue-400" />
-              <span>{t('header.title')}</span>
-            </h1>
-            <p className="max-w-2xl text-base leading-8 text-slate-600 dark:text-slate-400">
-              {isDemo ? t('header.demoDescription') : t('header.recordsLoaded', { count: formatLocalizedNumber(rawDataCount, activeLocale) })}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 pt-1">
-            {liveStatus && (
-              <span
-                className={`inline-flex w-fit items-center gap-2 rounded-2xl border px-3 py-2 text-xs font-medium ${liveStatus.badgeClass}`}
-                title={liveStatus.title}
-              >
-                <Clock size={14} />
-                <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] ${liveStatus.markerClass}`}>
-                  {liveStatus.label}
-                </span>
-                <span className="leading-5">
-                  {t('header.lastUpdated', { value: formatLocalizedDateTime(liveStatus.timestamp, activeLocale) })}
-                </span>
+        <div className="flex h-full flex-col justify-between gap-8">
+          <div className="space-y-4">
+            {rawDataCount > 0 && (
+              <span className="inline-flex w-fit items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 shadow-sm dark:border-blue-900/70 dark:bg-blue-950/40 dark:text-blue-200">
+                <Activity size={14} className="shrink-0" />
+                <span>{recordsLoadedText}</span>
               </span>
             )}
 
-            {rawDataCount > 0 && (
-              <button
-                onClick={handleRefreshPrices}
-                disabled={isLoadingPrices || rawDataCount === 0}
-                className={`inline-flex min-h-[3rem] items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold shadow-sm transition-colors disabled:opacity-50 ${refreshButtonClasses}`}
-                title={refreshButtonTitle}
-              >
-                <RefreshCw size={18} className={isLoadingPrices ? 'animate-spin' : ''} />
-                <span>{refreshButtonLabel}</span>
-              </button>
-            )}
+            <div className="space-y-3">
+              <h1 className="flex items-start gap-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-white xl:text-[2.25rem] xl:leading-[1.12]">
+                <Activity className="mt-1 shrink-0 text-blue-600 dark:text-blue-400" />
+                <span>{t('header.title')}</span>
+              </h1>
+              {isDemo && (
+                <p className="max-w-2xl text-base leading-8 text-slate-600 dark:text-slate-400">
+                  {t('header.demoDescription')}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="rounded-[24px] border border-slate-200/80 bg-gradient-to-br from-white via-slate-50 to-blue-50/80 p-4 shadow-[0_24px_50px_-38px_rgba(37,99,235,0.4)] dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="space-y-3">
+                {liveStatus && (
+                  <span
+                    className={`inline-flex w-fit items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold ${liveStatus.badgeClass}`}
+                    title={liveStatus.title}
+                  >
+                    <Clock size={14} />
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] ${liveStatus.markerClass}`}>
+                      {liveStatus.label}
+                    </span>
+                  </span>
+                )}
+
+                <div className="flex items-start gap-3">
+                  <div className="rounded-2xl bg-white/80 p-2.5 text-slate-500 shadow-sm dark:bg-slate-950/50 dark:text-slate-300">
+                    <Clock size={18} />
+                  </div>
+                  <div className="space-y-1">
+                    {liveStatus ? (
+                      <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                        {t('header.lastUpdated', { value: formatLocalizedDateTime(liveStatus.timestamp, activeLocale) })}
+                      </p>
+                    ) : (
+                      <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                        {refreshButtonLabel}
+                      </p>
+                    )}
+                    <p className="text-sm leading-6 text-slate-500 dark:text-slate-400">
+                      {refreshButtonTitle}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {rawDataCount > 0 && (
+                <button
+                  onClick={handleRefreshPrices}
+                  disabled={isLoadingPrices || rawDataCount === 0}
+                  className={`inline-flex min-h-[3.5rem] items-center justify-center gap-2 rounded-[20px] px-5 py-3 text-sm font-semibold shadow-sm transition-colors disabled:opacity-50 lg:min-w-[12rem] ${refreshButtonClasses}`}
+                  title={refreshButtonTitle}
+                >
+                  <RefreshCw size={18} className={isLoadingPrices ? 'animate-spin' : ''} />
+                  <span>{refreshButtonLabel}</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -257,17 +293,17 @@ export default function Header({
           <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center">
             <label
               className="flex min-w-[17rem] flex-1 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition-colors hover:border-blue-200 dark:border-slate-700 dark:bg-slate-800 xl:max-w-md xl:flex-none"
-              title="Language"
+              title={languageLabel}
             >
               <Languages size={16} className="shrink-0 text-blue-600 dark:text-blue-300" />
               <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
-                Language
+                {languageLabel}
               </span>
               <select
                 value={activeLocale}
                 onChange={handleLocaleChange}
                 className="min-w-0 flex-1 bg-transparent text-sm font-medium text-slate-700 outline-none dark:text-slate-200"
-                title="Language"
+                title={languageLabel}
               >
                 {SUPPORTED_LOCALES.map((locale) => (
                   <option key={locale.code} value={locale.code}>
