@@ -216,13 +216,6 @@ export default function Header({
       <div className="rounded-[24px] border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div className="flex h-full flex-col justify-between gap-8">
           <div className="space-y-4">
-            {rawDataCount > 0 && (
-              <span className="inline-flex w-fit items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 shadow-sm dark:border-blue-900/70 dark:bg-blue-950/40 dark:text-blue-200">
-                <Activity size={14} className="shrink-0" />
-                <span>{recordsLoadedText}</span>
-              </span>
-            )}
-
             <div className="space-y-3">
               <h1 className="flex items-start gap-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-white xl:text-[2.25rem] xl:leading-[1.12]">
                 <Activity className="mt-1 shrink-0 text-blue-600 dark:text-blue-400" />
@@ -232,6 +225,12 @@ export default function Header({
                 <p className="max-w-2xl text-base leading-8 text-slate-600 dark:text-slate-400">
                   {t('header.demoDescription')}
                 </p>
+              )}
+              {rawDataCount > 0 && (
+                <span className="inline-flex w-fit items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 shadow-sm dark:border-blue-900/70 dark:bg-blue-950/40 dark:text-blue-200">
+                  <Activity size={14} className="shrink-0" />
+                  <span>{recordsLoadedText}</span>
+                </span>
               )}
             </div>
           </div>
@@ -265,9 +264,6 @@ export default function Header({
                         {refreshButtonLabel}
                       </p>
                     )}
-                    <p className="text-sm leading-6 text-slate-500 dark:text-slate-400">
-                      {refreshButtonTitle}
-                    </p>
                   </div>
                 </div>
               </div>
