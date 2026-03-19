@@ -208,70 +208,53 @@ export default function Header({
   };
 
   return (
-    <div className="grid gap-5 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-5 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.35)] dark:border-slate-800 dark:bg-slate-950 xl:grid-cols-[minmax(0,1.14fr)_minmax(430px,0.86fr)]">
-      <div className="rounded-[24px] border border-blue-100/80 bg-gradient-to-br from-blue-50/85 via-white to-slate-50 p-5 shadow-sm dark:border-slate-800 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-900 dark:to-slate-800/70">
-        <div className="flex h-full flex-col justify-between gap-6">
-          <div className="space-y-4">
-            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-blue-100/80 bg-white/80 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-700 shadow-sm dark:border-slate-700 dark:bg-slate-900/80 dark:text-blue-300">
-              <Activity size={14} className="text-blue-600 dark:text-blue-400" />
-              {isDemo
-                ? liveStatus?.label || 'Demo'
-                : t('header.recordsLoaded', { count: formatLocalizedNumber(rawDataCount, activeLocale) })}
-            </div>
-
-            <div className="space-y-3">
-              <h1 className="max-w-3xl text-3xl font-bold tracking-tight text-slate-900 dark:text-white xl:text-[2.35rem] xl:leading-[1.12]">
-                {t('header.title')}
-              </h1>
-              <p className="max-w-2xl text-base leading-8 text-slate-600 dark:text-slate-400">
-                {isDemo ? t('header.demoDescription') : t('header.recordsLoaded', { count: formatLocalizedNumber(rawDataCount, activeLocale) })}
-              </p>
-            </div>
+    <div className="grid gap-5 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-5 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.18)] dark:border-slate-800 dark:bg-slate-950 xl:grid-cols-[minmax(0,1.06fr)_minmax(430px,0.94fr)]">
+      <div className="rounded-[24px] border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className="space-y-5">
+          <div className="space-y-3">
+            <h1 className="flex items-start gap-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-white xl:text-[2.25rem] xl:leading-[1.12]">
+              <Activity className="mt-1 shrink-0 text-blue-600 dark:text-blue-400" />
+              <span>{t('header.title')}</span>
+            </h1>
+            <p className="max-w-2xl text-base leading-8 text-slate-600 dark:text-slate-400">
+              {isDemo ? t('header.demoDescription') : t('header.recordsLoaded', { count: formatLocalizedNumber(rawDataCount, activeLocale) })}
+            </p>
           </div>
 
-          <div className="rounded-[22px] border border-slate-200/80 bg-white/80 p-4 shadow-sm backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/80">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div className="flex flex-wrap items-center gap-3">
-                {liveStatus && (
-                  <span
-                    className={`inline-flex w-fit items-center gap-2 rounded-2xl border px-3 py-2 text-xs font-medium ${liveStatus.badgeClass}`}
-                    title={liveStatus.title}
-                  >
-                    <Clock size={14} />
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] ${liveStatus.markerClass}`}>
-                      {liveStatus.label}
-                    </span>
-                  </span>
-                )}
+          <div className="flex flex-wrap items-center gap-3 pt-1">
+            {liveStatus && (
+              <span
+                className={`inline-flex w-fit items-center gap-2 rounded-2xl border px-3 py-2 text-xs font-medium ${liveStatus.badgeClass}`}
+                title={liveStatus.title}
+              >
+                <Clock size={14} />
+                <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] ${liveStatus.markerClass}`}>
+                  {liveStatus.label}
+                </span>
+                <span className="leading-5">
+                  {t('header.lastUpdated', { value: formatLocalizedDateTime(liveStatus.timestamp, activeLocale) })}
+                </span>
+              </span>
+            )}
 
-                {liveStatus && (
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-                      {t('header.lastUpdated', { value: formatLocalizedDateTime(liveStatus.timestamp, activeLocale) })}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {rawDataCount > 0 && (
-                <button
-                  onClick={handleRefreshPrices}
-                  disabled={isLoadingPrices || rawDataCount === 0}
-                  className={`inline-flex min-h-[3.25rem] items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold shadow-sm transition-colors disabled:opacity-50 ${refreshButtonClasses}`}
-                  title={refreshButtonTitle}
-                >
-                  <RefreshCw size={18} className={isLoadingPrices ? 'animate-spin' : ''} />
-                  <span>{refreshButtonLabel}</span>
-                </button>
-              )}
-            </div>
+            {rawDataCount > 0 && (
+              <button
+                onClick={handleRefreshPrices}
+                disabled={isLoadingPrices || rawDataCount === 0}
+                className={`inline-flex min-h-[3rem] items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold shadow-sm transition-colors disabled:opacity-50 ${refreshButtonClasses}`}
+                title={refreshButtonTitle}
+              >
+                <RefreshCw size={18} className={isLoadingPrices ? 'animate-spin' : ''} />
+                <span>{refreshButtonLabel}</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
 
       <div className="flex flex-col gap-4">
         <div className="rounded-[22px] border border-slate-200/80 bg-white/85 p-3 shadow-sm backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/85">
-          <div className="flex flex-wrap items-center gap-3 xl:justify-end">
+          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center">
             <label
               className="flex min-w-[17rem] flex-1 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition-colors hover:border-blue-200 dark:border-slate-700 dark:bg-slate-800 xl:max-w-md xl:flex-none"
               title="Language"
@@ -296,7 +279,7 @@ export default function Header({
 
             <button
               onClick={toggleDarkMode}
-              className="rounded-xl border border-slate-200 bg-white p-2.5 text-slate-700 shadow-sm transition-colors hover:border-blue-200 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+              className="justify-self-start rounded-xl border border-slate-200 bg-white p-2.5 text-slate-700 shadow-sm transition-colors hover:border-blue-200 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 sm:justify-self-center"
               title={darkMode ? t('header.switchToLight') : t('header.switchToDark')}
             >
               {darkMode ? <Sun size={18} /> : <Moon size={18} />}
@@ -304,7 +287,7 @@ export default function Header({
 
             <button
               onClick={() => setShowManager(!showManager)}
-              className={`flex min-h-[3rem] items-center gap-2 rounded-xl px-4 py-2.5 font-medium transition-colors shadow-sm ${
+              className={`inline-flex min-h-[3rem] items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-medium transition-colors shadow-sm sm:justify-self-end ${
                 showManager
                   ? 'bg-slate-800 text-white'
                   : 'border border-slate-200 bg-white text-slate-700 hover:border-blue-200 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
@@ -316,7 +299,7 @@ export default function Header({
           </div>
         </div>
 
-        <div className="rounded-[24px] border border-slate-200/80 bg-gradient-to-br from-slate-50 via-white to-slate-100/80 p-4 shadow-sm dark:border-slate-700 dark:bg-gradient-to-br dark:from-slate-800/70 dark:via-slate-900 dark:to-slate-900/90">
+        <div className="rounded-[24px] border border-slate-200/80 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
           <div className="grid gap-4">
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
