@@ -520,13 +520,14 @@ const getRateSnapshotStatus = (rateSnapshot, now = Date.now()) => {
 const getResolvedQuoteSnapshotStatus = (symbol, liveSnapshot, manualSnapshot, now = Date.now()) => {
   const manualEntry = manualSnapshot?.[symbol];
   const manualPrice = Number.parseFloat(manualEntry?.price);
-  const manualTimestamp = getSnapshotTimestamp(manualEntry?.timestamp);
 
   if (Number.isFinite(manualPrice) && Math.abs(manualPrice) > POSITION_EPSILON) {
     return {
       hasQuote: true,
-      isFresh: isFreshSnapshotTimestamp(manualTimestamp, now),
-      hasRecentAttempt: isFreshSnapshotTimestamp(manualTimestamp, now),
+      // Treat manual overrides as resolved quotes during normal refreshes.
+      // Users can still use force refresh to replace them with live API data.
+      isFresh: true,
+      hasRecentAttempt: true,
       source: 'manual'
     };
   }
