@@ -286,47 +286,49 @@ export default function Header({
 
       <div className="flex flex-col gap-4">
         <div className="rounded-[22px] border border-slate-200/80 bg-white/85 p-3 shadow-sm backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/85">
-          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center">
-            <label
-              className="flex min-w-[17rem] flex-1 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition-colors hover:border-blue-200 dark:border-slate-700 dark:bg-slate-800 xl:max-w-md xl:flex-none"
-              title={languageLabel}
-            >
-              <Languages size={16} className="shrink-0 text-blue-600 dark:text-blue-300" />
-              <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
-                {languageLabel}
-              </span>
-              <select
-                value={activeLocale}
-                onChange={handleLocaleChange}
-                className="min-w-0 flex-1 bg-transparent text-sm font-medium text-slate-700 outline-none dark:text-slate-200"
+          <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
+            <div className="flex min-w-0 gap-3">
+              <label
+                className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition-colors hover:border-blue-200 dark:border-slate-700 dark:bg-slate-800"
                 title={languageLabel}
               >
-                {SUPPORTED_LOCALES.map((locale) => (
-                  <option key={locale.code} value={locale.code}>
-                    {locale.nativeLabel}
-                  </option>
-                ))}
-              </select>
-            </label>
+                <Languages size={16} className="shrink-0 text-blue-600 dark:text-blue-300" />
+                <span className="hidden text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400 2xl:block">
+                  {languageLabel}
+                </span>
+                <select
+                  value={activeLocale}
+                  onChange={handleLocaleChange}
+                  className="min-w-0 flex-1 truncate bg-transparent pr-4 text-sm font-medium text-slate-700 outline-none dark:text-slate-200"
+                  title={languageLabel}
+                >
+                  {SUPPORTED_LOCALES.map((locale) => (
+                    <option key={locale.code} value={locale.code}>
+                      {locale.nativeLabel}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-            <button
-              onClick={toggleDarkMode}
-              className="justify-self-start rounded-xl border border-slate-200 bg-white p-2.5 text-slate-700 shadow-sm transition-colors hover:border-blue-200 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 sm:justify-self-center"
-              title={darkMode ? t('header.switchToLight') : t('header.switchToDark')}
-            >
-              {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
+              <button
+                onClick={toggleDarkMode}
+                className="shrink-0 rounded-xl border border-slate-200 bg-white p-2.5 text-slate-700 shadow-sm transition-colors hover:border-blue-200 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                title={darkMode ? t('header.switchToLight') : t('header.switchToDark')}
+              >
+                {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
+            </div>
 
             <button
               onClick={() => setShowManager(!showManager)}
-              className={`inline-flex min-h-[3rem] items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-medium transition-colors shadow-sm sm:justify-self-end ${
+              className={`inline-flex min-h-[3rem] w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-medium transition-colors shadow-sm xl:ml-auto xl:w-auto ${
                 showManager
                   ? 'bg-slate-800 text-white'
                   : 'border border-slate-200 bg-white text-slate-700 hover:border-blue-200 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
               }`}
             >
-              <Database size={18} />
-              <span>{t('header.settingsRecords')}</span>
+              <Database size={18} className="shrink-0" />
+              <span className="truncate">{t('header.settingsRecords')}</span>
             </button>
           </div>
         </div>
