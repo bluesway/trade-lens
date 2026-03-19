@@ -188,6 +188,7 @@ export default function Header({
   const refreshButtonTitle = apiKey
     ? (hasStaleMarketData ? t('header.updateWithCache') : t('header.forceRefreshTitle'))
     : t('header.setApiKeyFirst');
+  const refreshButtonLabel = apiKey ? t('header.updatePrices') : t('header.apiKeyRequired');
 
   const getLocalizedSkippedReasonLabel = (reasonCode) => {
     switch (reasonCode) {
@@ -207,7 +208,7 @@ export default function Header({
   };
 
   return (
-    <div className="grid gap-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 xl:grid-cols-[minmax(0,1fr)_minmax(520px,1.08fr)]">
+    <div className="grid gap-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 xl:grid-cols-[minmax(0,1.08fr)_minmax(460px,0.92fr)]">
       <div className="flex flex-col gap-5">
         <div className="space-y-3">
           <h1 className="flex items-start gap-3 text-2xl font-bold text-slate-900 dark:text-white xl:text-[2rem] xl:leading-tight">
@@ -219,7 +220,7 @@ export default function Header({
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-3">
           {liveStatus && (
             <span
               className={`inline-flex w-fit items-center gap-2 rounded-2xl border px-3 py-2 text-xs font-medium ${liveStatus.badgeClass}`}
@@ -233,6 +234,18 @@ export default function Header({
                 {t('header.lastUpdated', { value: formatLocalizedDateTime(liveStatus.timestamp, activeLocale) })}
               </span>
             </span>
+          )}
+
+          {rawDataCount > 0 && (
+            <button
+              onClick={handleRefreshPrices}
+              disabled={isLoadingPrices || rawDataCount === 0}
+              className={`flex min-h-[3rem] items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 ${refreshButtonClasses}`}
+              title={refreshButtonTitle}
+            >
+              <RefreshCw size={18} className={isLoadingPrices ? 'animate-spin' : ''} />
+              <span>{refreshButtonLabel}</span>
+            </button>
           )}
         </div>
       </div>
@@ -281,16 +294,6 @@ export default function Header({
             <span>{t('header.settingsRecords')}</span>
           </button>
         </div>
-
-        <button
-          onClick={handleRefreshPrices}
-          disabled={isLoadingPrices || rawDataCount === 0}
-          className={`flex min-h-[3.25rem] items-center justify-center gap-2 rounded-xl px-4 py-3 font-medium transition-colors disabled:opacity-50 ${refreshButtonClasses}`}
-          title={refreshButtonTitle}
-        >
-          <RefreshCw size={18} className={isLoadingPrices ? 'animate-spin' : ''} />
-          <span>{apiKey ? t('header.updatePrices') : t('header.apiKeyRequired')}</span>
-        </button>
 
         <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-700 dark:bg-slate-800/60">
           <div className="grid gap-4">
