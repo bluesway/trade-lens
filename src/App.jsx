@@ -84,6 +84,7 @@ export default function App() {
     setApiKey,
     setCsvImportProfile,
     setExpandedStock,
+    setHistorySort,
     setHideZeroHolding,
     setMarketFilter,
     setShowManager,
@@ -96,6 +97,7 @@ export default function App() {
     trackedSymbols,
     trendData,
     trendTimeRange,
+    toggleHistorySortDirection,
     updateNewRecAmount,
     updateNewRecField,
     updateNewRecPrice,
@@ -369,11 +371,13 @@ export default function App() {
           historySortConfig={historySortConfig}
           marketFilter={marketFilter}
           requestSort={requestSort}
+          setHistorySort={setHistorySort}
           setExpandedStock={setExpandedStock}
           setMarketFilter={setMarketFilter}
           setTempStockEdit={setTempStockEdit}
           startEditingStock={startEditingStock}
           tempStockEdit={tempStockEdit}
+          toggleHistorySortDirection={toggleHistorySortDirection}
         />
       </div>
     </div>

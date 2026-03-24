@@ -35,11 +35,13 @@ export default function DataTable({
   historySortConfig,
   marketFilter,
   requestSort,
+  setHistorySort,
   setExpandedStock,
   setMarketFilter,
   setTempStockEdit,
   startEditingStock,
-  tempStockEdit
+  tempStockEdit,
+  toggleHistorySortDirection
 }) {
   const { t, i18n } = useTranslation();
   const activeLocale = normalizeLocale(i18n.resolvedLanguage || i18n.language);
@@ -149,6 +151,16 @@ export default function DataTable({
     isManualOverride ? 'table.manualUpdatedAt' : 'table.apiUpdatedAt',
     { value: formatStockUpdateValue(timestamp) }
   );
+  const sortOptions = [
+    { key: '日期', label: t('manager.fields.date') },
+    { key: '市值', label: t('table.columns.currentValue') },
+    { key: '持股數', label: t('table.columns.holdingQty') },
+    { key: '未實現', label: t('table.columns.unrealized') },
+    { key: '已實現', label: t('table.columns.realized') },
+    { key: '代號', label: t('table.columns.symbol') }
+  ];
+  const activeSortOption = sortOptions.find((option) => option.key === historySortConfig?.key) || sortOptions[0];
+  const activeSortDirection = historySortConfig?.direction === 'asc' ? 'asc' : 'desc';
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
@@ -162,7 +174,45 @@ export default function DataTable({
           </span>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <label
+              className="relative flex min-w-[10.5rem] max-w-full rounded-full border border-slate-200 bg-white px-3 py-1.5 shadow-sm transition-colors hover:border-blue-200 dark:border-slate-700 dark:bg-slate-800"
+              title={t('table.sortSelectorTitle', { defaultValue: 'Sort by' })}
+            >
+              <div className="pointer-events-none flex min-w-0 flex-1 items-center gap-2 pr-6">
+                <ArrowUpDown size={14} className="shrink-0 text-slate-400 dark:text-slate-500" />
+                <span className="truncate text-xs font-medium text-slate-600 dark:text-slate-300">
+                  {activeSortOption.label}
+                </span>
+              </div>
+              <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+              <select
+                value={activeSortOption.key}
+                onChange={(event) => setHistorySort(event.target.value)}
+                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                title={t('table.sortSelectorTitle', { defaultValue: 'Sort by' })}
+              >
+                {sortOptions.map((option) => (
+                  <option key={option.key} value={option.key}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <button
+              type="button"
+              onClick={toggleHistorySortDirection}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition-colors hover:border-blue-200 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+              title={t('table.sortDirectionTitle', {
+                defaultValue: activeSortDirection === 'desc' ? 'Descending' : 'Ascending'
+              })}
+            >
+              {activeSortDirection === 'desc' ? <ArrowDown size={14} /> : <ArrowUp size={14} />}
+            </button>
+          </div>
+
           {['全部', ...availableMarkets].map((market) => (
             <button
               key={market}

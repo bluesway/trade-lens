@@ -73,6 +73,7 @@ const TRADE_DATE_PATTERNS = [
   /(\d{4})[/-](\d{1,2})[/-](\d{1,2})/g,
   /(\d{1,2})[/-](\d{1,2})[/-](\d{4})/g
 ];
+const getDefaultHistorySortDirection = (key) => (key === '代號' ? 'asc' : 'desc');
 
 const getFxRateSymbols = (fromCurrency, toCurrency) => {
   if (!fromCurrency || !toCurrency || fromCurrency === toCurrency) {
@@ -720,7 +721,10 @@ export function useTradeData(showToast) {
   const [apiKey, setApiKey] = useState('');
   const [baseCurrency, setBaseCurrency] = useState('TWD');
   const [marketFilter, setMarketFilter] = useState('全部');
-  const [historySortConfig, setHistorySortConfig] = useState({ key: '日期', direction: 'desc' });
+  const [historySortConfig, setHistorySortConfig] = useState({
+    key: '日期',
+    direction: getDefaultHistorySortDirection('日期')
+  });
   const [trendTimeRange, setTrendTimeRange] = useState('全部');
   const [showManager, setShowManager] = useState(false);
   const [hideZeroHolding, setHideZeroHolding] = useState(false);
@@ -1914,12 +1918,14 @@ export function useTradeData(showToast) {
           totalSoldQty: 0,
           totalSoldCostOriginal: 0,
           tradeCount: 0,
+          latestTradeTimestamp: 0,
           history: []
         };
       }
 
       aggregatedStocks[symbol].tradeCount += 1;
       aggregatedStocks[symbol].history.push(row);
+      aggregatedStocks[symbol].latestTradeTimestamp = getTradeTimestamp(row['日期']);
       aggregatedStocks[symbol].holdingQty = row.__holdingQtyAfter;
       aggregatedStocks[symbol].holdingCostOriginal = row.__holdingCostOriginalAfter;
       aggregatedStocks[symbol].totalCost = row.__netOpenCostOriginalAfter;
@@ -1999,7 +2005,7 @@ export function useTradeData(showToast) {
           ifSoldTodayPnlBase
         };
       })
-      .sort((a, b) => b.realizedPnlBase - a.realizedPnlBase);
+      .sort((a, b) => b.latestTradeTimestamp - a.latestTradeTimestamp);
   }, [
     baseCurrency,
     effectiveExchangeRates,
@@ -2038,11 +2044,25 @@ export function useTradeData(showToast) {
   }, [processedData, t]);
 
   const requestSort = (key) => {
-    let direction = 'desc';
-    if (historySortConfig.key === key && historySortConfig.direction === 'desc') {
-      direction = 'asc';
+    let direction = getDefaultHistorySortDirection(key);
+    if (historySortConfig.key === key) {
+      direction = historySortConfig.direction === 'desc' ? 'asc' : 'desc';
     }
     setHistorySortConfig({ key, direction });
+  };
+
+  const setHistorySort = (key) => {
+    setHistorySortConfig({
+      key,
+      direction: getDefaultHistorySortDirection(key)
+    });
+  };
+
+  const toggleHistorySortDirection = () => {
+    setHistorySortConfig((currentConfig) => ({
+      ...currentConfig,
+      direction: currentConfig.direction === 'desc' ? 'asc' : 'desc'
+    }));
   };
 
   const displayData = useMemo(() => {
@@ -2076,9 +2096,12 @@ export function useTradeData(showToast) {
         } else if (historySortConfig.key === '代號') {
           valueA = a.symbol;
           valueB = b.symbol;
+        } else if (historySortConfig.key === '日期') {
+          valueA = a.latestTradeTimestamp;
+          valueB = b.latestTradeTimestamp;
         } else {
-          valueA = a.realizedPnlBase;
-          valueB = b.realizedPnlBase;
+          valueA = a.latestTradeTimestamp;
+          valueB = b.latestTradeTimestamp;
         }
 
         if (valueA < valueB) return historySortConfig.direction === 'asc' ? -1 : 1;
@@ -2271,6 +2294,7 @@ export function useTradeData(showToast) {
     setApiKey,
     setCsvImportProfile: handleSetCsvImportProfile,
     setExpandedStock,
+    setHistorySort,
     setHideZeroHolding,
     setMarketFilter,
     setShowManager,
@@ -2279,6 +2303,7 @@ export function useTradeData(showToast) {
     startEditingStock,
     summary,
     tempStockEdit,
+    toggleHistorySortDirection,
     trackedSymbols,
     trendData,
     trendTimeRange,
