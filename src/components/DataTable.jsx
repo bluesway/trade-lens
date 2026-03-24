@@ -152,7 +152,7 @@ export default function DataTable({
     { value: formatStockUpdateValue(timestamp) }
   );
   const sortOptions = [
-    { key: '日期', label: t('manager.fields.date') },
+    { key: '日期', label: t('table.sortOptions.latestTradeDate', { defaultValue: 'Last trade date' }) },
     { key: '市值', label: t('table.columns.currentValue') },
     { key: '持股數', label: t('table.columns.holdingQty') },
     { key: '未實現', label: t('table.columns.unrealized') },
@@ -205,27 +205,32 @@ export default function DataTable({
               type="button"
               onClick={toggleHistorySortDirection}
               className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition-colors hover:border-blue-200 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-              title={t('table.sortDirectionTitle', {
-                defaultValue: activeSortDirection === 'desc' ? 'Descending' : 'Ascending'
-              })}
+              title={activeSortDirection === 'desc'
+                ? t('table.sortDirectionDescending', { defaultValue: 'Descending' })
+                : t('table.sortDirectionAscending', { defaultValue: 'Ascending' })}
             >
               {activeSortDirection === 'desc' ? <ArrowDown size={14} /> : <ArrowUp size={14} />}
             </button>
           </div>
 
-          {['全部', ...availableMarkets].map((market) => (
-            <button
-              key={market}
-              onClick={() => setMarketFilter(market)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                marketFilter === market
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
-              }`}
-            >
-              {getMarketLabel(market, activeLocale, t)}
-            </button>
-          ))}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+              {t('table.marketFilterTitle', { defaultValue: 'Markets in current data' })}
+            </span>
+            {['全部', ...availableMarkets].map((market) => (
+              <button
+                key={market}
+                onClick={() => setMarketFilter(market)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  marketFilter === market
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                }`}
+              >
+                {getMarketLabel(market, activeLocale, t)}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

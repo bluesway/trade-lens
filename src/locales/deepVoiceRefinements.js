@@ -58,6 +58,24 @@ const buildDeepPatch = ({
   }
 });
 
+const buildTableControlPatch = ({
+  sortSelectorTitle,
+  sortDirectionAscending,
+  sortDirectionDescending,
+  latestTradeDate,
+  marketFilterTitle
+}) => ({
+  table: {
+    sortSelectorTitle,
+    sortDirectionAscending,
+    sortDirectionDescending,
+    sortOptions: {
+      latestTradeDate
+    },
+    marketFilterTitle
+  }
+});
+
 const assignPatch = (patches, locales, patch) => {
   locales.forEach((locale) => {
     patches[locale] = patch;
@@ -805,6 +823,318 @@ assignPatch(deepPatches, ['ur-PK'], buildDeepPatch({
   dataCleared: 'data صاف کر کے demo set دوبارہ لوڈ کر دیا گیا۔',
   clearConfirm: 'کیا تمام data صاف کر کے demo set دوبارہ لوڈ کرنا ہے؟ ایک بار ہاں کہہ دی تو واپسی نہیں۔',
   backupConfirm: 'صاف کرنے سے پہلے کیا موجودہ data کو CSV backup کے طور پر export کرنا چاہتے ہیں؟'
+}));
+
+extendPatch(deepPatches, ['zh-TW'], buildTableControlPatch({
+  sortSelectorTitle: '排序方式',
+  sortDirectionAscending: '升冪',
+  sortDirectionDescending: '降冪',
+  latestTradeDate: '最後交易日期',
+  marketFilterTitle: '目前資料中的市場'
+}));
+
+extendPatch(deepPatches, ['yue-Hant-HK'], buildTableControlPatch({
+  sortSelectorTitle: '排序方式',
+  sortDirectionAscending: '由細到大',
+  sortDirectionDescending: '由大到細',
+  latestTradeDate: '最後交易日期',
+  marketFilterTitle: '而家資料入面嘅市場'
+}));
+
+extendPatch(deepPatches, ['zh-CN', 'zh-SG'], buildTableControlPatch({
+  sortSelectorTitle: '排序方式',
+  sortDirectionAscending: '升序',
+  sortDirectionDescending: '降序',
+  latestTradeDate: '最后交易日期',
+  marketFilterTitle: '当前数据中的市场'
+}));
+
+extendPatch(deepPatches, ['en-US', 'en-CA', 'en-AU', 'en-GB', 'en-IE', 'en-NZ', 'en-SG', 'en-ZA'], buildTableControlPatch({
+  sortSelectorTitle: 'Sort by',
+  sortDirectionAscending: 'Ascending',
+  sortDirectionDescending: 'Descending',
+  latestTradeDate: 'Last trade date',
+  marketFilterTitle: 'Markets in current data'
+}));
+
+extendPatch(deepPatches, ['ja-JP'], buildTableControlPatch({
+  sortSelectorTitle: '並び替え',
+  sortDirectionAscending: '昇順',
+  sortDirectionDescending: '降順',
+  latestTradeDate: '最終取引日',
+  marketFilterTitle: '現在のデータにある市場'
+}));
+
+extendPatch(deepPatches, ['ko-KR'], buildTableControlPatch({
+  sortSelectorTitle: '정렬 기준',
+  sortDirectionAscending: '오름차순',
+  sortDirectionDescending: '내림차순',
+  latestTradeDate: '마지막 거래일',
+  marketFilterTitle: '현재 데이터에 있는 시장'
+}));
+
+extendPatch(deepPatches, ['id-ID'], buildTableControlPatch({
+  sortSelectorTitle: 'Urutkan menurut',
+  sortDirectionAscending: 'Naik',
+  sortDirectionDescending: 'Turun',
+  latestTradeDate: 'Tanggal transaksi terakhir',
+  marketFilterTitle: 'Pasar dalam data saat ini'
+}));
+
+extendPatch(deepPatches, ['fr-FR', 'fr-BE', 'fr-CA', 'fr-CH'], buildTableControlPatch({
+  sortSelectorTitle: 'Trier par',
+  sortDirectionAscending: 'Croissant',
+  sortDirectionDescending: 'Décroissant',
+  latestTradeDate: 'Dernière date de transaction',
+  marketFilterTitle: 'Marchés présents dans les données'
+}));
+
+extendPatch(deepPatches, ['de-DE', 'de-AT', 'de-CH'], buildTableControlPatch({
+  sortSelectorTitle: 'Sortieren nach',
+  sortDirectionAscending: 'Aufsteigend',
+  sortDirectionDescending: 'Absteigend',
+  latestTradeDate: 'Letztes Handelsdatum',
+  marketFilterTitle: 'Märkte in den aktuellen Daten'
+}));
+
+extendPatch(deepPatches, ['it-IT', 'it-CH'], buildTableControlPatch({
+  sortSelectorTitle: 'Ordina per',
+  sortDirectionAscending: 'Crescente',
+  sortDirectionDescending: 'Decrescente',
+  latestTradeDate: 'Data ultima operazione',
+  marketFilterTitle: 'Mercati presenti nei dati correnti'
+}));
+
+extendPatch(deepPatches, ['ms-MY'], buildTableControlPatch({
+  sortSelectorTitle: 'Susun ikut',
+  sortDirectionAscending: 'Menaik',
+  sortDirectionDescending: 'Menurun',
+  latestTradeDate: 'Tarikh dagangan terakhir',
+  marketFilterTitle: 'Pasaran dalam data semasa'
+}));
+
+extendPatch(deepPatches, ['nl-NL', 'nl-BE'], buildTableControlPatch({
+  sortSelectorTitle: 'Sorteren op',
+  sortDirectionAscending: 'Oplopend',
+  sortDirectionDescending: 'Aflopend',
+  latestTradeDate: 'Laatste transactiedatum',
+  marketFilterTitle: 'Markten in de huidige data'
+}));
+
+extendPatch(deepPatches, ['fa-IR'], buildTableControlPatch({
+  sortSelectorTitle: 'مرتب‌سازی بر اساس',
+  sortDirectionAscending: 'صعودی',
+  sortDirectionDescending: 'نزولی',
+  latestTradeDate: 'تاریخ آخرین معامله',
+  marketFilterTitle: 'بازارهای موجود در داده‌های فعلی'
+}));
+
+extendPatch(deepPatches, ['he-IL'], buildTableControlPatch({
+  sortSelectorTitle: 'מיון לפי',
+  sortDirectionAscending: 'בסדר עולה',
+  sortDirectionDescending: 'בסדר יורד',
+  latestTradeDate: 'תאריך העסקה האחרון',
+  marketFilterTitle: 'שווקים שקיימים בנתונים הנוכחיים'
+}));
+
+extendPatch(deepPatches, ['es-419', 'es-AR', 'es-CL', 'es-CO', 'es-MX', 'es-PE', 'es-VE'], buildTableControlPatch({
+  sortSelectorTitle: 'Ordenar por',
+  sortDirectionAscending: 'Ascendente',
+  sortDirectionDescending: 'Descendente',
+  latestTradeDate: 'Última fecha de operación',
+  marketFilterTitle: 'Mercados presentes en los datos actuales'
+}));
+
+extendPatch(deepPatches, ['es-ES'], buildTableControlPatch({
+  sortSelectorTitle: 'Ordenar por',
+  sortDirectionAscending: 'Ascendente',
+  sortDirectionDescending: 'Descendente',
+  latestTradeDate: 'Última fecha de operación',
+  marketFilterTitle: 'Mercados presentes en los datos actuales'
+}));
+
+extendPatch(deepPatches, ['pt-BR'], buildTableControlPatch({
+  sortSelectorTitle: 'Ordenar por',
+  sortDirectionAscending: 'Crescente',
+  sortDirectionDescending: 'Decrescente',
+  latestTradeDate: 'Data da última operação',
+  marketFilterTitle: 'Mercados presentes nos dados atuais'
+}));
+
+extendPatch(deepPatches, ['pt-PT'], buildTableControlPatch({
+  sortSelectorTitle: 'Ordenar por',
+  sortDirectionAscending: 'Crescente',
+  sortDirectionDescending: 'Decrescente',
+  latestTradeDate: 'Data da última operação',
+  marketFilterTitle: 'Mercados presentes nos dados atuais'
+}));
+
+extendPatch(deepPatches, ['pl-PL'], buildTableControlPatch({
+  sortSelectorTitle: 'Sortuj według',
+  sortDirectionAscending: 'Rosnąco',
+  sortDirectionDescending: 'Malejąco',
+  latestTradeDate: 'Data ostatniej transakcji',
+  marketFilterTitle: 'Rynki obecne w bieżących danych'
+}));
+
+extendPatch(deepPatches, ['tr-TR'], buildTableControlPatch({
+  sortSelectorTitle: 'Sırala',
+  sortDirectionAscending: 'Artan',
+  sortDirectionDescending: 'Azalan',
+  latestTradeDate: 'Son işlem tarihi',
+  marketFilterTitle: 'Mevcut verilerdeki piyasalar'
+}));
+
+extendPatch(deepPatches, ['hi-IN'], buildTableControlPatch({
+  sortSelectorTitle: 'क्रमबद्ध करें',
+  sortDirectionAscending: 'आरोही',
+  sortDirectionDescending: 'अवरोही',
+  latestTradeDate: 'आख़िरी ट्रेड तारीख',
+  marketFilterTitle: 'मौजूदा डेटा में मौजूद बाज़ार'
+}));
+
+extendPatch(deepPatches, ['ru-RU'], buildTableControlPatch({
+  sortSelectorTitle: 'Сортировать по',
+  sortDirectionAscending: 'По возрастанию',
+  sortDirectionDescending: 'По убыванию',
+  latestTradeDate: 'Дата последней сделки',
+  marketFilterTitle: 'Рынки в текущих данных'
+}));
+
+extendPatch(deepPatches, ['sv-SE'], buildTableControlPatch({
+  sortSelectorTitle: 'Sortera efter',
+  sortDirectionAscending: 'Stigande',
+  sortDirectionDescending: 'Fallande',
+  latestTradeDate: 'Senaste handelsdatum',
+  marketFilterTitle: 'Marknader i nuvarande data'
+}));
+
+extendPatch(deepPatches, ['cs-CZ'], buildTableControlPatch({
+  sortSelectorTitle: 'Řadit podle',
+  sortDirectionAscending: 'Vzestupně',
+  sortDirectionDescending: 'Sestupně',
+  latestTradeDate: 'Datum posledního obchodu',
+  marketFilterTitle: 'Trhy v aktuálních datech'
+}));
+
+extendPatch(deepPatches, ['et-EE'], buildTableControlPatch({
+  sortSelectorTitle: 'Sorteeri järgi',
+  sortDirectionAscending: 'Kasvavalt',
+  sortDirectionDescending: 'Kahanevalt',
+  latestTradeDate: 'Viimase tehingu kuupäev',
+  marketFilterTitle: 'Praegustes andmetes olevad turud'
+}));
+
+extendPatch(deepPatches, ['is-IS'], buildTableControlPatch({
+  sortSelectorTitle: 'Raða eftir',
+  sortDirectionAscending: 'Hækkandi',
+  sortDirectionDescending: 'Lækkandi',
+  latestTradeDate: 'Dagsetning síðustu viðskipta',
+  marketFilterTitle: 'Markaðir í núverandi gögnum'
+}));
+
+extendPatch(deepPatches, ['ro-RO'], buildTableControlPatch({
+  sortSelectorTitle: 'Sortează după',
+  sortDirectionAscending: 'Crescător',
+  sortDirectionDescending: 'Descrescător',
+  latestTradeDate: 'Data ultimei tranzacții',
+  marketFilterTitle: 'Piețele din datele curente'
+}));
+
+extendPatch(deepPatches, ['hu-HU'], buildTableControlPatch({
+  sortSelectorTitle: 'Rendezés',
+  sortDirectionAscending: 'Növekvő',
+  sortDirectionDescending: 'Csökkenő',
+  latestTradeDate: 'Utolsó ügylet dátuma',
+  marketFilterTitle: 'A jelenlegi adatok piacai'
+}));
+
+extendPatch(deepPatches, ['da-DK'], buildTableControlPatch({
+  sortSelectorTitle: 'Sortér efter',
+  sortDirectionAscending: 'Stigende',
+  sortDirectionDescending: 'Faldende',
+  latestTradeDate: 'Dato for seneste handel',
+  marketFilterTitle: 'Markeder i de aktuelle data'
+}));
+
+extendPatch(deepPatches, ['el-GR'], buildTableControlPatch({
+  sortSelectorTitle: 'Ταξινόμηση κατά',
+  sortDirectionAscending: 'Αύξουσα',
+  sortDirectionDescending: 'Φθίνουσα',
+  latestTradeDate: 'Ημερομηνία τελευταίας συναλλαγής',
+  marketFilterTitle: 'Αγορές στα τρέχοντα δεδομένα'
+}));
+
+extendPatch(deepPatches, ['lv-LV'], buildTableControlPatch({
+  sortSelectorTitle: 'Kārtot pēc',
+  sortDirectionAscending: 'Augošā secībā',
+  sortDirectionDescending: 'Dilstošā secībā',
+  latestTradeDate: 'Pēdējā darījuma datums',
+  marketFilterTitle: 'Tirgi pašreizējos datos'
+}));
+
+extendPatch(deepPatches, ['lt-LT'], buildTableControlPatch({
+  sortSelectorTitle: 'Rikiuoti pagal',
+  sortDirectionAscending: 'Didėjančiai',
+  sortDirectionDescending: 'Mažėjančiai',
+  latestTradeDate: 'Paskutinio sandorio data',
+  marketFilterTitle: 'Rinkos dabartiniuose duomenyse'
+}));
+
+extendPatch(deepPatches, ['nb-NO'], buildTableControlPatch({
+  sortSelectorTitle: 'Sorter etter',
+  sortDirectionAscending: 'Stigende',
+  sortDirectionDescending: 'Synkende',
+  latestTradeDate: 'Dato for siste handel',
+  marketFilterTitle: 'Markeder i dagens data'
+}));
+
+extendPatch(deepPatches, ['fi-FI'], buildTableControlPatch({
+  sortSelectorTitle: 'Lajittele',
+  sortDirectionAscending: 'Nouseva',
+  sortDirectionDescending: 'Laskeva',
+  latestTradeDate: 'Viimeisin kaupankäyntipäivä',
+  marketFilterTitle: 'Nykyisten tietojen markkinat'
+}));
+
+extendPatch(deepPatches, ['fil-PH'], buildTableControlPatch({
+  sortSelectorTitle: 'Ayusin ayon sa',
+  sortDirectionAscending: 'Pataas',
+  sortDirectionDescending: 'Pababa',
+  latestTradeDate: 'Huling petsa ng trade',
+  marketFilterTitle: 'Mga market sa kasalukuyang data'
+}));
+
+extendPatch(deepPatches, ['vi-VN'], buildTableControlPatch({
+  sortSelectorTitle: 'Sắp xếp theo',
+  sortDirectionAscending: 'Tăng dần',
+  sortDirectionDescending: 'Giảm dần',
+  latestTradeDate: 'Ngày giao dịch gần nhất',
+  marketFilterTitle: 'Các thị trường có trong dữ liệu hiện tại'
+}));
+
+extendPatch(deepPatches, ['th-TH'], buildTableControlPatch({
+  sortSelectorTitle: 'เรียงตาม',
+  sortDirectionAscending: 'น้อยไปมาก',
+  sortDirectionDescending: 'มากไปน้อย',
+  latestTradeDate: 'วันที่ซื้อขายล่าสุด',
+  marketFilterTitle: 'ตลาดที่มีอยู่ในข้อมูลตอนนี้'
+}));
+
+extendPatch(deepPatches, ['ar-SA', 'ar-EG', 'ar-AE', 'ar-KW', 'ar-QA'], buildTableControlPatch({
+  sortSelectorTitle: 'الترتيب حسب',
+  sortDirectionAscending: 'تصاعدي',
+  sortDirectionDescending: 'تنازلي',
+  latestTradeDate: 'تاريخ آخر صفقة',
+  marketFilterTitle: 'الأسواق الموجودة في البيانات الحالية'
+}));
+
+extendPatch(deepPatches, ['ur-PK'], buildTableControlPatch({
+  sortSelectorTitle: 'ترتیب کے مطابق',
+  sortDirectionAscending: 'صعودی',
+  sortDirectionDescending: 'نزولی',
+  latestTradeDate: 'آخری ٹریڈ کی تاریخ',
+  marketFilterTitle: 'موجودہ ڈیٹا میں موجود مارکیٹس'
 }));
 
 export const DEEP_REFINED_LOCALES = Object.freeze(Object.keys(deepPatches));
