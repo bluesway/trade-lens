@@ -82,6 +82,14 @@ const assignPatch = (patches, locales, patch) => {
   });
 };
 
+const extendPatch = (patches, locales, patch) => {
+  locales.forEach((locale) => {
+    patches[locale] = patches[locale]
+      ? mergeLocale(patches[locale], patch)
+      : patch;
+  });
+};
+
 const deepPatches = {};
 
 assignPatch(deepPatches, ['zh-TW'], buildDeepPatch({
