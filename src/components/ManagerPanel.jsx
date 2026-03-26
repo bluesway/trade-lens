@@ -409,7 +409,7 @@ export default function ManagerPanel({
                     <td className="px-4 py-2 text-center">
                       {row.__syntheticDelist ? (
                         <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-900/30">
-                          auto
+                          {t('manager.symbolOverrides.autoLabel', { defaultValue: 'auto' })}
                         </span>
                       ) : (
                         <div className="flex items-center justify-center gap-2">
