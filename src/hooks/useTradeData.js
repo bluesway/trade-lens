@@ -277,10 +277,8 @@ const buildFallbackResolvedTradeRow = (row, originalIndex) => ({
   __quantityValue: getNumericValue(row['數量']),
   __priceValue: getNumericValue(row['單價']),
   __amountValue: getNumericValue(row['總金額']),
-  __computedPnlOriginal: 0,
   __resolvedPnlOriginal: getOptionalNumericValue(row['損益']) ?? 0,
   __closedCostOriginal: 0,
-  __closedQuantity: 0,
   __matchedLongSoldQty: 0,
   __matchedLongSoldCostOriginal: 0,
   __holdingQtyAfter: 0,
@@ -435,10 +433,8 @@ const buildResolvedTradeRows = (rows, overrides = []) => {
       __quantityValue: quantityValue,
       __priceValue: unitPrice,
       __amountValue: amountValue,
-      __computedPnlOriginal: computedPnlOriginal,
       __resolvedPnlOriginal: resolvedPnlOriginal,
       __closedCostOriginal: closedCostOriginal,
-      __closedQuantity: closedQuantity,
       __matchedLongSoldQty: matchedLongSoldQty,
       __matchedLongSoldCostOriginal: matchedLongSoldCostOriginal,
       __holdingQtyAfter: hasMeaningfulValue(holdingQty) ? holdingQty : 0,
@@ -1959,10 +1955,14 @@ export function useTradeData(showToast) {
     });
   };
 
-  const processedData = useMemo(() => {
-    if (!isAppLoaded) return [];
+  // Phase 1: aggregate trade-level data into per-symbol buckets.
+  // This only depends on the resolved rows, so it stays stable while live prices
+  // refresh — avoiding a full re-aggregation (loop over all rows, history.push, etc.)
+  // on every price update.
+  const aggregatedStockBase = useMemo(() => {
+    if (!isAppLoaded) return {};
 
-    const aggregatedStocks = {};
+    const stocks = {};
 
     resolvedTradeRowsChronological.forEach((row) => {
       const symbol = row.__symbol;
@@ -1971,14 +1971,14 @@ export function useTradeData(showToast) {
       const market = row.__market;
       const rawCode = String(row['代號'] || '').trim();
 
-      if (!aggregatedStocks[symbol]) {
-        aggregatedStocks[symbol] = {
+      if (!stocks[symbol]) {
+        stocks[symbol] = {
           symbol,
           rawCode,
           market,
           name: STOCK_MAPPING[symbol]?.name || symbol,
-          currentPrice: STOCK_MAPPING[symbol]?.price || 0,
-          currency: row.__currency || getCurrencyBySymbolOrMarket(symbol, market),
+          defaultPrice: STOCK_MAPPING[symbol]?.price || 0,
+          defaultCurrency: row.__currency || getCurrencyBySymbolOrMarket(symbol, market),
           holdingQty: 0,
           holdingCostOriginal: 0,
           realizedPnl: 0,
@@ -1992,19 +1992,26 @@ export function useTradeData(showToast) {
         };
       }
 
-      aggregatedStocks[symbol].tradeCount += 1;
-      aggregatedStocks[symbol].history.push(row);
-      aggregatedStocks[symbol].latestTradeTimestamp = getTradeTimestamp(row['日期']);
-      aggregatedStocks[symbol].holdingQty = row.__holdingQtyAfter;
-      aggregatedStocks[symbol].holdingCostOriginal = row.__holdingCostOriginalAfter;
-      aggregatedStocks[symbol].totalCost = row.__netOpenCostOriginalAfter;
-      aggregatedStocks[symbol].realizedPnl += row.__resolvedPnlOriginal;
-      aggregatedStocks[symbol].realizedCostOriginal += row.__closedCostOriginal;
-      aggregatedStocks[symbol].totalSoldQty += row.__matchedLongSoldQty;
-      aggregatedStocks[symbol].totalSoldCostOriginal += row.__matchedLongSoldCostOriginal;
+      stocks[symbol].tradeCount += 1;
+      stocks[symbol].history.push(row);
+      stocks[symbol].latestTradeTimestamp = getTradeTimestamp(row['日期']);
+      stocks[symbol].holdingQty = row.__holdingQtyAfter;
+      stocks[symbol].holdingCostOriginal = row.__holdingCostOriginalAfter;
+      stocks[symbol].totalCost = row.__netOpenCostOriginalAfter;
+      stocks[symbol].realizedPnl += row.__resolvedPnlOriginal;
+      stocks[symbol].realizedCostOriginal += row.__closedCostOriginal;
+      stocks[symbol].totalSoldQty += row.__matchedLongSoldQty;
+      stocks[symbol].totalSoldCostOriginal += row.__matchedLongSoldCostOriginal;
     });
 
-    return Object.values(aggregatedStocks)
+    return stocks;
+  }, [isAppLoaded, resolvedTradeRowsChronological]);
+
+  // Phase 2: enrich each stock with live price / exchange-rate data.
+  // Runs on every price refresh but only iterates the symbol list (small),
+  // not the full trade-row list.
+  const processedData = useMemo(() => {
+    return Object.values(aggregatedStockBase)
       .map((stock) => {
         const apiData = liveData[stock.symbol];
         const manualData = manualStockData[stock.symbol];
@@ -2012,19 +2019,17 @@ export function useTradeData(showToast) {
         const isManualPrice = manualData?.price !== undefined;
         const isManualName = manualData?.name !== undefined && manualData?.name !== '';
         const normalizedApiQuote = normalizeQuoteCurrencyData(apiData?.currency, apiData?.price);
-        const currentPrice = isManualPrice ? manualData.price : normalizedApiQuote.price || stock.currentPrice;
+        const currentPrice = isManualPrice ? manualData.price : normalizedApiQuote.price || stock.defaultPrice;
         const currentName = isManualName ? manualData.name : apiData?.name || stock.name;
         const nameUpdateTimestamp = isManualName ? manualData?.timestamp || null : apiData?.timestamp || null;
         const priceUpdateTimestamp = isManualPrice ? manualData?.timestamp || null : apiData?.timestamp || null;
         const lastUpdateTimestamp = priceUpdateTimestamp || nameUpdateTimestamp;
-        const currency = normalizedApiQuote.currency || getCurrencyBySymbolOrMarket(stock.symbol, stock.market);
+        const currency = normalizedApiQuote.currency || stock.defaultCurrency;
         const exchangeRate = getExchangeRateValue(currency, baseCurrency, effectiveExchangeRates, isDemo);
 
         const hasCurrentPrice = hasMeaningfulValue(currentPrice);
         const currentValueOriginal = hasCurrentPrice ? stock.holdingQty * currentPrice : 0;
-        const unrealizedPnlOriginal = hasCurrentPrice
-          ? currentValueOriginal - stock.totalCost
-          : 0;
+        const unrealizedPnlOriginal = hasCurrentPrice ? currentValueOriginal - stock.totalCost : 0;
         const unrealizedPnlPercent = stock.holdingCostOriginal > 0 && hasCurrentPrice
           ? (unrealizedPnlOriginal / stock.holdingCostOriginal) * 100
           : 0;
@@ -2076,13 +2081,12 @@ export function useTradeData(showToast) {
       })
       .sort((a, b) => b.latestTradeTimestamp - a.latestTradeTimestamp);
   }, [
+    aggregatedStockBase,
     baseCurrency,
     effectiveExchangeRates,
-    isAppLoaded,
     isDemo,
     liveData,
-    manualStockData,
-    resolvedTradeRowsChronological
+    manualStockData
   ]);
 
   const chartData = useMemo(() => {

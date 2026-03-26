@@ -1,20 +1,18 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
+  Chart as ChartJS,
+  ArcElement,
+  BarElement,
+  CategoryScale,
+  Filler,
   Legend,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis
-} from 'recharts';
+  LinearScale,
+  LineElement,
+  PointElement,
+  Tooltip
+} from 'chart.js';
+import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import { Camera } from 'lucide-react';
 import { TREND_RANGE_TRANSLATION_KEYS, normalizeLocale } from '../locales/config';
 import { COLORS } from '../utils/constants';
@@ -22,6 +20,49 @@ import {
   formatLocalizedCompactNumber,
   formatLocalizedPercent
 } from '../utils/localization';
+
+ChartJS.register(
+  ArcElement,
+  BarElement,
+  CategoryScale,
+  Filler,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Tooltip
+);
+
+// Returns a vertical canvas gradient for an area fill.
+const makeAreaGradient = (ctx, chartArea, topColor, bottomColor) => {
+  const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+  gradient.addColorStop(0, topColor);
+  gradient.addColorStop(1, bottomColor);
+  return gradient;
+};
+
+// Returns the dual-color (green/red split at zero) area fill gradient for P&L.
+// gradientOffset: fraction 0-1 representing where the zero line sits from the top.
+const makePnlGradient = (ctx, chartArea, gradientOffset) => {
+  const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+  const zeroFraction = 1 - gradientOffset;
+
+  if (gradientOffset >= 1) {
+    // All positive
+    gradient.addColorStop(0, 'rgba(16,185,129,0.8)');
+    gradient.addColorStop(1, 'rgba(16,185,129,0)');
+  } else if (gradientOffset <= 0) {
+    // All negative
+    gradient.addColorStop(0, 'rgba(239,68,68,0)');
+    gradient.addColorStop(1, 'rgba(239,68,68,0.8)');
+  } else {
+    gradient.addColorStop(0, 'rgba(16,185,129,0.8)');
+    gradient.addColorStop(zeroFraction, 'rgba(16,185,129,0.05)');
+    gradient.addColorStop(zeroFraction, 'rgba(239,68,68,0.05)');
+    gradient.addColorStop(1, 'rgba(239,68,68,0.8)');
+  }
+  return gradient;
+};
 
 export default function ChartsSection({
   barChartRef,
@@ -40,69 +81,303 @@ export default function ChartsSection({
   const activeLocale = normalizeLocale(i18n.resolvedLanguage || i18n.language);
   const timeRangeKeys = ['1週', '1月', '3月', '半年', 'YTD', '1年', '5年', '全部'];
 
+  const gridColor = darkMode ? '#334155' : '#e2e8f0';
+  const tickColor = darkMode ? '#94a3b8' : '#64748b';
+
+  // Shared tooltip callback so both charts format numbers the same way
+  const tooltipLabelCallback = useCallback(
+    (item) => `${item.dataset.label}: ${formatBaseCurrency(item.parsed.y ?? item.parsed)}`,
+    [formatBaseCurrency]
+  );
+
+  // ─── Trend chart ────────────────────────────────────────────────────────────
+
   const pnlGradientOffset = useMemo(() => {
     if (!trendData || trendData.length === 0) return 0;
-
-    const dataMax = Math.max(...trendData.map((item) => item.realizedPnlBase));
-    const dataMin = Math.min(...trendData.map((item) => item.realizedPnlBase));
-
+    const dataMax = Math.max(...trendData.map((d) => d.realizedPnlBase));
+    const dataMin = Math.min(...trendData.map((d) => d.realizedPnlBase));
     if (dataMax <= 0) return 0;
     if (dataMin >= 0) return 1;
-
     return dataMax / (dataMax - dataMin);
   }, [trendData]);
 
-  const CustomTooltip = ({ active, label, payload }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white dark:bg-slate-900 p-3 border border-slate-200 dark:border-slate-700 shadow-lg rounded-lg z-50">
-          <p className="font-bold text-slate-800 dark:text-slate-200 mb-2 border-b border-slate-200 dark:border-slate-700 pb-1">
-            {label}
-          </p>
-          {payload.map((entry, index) => (
-            <p
-              key={index}
-              className="text-sm flex justify-between gap-4 font-medium"
-              style={{ color: entry.color || entry.fill }}
-            >
-              <span>{entry.name}:</span>
-              <span>{formatBaseCurrency(entry.value)}</span>
-            </p>
-          ))}
-        </div>
-      );
+  const trendChartData = useMemo(() => ({
+    labels: trendData.map((d) => d.displayDate),
+    datasets: [
+      {
+        label: t('charts.costSeries'),
+        data: trendData.map((d) => d.costBase),
+        borderColor: '#818cf8',
+        borderWidth: 3,
+        backgroundColor: ({ chart: { ctx, chartArea } }) =>
+          chartArea
+            ? makeAreaGradient(ctx, chartArea, 'rgba(129,140,248,0.8)', 'rgba(129,140,248,0)')
+            : 'transparent',
+        fill: true,
+        yAxisID: 'yLeft',
+        pointRadius: 0,
+        tension: 0.1
+      },
+      {
+        label: t('charts.realizedSeries'),
+        data: trendData.map((d) => d.realizedPnlBase),
+        borderColor: '#10b981',
+        borderWidth: 2,
+        backgroundColor: ({ chart: { ctx, chartArea } }) =>
+          chartArea ? makePnlGradient(ctx, chartArea, pnlGradientOffset) : 'transparent',
+        fill: true,
+        yAxisID: 'yRight',
+        pointRadius: 0,
+        tension: 0.1,
+        segment: {
+          borderColor: (ctx) => (ctx.p1.parsed.y < 0 ? '#ef4444' : '#10b981')
+        }
+      }
+    ]
+  }), [trendData, pnlGradientOffset, t]);
+
+  const trendChartOptions = useMemo(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: {
+        position: 'top',
+        align: 'start',
+        labels: {
+          color: tickColor,
+          boxWidth: 16,
+          boxHeight: 16,
+          borderRadius: 2,
+          useBorderRadius: true,
+          padding: 12
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: tooltipLabelCallback
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        border: { display: false },
+        ticks: {
+          color: tickColor,
+          maxTicksLimit: 8,
+          font: { size: 12 }
+        }
+      },
+      yLeft: {
+        type: 'linear',
+        position: 'left',
+        grid: { color: gridColor },
+        border: { display: false },
+        ticks: {
+          color: '#818cf8',
+          font: { size: 11 },
+          callback: (v) => formatLocalizedCompactNumber(v, activeLocale)
+        }
+      },
+      yRight: {
+        type: 'linear',
+        position: 'right',
+        grid: { drawOnChartArea: false },
+        border: { display: false },
+        ticks: {
+          color: (ctx) => (ctx.tick.value < 0 ? '#ef4444' : '#10b981'),
+          font: { size: 11 },
+          callback: (v) => formatLocalizedCompactNumber(v, activeLocale)
+        }
+      }
     }
+  }), [tickColor, gridColor, activeLocale, tooltipLabelCallback]);
 
-    return null;
-  };
+  // ─── Bar chart ───────────────────────────────────────────────────────────────
 
-  const renderCustomLegend = ({ payload }) => (
-    <ul className="flex justify-center gap-6 pt-4">
-      {payload.map((entry, index) => {
-        const isIfSoldToday = entry.dataKey === 'ifSoldTodayPnlBase';
-        const markerStyle = isIfSoldToday
-          ? undefined
-          : { backgroundColor: entry.color || entry.fill || '#64748b' };
+  const barChartDatasets = useMemo(() => ({
+    labels: chartData.pnlData.map((d) => d.name),
+    datasets: [
+      {
+        label: t('charts.ifSoldSeries'),
+        data: chartData.pnlData.map((d) => d.ifSoldTodayPnlBase),
+        backgroundColor: chartData.pnlData.map((d) =>
+          d.ifSoldTodayPnlBase >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'
+        ),
+        borderColor: chartData.pnlData.map((d) =>
+          d.ifSoldTodayPnlBase >= 0 ? '#10b981' : '#ef4444'
+        ),
+        borderWidth: 2,
+        borderDash: [4, 4],
+        borderRadius: 4,
+        barPercentage: 0.95,
+        categoryPercentage: 0.8
+      },
+      {
+        label: t('charts.actualSeries'),
+        data: chartData.pnlData.map((d) => d.realizedPnlBase),
+        backgroundColor: chartData.pnlData.map((d) =>
+          d.realizedPnlBase >= 0 ? '#10b981' : '#ef4444'
+        ),
+        borderRadius: 4,
+        barPercentage: 0.6,
+        categoryPercentage: 0.8
+      }
+    ]
+  }), [chartData.pnlData, t]);
 
-        return (
-          <li key={`item-${index}`} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 font-medium">
-            <div
-              className={`w-4 h-4 rounded-[2px] ${
-                isIfSoldToday
-                  ? 'border-2 border-dashed border-slate-400 bg-slate-200/50 dark:bg-slate-700/50'
-                  : 'bg-slate-500 dark:bg-slate-300'
-              }`}
-              style={markerStyle}
-            />
-            <span>{t('charts.legendConverted', { label: entry.value })}</span>
-          </li>
-        );
-      })}
-    </ul>
-  );
+  const barChartOptions = useMemo(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: {
+        position: 'top',
+        align: 'start',
+        labels: {
+          color: tickColor,
+          boxWidth: 16,
+          boxHeight: 16,
+          borderRadius: 2,
+          useBorderRadius: true,
+          padding: 12,
+          generateLabels: (chart) =>
+            chart.data.datasets.map((ds, i) => ({
+              text: t('charts.legendConverted', { label: ds.label }),
+              fillStyle: Array.isArray(ds.backgroundColor) ? ds.backgroundColor[0] : ds.backgroundColor,
+              strokeStyle: Array.isArray(ds.borderColor) ? ds.borderColor[0] : ds.borderColor,
+              lineWidth: ds.borderWidth ?? 1,
+              lineDash: ds.borderDash ?? [],
+              hidden: !chart.isDatasetVisible(i),
+              index: i,
+              datasetIndex: i
+            }))
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: tooltipLabelCallback,
+          title: (items) => {
+            const fullName = chartData.pnlData[items[0]?.dataIndex]?.name || items[0]?.label || '';
+            return fullName.length > 4 ? fullName : items[0]?.label || '';
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        border: { display: false },
+        ticks: {
+          color: tickColor,
+          font: { size: 12 },
+          callback: (_, i) => {
+            const label = chartData.pnlData[i]?.name || '';
+            return label.length > 4 ? `${label.substring(0, 4)}..` : label;
+          }
+        }
+      },
+      y: {
+        grid: { color: gridColor },
+        border: { display: false },
+        ticks: {
+          color: tickColor,
+          font: { size: 12 },
+          callback: (v) => formatLocalizedCompactNumber(v, activeLocale)
+        }
+      }
+    }
+  }), [tickColor, gridColor, activeLocale, tooltipLabelCallback, chartData.pnlData, t]);
+
+  // ─── Doughnut chart ──────────────────────────────────────────────────────────
+
+  const doughnutData = useMemo(() => ({
+    labels: chartData.holdingData.map((d) => d.name),
+    datasets: [{
+      data: chartData.holdingData.map((d) => d.currentValueBase),
+      backgroundColor: chartData.holdingData.map((_, i) => COLORS[i % COLORS.length]),
+      borderWidth: 2,
+      borderColor: darkMode ? '#0f172a' : '#ffffff',
+      hoverOffset: 6
+    }]
+  }), [chartData.holdingData, darkMode]);
+
+  // Inline plugin to draw external labels with connecting lines (replicates Recharts labelLine).
+  // Recreated when tickColor or activeLocale changes so the closure stays fresh.
+  const doughnutLabelPlugin = useMemo(() => ({
+    id: 'doughnut-outside-labels',
+    afterDraw(chart) {
+      const { ctx } = chart;
+      const meta = chart.getDatasetMeta(0);
+      if (!meta?.data?.length) return;
+
+      const total = chart.data.datasets[0].data.reduce((s, v) => s + v, 0);
+      if (!total) return;
+
+      meta.data.forEach((arc, index) => {
+        const percent = chart.data.datasets[0].data[index] / total;
+        if (percent < 0.04) return; // skip slivers
+
+        const midAngle = arc.startAngle + (arc.endAngle - arc.startAngle) / 2;
+        const outerR = arc.outerRadius;
+        const cx = arc.x;
+        const cy = arc.y;
+
+        const cosA = Math.cos(midAngle);
+        const sinA = Math.sin(midAngle);
+
+        const lineX1 = cx + cosA * (outerR + 4);
+        const lineY1 = cy + sinA * (outerR + 4);
+        const lineX2 = cx + cosA * (outerR + 16);
+        const lineY2 = cy + sinA * (outerR + 16);
+        const textX = cx + cosA * (outerR + 22);
+        const textY = cy + sinA * (outerR + 22);
+
+        const label = String(chart.data.labels[index] ?? '').slice(0, 4);
+        const pctStr = formatLocalizedPercent(percent * 100, activeLocale, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        });
+
+        ctx.save();
+        ctx.strokeStyle = tickColor;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(lineX1, lineY1);
+        ctx.lineTo(lineX2, lineY2);
+        ctx.stroke();
+
+        ctx.fillStyle = tickColor;
+        ctx.font = '11px sans-serif';
+        ctx.textAlign = cosA > 0 ? 'left' : 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`${label} ${pctStr}`, textX, textY);
+        ctx.restore();
+      });
+    }
+  }), [tickColor, activeLocale]);
+
+  const doughnutOptions = useMemo(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '55%',
+    layout: { padding: 30 },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (item) => `${item.label}: ${formatBaseCurrency(item.parsed)}`
+        }
+      }
+    }
+  }), [formatBaseCurrency]);
+
+  // ─── Render ──────────────────────────────────────────────────────────────────
 
   return (
     <div className="space-y-6">
+      {/* Trend chart */}
       <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800" ref={trendChartRef}>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
@@ -133,81 +408,7 @@ export default function ChartsSection({
         </div>
         <div className="h-72">
           {trendData.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={trendData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorCost" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#818cf8" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="#818cf8" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="colorPnlSplit" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.8} />
-                    <stop offset={pnlGradientOffset} stopColor="#10b981" stopOpacity={0.1} />
-                    <stop offset={pnlGradientOffset} stopColor="#ef4444" stopOpacity={0.1} />
-                    <stop offset="100%" stopColor="#ef4444" stopOpacity={0.8} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={darkMode ? '#334155' : '#E2E8F0'} />
-                <XAxis
-                  dataKey="displayDate"
-                  tick={{ fontSize: 12, fill: darkMode ? '#94a3b8' : '#64748b' }}
-                  tickMargin={10}
-                  minTickGap={30}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  yAxisId="left"
-                  tickFormatter={(value) => formatLocalizedCompactNumber(value, activeLocale)}
-                  tick={{ fontSize: 11, fill: '#818cf8' }}
-                  orientation="left"
-                  stroke="#818cf8"
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  yAxisId="right"
-                  orientation="right"
-                  axisLine={false}
-                  tickLine={false}
-                    tick={(props) => {
-                      const { payload, x, y } = props;
-                      const value = payload.value;
-                      const isNegative = value < 0;
-                      const fill = isNegative ? '#ef4444' : '#10b981';
-                      const formattedValue = formatLocalizedCompactNumber(value, activeLocale);
-
-                      return (
-                        <text x={x} y={y} dy={4} fill={fill} fontSize={11} textAnchor="start">
-                        {formattedValue}
-                      </text>
-                    );
-                  }}
-                />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: darkMode ? '#1e293b' : '#f1f5f9' }} />
-                <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: '20px' }} />
-                <Area
-                  yAxisId="left"
-                  type="monotone"
-                  dataKey="costBase"
-                  name={t('charts.costSeries')}
-                  stroke="#818cf8"
-                  strokeWidth={3}
-                  fillOpacity={1}
-                  fill="url(#colorCost)"
-                />
-                <Area
-                  yAxisId="right"
-                  type="monotone"
-                  dataKey="realizedPnlBase"
-                  name={t('charts.realizedSeries')}
-                  stroke="url(#colorPnlSplit)"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#colorPnlSplit)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            <Line data={trendChartData} options={trendChartOptions} />
           ) : (
             <div className="flex h-full items-center justify-center text-slate-400 dark:text-slate-500">
               {t('charts.noTrend')}
@@ -217,6 +418,7 @@ export default function ChartsSection({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Bar chart */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800" ref={barChartRef}>
           <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -235,41 +437,7 @@ export default function ChartsSection({
           </h3>
           <div className="h-80">
             {chartData.pnlData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData.pnlData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={darkMode ? '#334155' : '#E2E8F0'} />
-                  <XAxis
-                    xAxisId={0}
-                    dataKey="name"
-                    tick={{ fontSize: 12, fill: darkMode ? '#94a3b8' : '#64748b' }}
-                    tickFormatter={(value) => (value.length > 4 ? `${value.substring(0, 4)}..` : value)}
-                  />
-                  <XAxis xAxisId={1} dataKey="name" hide />
-                  <YAxis
-                    tickFormatter={(value) => formatLocalizedCompactNumber(value, activeLocale)}
-                    tick={{ fontSize: 12, fill: darkMode ? '#94a3b8' : '#64748b' }}
-                  />
-                  <Tooltip content={<CustomTooltip />} cursor={{ fill: darkMode ? '#1e293b' : '#f1f5f9' }} />
-                  <Legend content={renderCustomLegend} verticalAlign="top" wrapperStyle={{ paddingBottom: '20px' }} />
-                  <Bar xAxisId={1} dataKey="ifSoldTodayPnlBase" name={t('charts.ifSoldSeries')} radius={[4, 4, 0, 0]}>
-                    {chartData.pnlData.map((entry, index) => (
-                      <Cell
-                        key={`cell-if-${index}`}
-                        fill={entry.ifSoldTodayPnlBase >= 0 ? '#10B981' : '#EF4444'}
-                        fillOpacity={0.25}
-                        stroke={entry.ifSoldTodayPnlBase >= 0 ? '#10B981' : '#EF4444'}
-                        strokeDasharray="4 4"
-                        strokeWidth={1.5}
-                      />
-                    ))}
-                  </Bar>
-                  <Bar xAxisId={0} dataKey="realizedPnlBase" name={t('charts.actualSeries')} radius={[4, 4, 0, 0]}>
-                    {chartData.pnlData.map((entry, index) => (
-                      <Cell key={`cell-actual-${index}`} fill={entry.realizedPnlBase >= 0 ? '#10B981' : '#EF4444'} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+              <Bar data={barChartDatasets} options={barChartOptions} />
             ) : (
               <div className="flex h-full items-center justify-center text-slate-400 dark:text-slate-500">
                 {t('charts.noPnlData')}
@@ -278,6 +446,7 @@ export default function ChartsSection({
           </div>
         </div>
 
+        {/* Doughnut chart */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800" ref={pieChartRef}>
           <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -296,30 +465,11 @@ export default function ChartsSection({
           </h3>
           <div className="h-80">
             {chartData.holdingData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={chartData.holdingData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    paddingAngle={5}
-                    dataKey="currentValueBase"
-                    nameKey="name"
-                    labelLine
-                    label={({ name, percent }) => `${String(name).slice(0, 4)} ${formatLocalizedPercent(percent * 100, activeLocale, {
-                      minimumFractionDigits: 0,
-                      maximumFractionDigits: 0
-                    })}`}
-                  >
-                    {chartData.holdingData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<CustomTooltip />} />
-                </PieChart>
-              </ResponsiveContainer>
+              <Doughnut
+                data={doughnutData}
+                options={doughnutOptions}
+                plugins={[doughnutLabelPlugin]}
+              />
             ) : (
               <div className="flex h-full items-center justify-center text-slate-400 dark:text-slate-500">
                 {t('charts.noHoldings')}
