@@ -42,23 +42,24 @@ const makeAreaGradient = (ctx, chartArea, topColor, bottomColor) => {
 };
 
 // Returns the dual-color (green/red split at zero) area fill gradient for P&L.
-// gradientOffset: fraction 0-1 representing where the zero line sits from the top.
+// gradientOffset: dataMax / (dataMax - dataMin) = fraction from chartArea.top where
+// the zero line sits.  Matches the original Recharts SVG linearGradient offset logic.
 const makePnlGradient = (ctx, chartArea, gradientOffset) => {
   const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-  const zeroFraction = 1 - gradientOffset;
 
   if (gradientOffset >= 1) {
-    // All positive
+    // All positive — pure green fade
     gradient.addColorStop(0, 'rgba(16,185,129,0.8)');
     gradient.addColorStop(1, 'rgba(16,185,129,0)');
   } else if (gradientOffset <= 0) {
-    // All negative
+    // All negative — pure red fade
     gradient.addColorStop(0, 'rgba(239,68,68,0)');
     gradient.addColorStop(1, 'rgba(239,68,68,0.8)');
   } else {
+    // Mixed: gradientOffset is the zero line position from the top
     gradient.addColorStop(0, 'rgba(16,185,129,0.8)');
-    gradient.addColorStop(zeroFraction, 'rgba(16,185,129,0.05)');
-    gradient.addColorStop(zeroFraction, 'rgba(239,68,68,0.05)');
+    gradient.addColorStop(gradientOffset, 'rgba(16,185,129,0.05)');
+    gradient.addColorStop(gradientOffset, 'rgba(239,68,68,0.05)');
     gradient.addColorStop(1, 'rgba(239,68,68,0.8)');
   }
   return gradient;
@@ -196,6 +197,51 @@ export default function ChartsSection({
 
   // ─── Bar chart ───────────────────────────────────────────────────────────────
 
+  // Chart.js BarElement.draw() does not call setLineDash, so borderDash is
+  // ignored natively.  This plugin post-draws dashed borders for any bar
+  // dataset that has a non-empty `borderDash` array, after clearing Chart.js's
+  // own (solid) border by setting borderWidth: 0 on those datasets.
+  const barDashedBorderPlugin = useMemo(() => ({
+    id: 'bar-dashed-border',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      chart.data.datasets.forEach((dataset, datasetIndex) => {
+        const dash = dataset.borderDash;
+        if (!Array.isArray(dash) || !dash.length) return;
+        const meta = chart.getDatasetMeta(datasetIndex);
+        if (!meta.visible) return;
+
+        const bw = 1.5;
+        const radius = typeof dataset.borderRadius === 'number' ? dataset.borderRadius : 0;
+
+        meta.data.forEach((bar, index) => {
+          const { x, y, base, width } = bar;
+          const barTop = Math.min(y, base);
+          const barHeight = Math.abs(y - base);
+          if (barHeight < 1) return;
+
+          const bColor = Array.isArray(dataset.borderColor)
+            ? (dataset.borderColor[index] ?? dataset.borderColor[0])
+            : (dataset.borderColor ?? '#666');
+
+          const half = bw / 2;
+          ctx.save();
+          ctx.strokeStyle = bColor;
+          ctx.lineWidth = bw;
+          ctx.setLineDash(dash);
+          ctx.beginPath();
+          if (ctx.roundRect) {
+            ctx.roundRect(x - width / 2 + half, barTop + half, width - bw, barHeight - bw, radius);
+          } else {
+            ctx.rect(x - width / 2 + half, barTop + half, width - bw, barHeight - bw);
+          }
+          ctx.stroke();
+          ctx.restore();
+        });
+      });
+    }
+  }), []);
+
   const barChartDatasets = useMemo(() => ({
     labels: chartData.pnlData.map((d) => d.name),
     datasets: [
@@ -208,7 +254,7 @@ export default function ChartsSection({
         borderColor: chartData.pnlData.map((d) =>
           d.ifSoldTodayPnlBase >= 0 ? '#10b981' : '#ef4444'
         ),
-        borderWidth: 2,
+        borderWidth: 0,   // suppress Chart.js's solid border; plugin draws dashed
         borderDash: [4, 4],
         borderRadius: 4,
         barPercentage: 0.95,
@@ -437,7 +483,7 @@ export default function ChartsSection({
           </h3>
           <div className="h-80">
             {chartData.pnlData.length > 0 ? (
-              <Bar data={barChartDatasets} options={barChartOptions} />
+              <Bar data={barChartDatasets} options={barChartOptions} plugins={[barDashedBorderPlugin]} />
             ) : (
               <div className="flex h-full items-center justify-center text-slate-400 dark:text-slate-500">
                 {t('charts.noPnlData')}
