@@ -24,11 +24,14 @@ import {
   normalizeMarket
 } from '../utils/helpers';
 import { STOCK_MAPPING } from '../utils/constants';
+import SymbolOverridesPanel from './SymbolOverridesPanel';
 
 export default function ManagerPanel({
+  addSymbolOverride,
   apiKey,
   baseCurrency,
   cancelEditingRecord,
+  deleteSymbolOverride,
   editingIndex,
   handleAddRecord,
   handleClearData,
@@ -44,6 +47,7 @@ export default function ManagerPanel({
   rawData,
   setApiKey,
   setHideZeroHolding,
+  symbolOverrides,
   updateNewRecAmount,
   updateNewRecField,
   updateNewRecPrice,
@@ -333,7 +337,13 @@ export default function ManagerPanel({
         </div>
       </div>
 
-      <div className="max-h-[350px] overflow-y-auto border border-slate-100 dark:border-slate-800 rounded-xl">
+      <SymbolOverridesPanel
+        symbolOverrides={symbolOverrides}
+        addSymbolOverride={addSymbolOverride}
+        deleteSymbolOverride={deleteSymbolOverride}
+      />
+
+      <div className="mt-6 max-h-[350px] overflow-y-auto border border-slate-100 dark:border-slate-800 rounded-xl">
         <table className="w-full text-left text-sm whitespace-nowrap">
           <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 sticky top-0 shadow-sm z-10">
             <tr>
@@ -397,22 +407,28 @@ export default function ManagerPanel({
                       {pnlValue === null ? '-' : formatLocalizedCurrency(pnlValue, currency, activeLocale, { signed: true })}
                     </td>
                     <td className="px-4 py-2 text-center">
-                      <div className="flex items-center justify-center gap-2">
-                        <button
-                          onClick={() => handleEditRecord(row.originalIndex)}
-                          className="text-slate-400 hover:text-blue-500 transition-colors p-1"
-                          title={t('common.edit')}
-                        >
-                          <Edit2 size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteRecord(row.originalIndex)}
-                          className="text-slate-400 hover:text-rose-500 transition-colors p-1"
-                          title={t('common.delete')}
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
+                      {row.__syntheticDelist ? (
+                        <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-900/30">
+                          auto
+                        </span>
+                      ) : (
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => handleEditRecord(row.originalIndex)}
+                            className="text-slate-400 hover:text-blue-500 transition-colors p-1"
+                            title={t('common.edit')}
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteRecord(row.originalIndex)}
+                            className="text-slate-400 hover:text-rose-500 transition-colors p-1"
+                            title={t('common.delete')}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 );

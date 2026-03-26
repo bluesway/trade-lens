@@ -34,6 +34,7 @@ export default function App() {
   };
 
   const {
+    addSymbolOverride,
     apiKey,
     availableMarkets,
     baseCurrency,
@@ -41,6 +42,7 @@ export default function App() {
     cancelEditingStock,
     chartData,
     csvImportProfile,
+    deleteSymbolOverride,
     displayData,
     demoLastUpdate,
     editingIndex,
@@ -78,6 +80,7 @@ export default function App() {
     pendingImportSymbolReview,
     rawData,
     resolvedTradeRows,
+    symbolOverrides,
     requestSort,
     savePendingImportSymbolReview,
     skipPendingImportSymbolReview,
@@ -311,9 +314,11 @@ export default function App() {
 
         {showManager && (
           <ManagerPanel
+            addSymbolOverride={addSymbolOverride}
             apiKey={apiKey}
             baseCurrency={baseCurrency}
             cancelEditingRecord={cancelEditingRecord}
+            deleteSymbolOverride={deleteSymbolOverride}
             editingIndex={editingIndex}
             handleAddRecord={handleAddRecord}
             handleClearData={() => handleClearData(handleExportCSV)}
@@ -329,6 +334,7 @@ export default function App() {
             rawData={resolvedTradeRows}
             setApiKey={setApiKey}
             setHideZeroHolding={setHideZeroHolding}
+            symbolOverrides={symbolOverrides}
             updateNewRecAmount={updateNewRecAmount}
             updateNewRecField={updateNewRecField}
             updateNewRecPrice={updateNewRecPrice}

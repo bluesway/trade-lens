@@ -20,6 +20,7 @@ import {
 } from '../utils/helpers';
 import {
   DEFAULT_CSV,
+  DEFAULT_SYMBOL_OVERRIDES,
   DEMO_REFERENCE_UPDATED_AT,
   DEMO_USD_RATES,
   STOCK_MAPPING
@@ -32,7 +33,8 @@ const STORAGE_KEYS = {
   dashboardCache: 'tr_dashboard_cache',
   dashboardData: 'tr_dashboard_data',
   exchangeRates: 'tr_exchange_rates',
-  manualStockData: 'tr_manual_stock_data'
+  manualStockData: 'tr_manual_stock_data',
+  symbolOverrides: 'tr_symbol_overrides'
 };
 
 const DEFAULT_NEW_RECORD = {
@@ -288,11 +290,21 @@ const buildFallbackResolvedTradeRow = (row, originalIndex) => ({
   __hasProvidedPnl: getOptionalNumericValue(row['損益']) !== null
 });
 
-const buildResolvedTradeRows = (rows) => {
+const buildResolvedTradeRows = (rows, overrides = []) => {
   const openLotsBySymbol = new Map();
   const resolvedByOriginalIndex = new Map();
   const chronologicalResolvedRows = [];
   const rowsWithIndex = rows.map((row, originalIndex) => ({ row, originalIndex }));
+
+  const aliasOverrides = overrides.filter((o) => o.type === 'alias' && o.sourceCode && o.aliasCode);
+  const getAliasedCodeAndMarket = (rawCode, market) => {
+    for (const o of aliasOverrides) {
+      if (o.sourceCode === rawCode && (!o.sourceMarket || o.sourceMarket === market)) {
+        return { code: o.aliasCode, market: o.aliasMarket || market };
+      }
+    }
+    return { code: rawCode, market };
+  };
 
   sortTradeRowsChronologically(rowsWithIndex).forEach(({ row, originalIndex }) => {
     const rawCode = String(row['代號'] || '').trim();
@@ -305,10 +317,24 @@ const buildResolvedTradeRows = (rows) => {
       return;
     }
 
-    const market = resolveMarket(rawCode, row['市場']);
-    const symbol = formatSymbol(rawCode, market);
+    const resolvedMarket = resolveMarket(rawCode, row['市場']);
+    const { code: effectiveCode, market } = getAliasedCodeAndMarket(rawCode, resolvedMarket);
+    const symbol = formatSymbol(effectiveCode, market);
     const currency = getCurrencyBySymbolOrMarket(symbol, market);
-    const quantityValue = Math.abs(getNumericValue(row['數量']));
+    const openLots = openLotsBySymbol.get(symbol) || [];
+    let quantityValue = Math.abs(getNumericValue(row['數量']));
+
+    if (row.__syntheticDelist && type === '賣出' && !hasMeaningfulValue(quantityValue)) {
+      const { holdingQty } = calculateOpenPositionMetrics(openLots);
+      quantityValue = Math.abs(holdingQty);
+      if (!hasMeaningfulValue(quantityValue)) {
+        const fallbackRow = buildFallbackResolvedTradeRow(row, originalIndex);
+        resolvedByOriginalIndex.set(originalIndex, fallbackRow);
+        chronologicalResolvedRows.push(fallbackRow);
+        return;
+      }
+    }
+
     const priceFromRow = getNumericValue(row['單價']);
     const amountFromRow = Math.abs(getNumericValue(row['總金額']));
     const unitPrice = hasMeaningfulValue(priceFromRow)
@@ -320,7 +346,6 @@ const buildResolvedTradeRows = (rows) => {
     const rawPnlText = String(row['損益'] ?? '').trim();
     const parsedProvidedPnl = getOptionalNumericValue(rawPnlText);
     const hasProvidedPnl = parsedProvidedPnl !== null;
-    const openLots = openLotsBySymbol.get(symbol) || [];
 
     let remainingQuantity = quantityValue;
     let computedPnlOriginal = 0;
@@ -741,6 +766,7 @@ export function useTradeData(showToast) {
     price: ''
   });
   const [newRec, setNewRec] = useState(DEFAULT_NEW_RECORD);
+  const [symbolOverrides, setSymbolOverrides] = useState([]);
   const [isLoadingPrices, setIsLoadingPrices] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(null);
   const activeLocale = normalizeLocale(i18n.resolvedLanguage || i18n.language);
@@ -763,6 +789,26 @@ export function useTradeData(showToast) {
   const persistManualData = (updatedManualStockData) => {
     setManualStockData(updatedManualStockData);
     persistJson(STORAGE_KEYS.manualStockData, updatedManualStockData);
+  };
+
+  const persistSymbolOverrides = (updated) => {
+    setSymbolOverrides(updated);
+    persistJson(STORAGE_KEYS.symbolOverrides, updated);
+  };
+
+  const addSymbolOverride = (entry) => {
+    const now = new Date().toISOString();
+    const newEntry = {
+      ...entry,
+      id: crypto.randomUUID(),
+      createdAt: now,
+      updatedAt: now,
+    };
+    persistSymbolOverrides([...symbolOverrides, newEntry]);
+  };
+
+  const deleteSymbolOverride = (id) => {
+    persistSymbolOverrides(symbolOverrides.filter((o) => o.id !== id));
   };
   const persistMarketData = (updatedLiveData, updatedExchangeRates) => {
     setLiveData(updatedLiveData);
@@ -802,6 +848,14 @@ export function useTradeData(showToast) {
         const savedManual = await asyncStorage.get(STORAGE_KEYS.manualStockData);
         if (savedManual) {
           setManualStockData(JSON.parse(savedManual));
+        }
+
+        const savedOverrides = await asyncStorage.get(STORAGE_KEYS.symbolOverrides);
+        if (savedOverrides) {
+          const parsedOverrides = JSON.parse(savedOverrides);
+          if (Array.isArray(parsedOverrides)) {
+            setSymbolOverrides(parsedOverrides);
+          }
         }
 
         const savedRates = await asyncStorage.get(STORAGE_KEYS.exchangeRates);
@@ -914,10 +968,25 @@ export function useTradeData(showToast) {
   const {
     resolvedTradeRows,
     resolvedTradeRowsChronological
-  } = useMemo(
-    () => buildResolvedTradeRows(rawData),
-    [rawData]
-  );
+  } = useMemo(() => {
+    const effectiveOverrides = [...DEFAULT_SYMBOL_OVERRIDES, ...symbolOverrides];
+    const syntheticDelistRows = effectiveOverrides
+      .filter((o) => o.type === 'delist' && o.sourceCode && o.delistDate && o.delistPrice > 0)
+      .map((o) => ({
+        日期: o.delistDate,
+        類型: '賣出',
+        代號: o.sourceCode,
+        市場: o.sourceMarket || '',
+        數量: '',
+        單價: String(o.delistPrice),
+        總金額: '',
+        損益: '',
+        說明: o.note || '',
+        __syntheticDelist: true,
+        __overrideId: o.id,
+      }));
+    return buildResolvedTradeRows([...rawData, ...syntheticDelistRows], effectiveOverrides);
+  }, [rawData, symbolOverrides]);
 
   const refreshPlan = useMemo(
     () => buildRefreshPlan({
@@ -2312,6 +2381,9 @@ export function useTradeData(showToast) {
     updateNewRecField,
     updateNewRecPrice,
     updateNewRecQuantity,
-    setTrendTimeRange
+    setTrendTimeRange,
+    symbolOverrides,
+    addSymbolOverride,
+    deleteSymbolOverride
   };
 }

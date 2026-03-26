@@ -121,3 +121,47 @@ export const DEFAULT_CSV = `日期,類型,代號,市場,數量,單價,總金額,
 export const DB_NAME = 'TrDashboardDB';
 export const STORE_NAME = 'store';
 export const DB_VERSION = 1;
+
+// Built-in symbol override rules. These are always applied and cannot be deleted by users.
+// User-defined overrides (stored in IndexedDB) are merged on top of these.
+export const DEFAULT_SYMBOL_OVERRIDES = [
+  {
+    id: 'builtin-x-delist-2025',
+    type: 'delist',
+    sourceCode: 'X',
+    sourceMarket: '美股',
+    aliasCode: '',
+    aliasMarket: '',
+    delistDate: '2025-06-18',
+    delistPrice: 55,
+    note: 'US Steel acquired by Nippon Steel, $55/share cash',
+    createdAt: '2025-06-18T00:00:00Z',
+    updatedAt: '2025-06-18T00:00:00Z',
+  },
+  {
+    id: 'builtin-k-delist-2025',
+    type: 'delist',
+    sourceCode: 'K',
+    sourceMarket: '美股',
+    aliasCode: '',
+    aliasMarket: '',
+    delistDate: '2025-12-11',
+    delistPrice: 83.5,
+    note: 'Kellanova acquired by Mars, $83.5/share cash',
+    createdAt: '2025-12-11T00:00:00Z',
+    updatedAt: '2025-12-11T00:00:00Z',
+  },
+  {
+    id: 'builtin-fi-alias-2025',
+    type: 'alias',
+    sourceCode: 'FI',
+    sourceMarket: '美股',
+    aliasCode: 'FISV',
+    aliasMarket: '美股',
+    delistDate: '',
+    delistPrice: 0,
+    note: 'Fiserv ticker changed FI→FISV on 2025-11-11 (NYSE→NASDAQ)',
+    createdAt: '2025-11-11T00:00:00Z',
+    updatedAt: '2025-11-11T00:00:00Z',
+  },
+];
