@@ -293,7 +293,7 @@ export default function ChartsSection({
               text: t('charts.legendConverted', { label: ds.label }),
               fillStyle: Array.isArray(ds.backgroundColor) ? ds.backgroundColor[0] : ds.backgroundColor,
               strokeStyle: Array.isArray(ds.borderColor) ? ds.borderColor[0] : ds.borderColor,
-              lineWidth: ds.borderWidth ?? 1,
+              lineWidth: ds.borderDash?.length ? 1.5 : (ds.borderWidth ?? 1),
               lineDash: ds.borderDash ?? [],
               hidden: !chart.isDatasetVisible(i),
               index: i,
