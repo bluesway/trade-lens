@@ -1976,7 +1976,7 @@ export function useTradeData(showToast) {
           symbol,
           rawCode,
           market,
-          name: STOCK_MAPPING[symbol]?.name || t('data.unknownSymbol', { symbol }),
+          name: STOCK_MAPPING[symbol]?.name || symbol,
           currentPrice: STOCK_MAPPING[symbol]?.price || 0,
           currency: row.__currency || getCurrencyBySymbolOrMarket(symbol, market),
           holdingQty: 0,
@@ -2082,8 +2082,7 @@ export function useTradeData(showToast) {
     isDemo,
     liveData,
     manualStockData,
-    resolvedTradeRowsChronological,
-    t
+    resolvedTradeRowsChronological
   ]);
 
   const chartData = useMemo(() => {
@@ -2199,11 +2198,11 @@ export function useTradeData(showToast) {
     }
   ), [processedData]);
 
-  const trendData = useMemo(() => {
+  const trendDataBase = useMemo(() => {
     if (!isAppLoaded || resolvedTradeRowsChronological.length === 0) return [];
 
     const stockStates = {};
-    const dailySnapshots = [];
+    const aggregatedByDate = [];
     let runningHoldingCostBase = 0;
     let runningRealizedPnlBase = 0;
 
@@ -2220,9 +2219,7 @@ export function useTradeData(showToast) {
       const exchangeRate = getExchangeRateValue(currency, baseCurrency, effectiveExchangeRates, isDemo);
 
       if (!stockStates[symbol]) {
-        stockStates[symbol] = {
-          holdingCostOriginal: 0
-        };
+        stockStates[symbol] = { holdingCostOriginal: 0 };
       }
 
       const previousHoldingCostOriginal = stockStates[symbol].holdingCostOriginal;
@@ -2232,44 +2229,31 @@ export function useTradeData(showToast) {
       runningRealizedPnlBase += row.__resolvedPnlOriginal * exchangeRate;
       stockStates[symbol].holdingCostOriginal = nextHoldingCostOriginal;
 
-      dailySnapshots.push({
-        date,
-        timestamp: dateObject.getTime(),
-        costBase: runningHoldingCostBase,
-        realizedPnlBase: runningRealizedPnlBase
-      });
-    });
-
-    const aggregatedByDate = [];
-    dailySnapshots.forEach((snapshot) => {
-      const lastSnapshot = aggregatedByDate[aggregatedByDate.length - 1];
-      if (lastSnapshot && lastSnapshot.date === snapshot.date) {
-        lastSnapshot.costBase = snapshot.costBase;
-        lastSnapshot.realizedPnlBase = snapshot.realizedPnlBase;
+      const lastEntry = aggregatedByDate[aggregatedByDate.length - 1];
+      if (lastEntry && lastEntry.date === date) {
+        lastEntry.costBase = runningHoldingCostBase;
+        lastEntry.realizedPnlBase = runningRealizedPnlBase;
       } else {
-        aggregatedByDate.push(snapshot);
+        aggregatedByDate.push({
+          date,
+          timestamp: dateObject.getTime(),
+          costBase: runningHoldingCostBase,
+          realizedPnlBase: runningRealizedPnlBase
+        });
       }
     });
 
     const now = Date.now();
-    let filtered = aggregatedByDate;
     if (trendTimeRange === 'YTD') {
       const yearToDate = new Date(new Date().getFullYear(), 0, 1).getTime();
-      filtered = aggregatedByDate.filter((item) => item.timestamp >= yearToDate);
-    } else if (TREND_RANGE_MS_MAP[trendTimeRange]) {
-      const cutoff = now - TREND_RANGE_MS_MAP[trendTimeRange];
-      filtered = aggregatedByDate.filter((item) => item.timestamp >= cutoff);
+      return aggregatedByDate.filter((item) => item.timestamp >= yearToDate);
     }
-
-    return filtered.map((item) => ({
-      ...item,
-      displayDate: formatLocalizedDate(item.date, activeLocale, {
-        month: 'short',
-        day: 'numeric'
-      })
-    }));
+    if (TREND_RANGE_MS_MAP[trendTimeRange]) {
+      const cutoff = now - TREND_RANGE_MS_MAP[trendTimeRange];
+      return aggregatedByDate.filter((item) => item.timestamp >= cutoff);
+    }
+    return aggregatedByDate;
   }, [
-    activeLocale,
     baseCurrency,
     effectiveExchangeRates,
     isAppLoaded,
@@ -2277,6 +2261,11 @@ export function useTradeData(showToast) {
     resolvedTradeRowsChronological,
     trendTimeRange
   ]);
+
+  const trendData = useMemo(() => trendDataBase.map((item) => ({
+    ...item,
+    displayDate: formatLocalizedDate(item.date, activeLocale, { month: 'short', day: 'numeric' })
+  })), [trendDataBase, activeLocale]);
 
   const availableMarkets = useMemo(
     () => Array.from(new Set(processedData.map((stock) => stock.market))).filter(Boolean),

@@ -28,9 +28,11 @@ export default function App() {
   const activeLocale = normalizeLocale(i18n.resolvedLanguage || i18n.language);
   const isRtl = isRtlLocale(activeLocale);
 
+  const toastTimerRef = useRef(null);
   const showToast = (message) => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToastMsg(message);
-    setTimeout(() => setToastMsg(''), 6000);
+    toastTimerRef.current = setTimeout(() => setToastMsg(''), 6000);
   };
 
   const {
